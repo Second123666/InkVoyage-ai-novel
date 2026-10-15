@@ -232,7 +232,7 @@ export default function ModelRoutesPage() {
     return {
       enabled: structuredFallback?.enabled ?? false,
       provider: structuredFallback?.provider ?? "deepseek",
-      model: structuredFallback?.model ?? "deepseek-chat",
+      model: structuredFallback?.model ?? "deepseek-flash",
       temperature: structuredFallback != null ? String(structuredFallback.temperature) : "0.2",
       maxTokens: structuredFallback?.maxTokens != null ? String(structuredFallback.maxTokens) : "",
       retryCount: structuredFallback != null ? String(structuredFallback.retryCount) : "1",

@@ -36,7 +36,7 @@ test("supported providers include kimi, minimax, glm, qwen, gemini and ollama", 
 });
 
 test("new provider defaults are present in their model fallback lists", () => {
-  for (const provider of ["kimi", "minimax", "glm", "qwen", "gemini", "ollama"]) {
+  for (const provider of ["deepseek", "kimi", "minimax", "glm", "qwen", "gemini", "ollama"]) {
     assert.ok(
       PROVIDERS[provider].models.includes(PROVIDERS[provider].defaultModel),
       `${provider} default model should exist in fallback models`,
@@ -169,6 +169,16 @@ test("structured output profiles distinguish official, ModelScope Qwen and unkno
   });
   assert.equal(deepseekFlashProfile.requiresNonThinkingForStructured, true);
   assert.equal(deepseekFlashProfile.supportsReasoningToggle, true);
+
+  const deepseekV41FlashProfile = resolveStructuredOutputProfile({
+    provider: "deepseek",
+    model: "deepseek-flash",
+    baseURL: "https://api.deepseek.com/v1",
+    executionMode: "structured",
+  });
+  assert.equal(deepseekV41FlashProfile.family, "deepseek");
+  assert.equal(deepseekV41FlashProfile.requiresNonThinkingForStructured, true);
+  assert.equal(deepseekV41FlashProfile.supportsReasoningToggle, true);
 
   const kimiProfile = resolveStructuredOutputProfile({
     provider: "kimi",
@@ -361,6 +371,17 @@ test("resolveLLMClientOptions applies structured reasoning and token guardrails"
     assert.equal(deepseekFlash.modelKwargs?.reasoning_effort, undefined);
     assert.equal(deepseekFlash.reasoningEffort, null);
     assert.equal(deepseekFlash.modelKwargs?.enable_thinking, undefined);
+
+    const deepseekV41Flash = await resolveLLMClientOptions("deepseek", {
+      model: "deepseek-flash",
+      executionMode: "structured",
+      structuredStrategy: "json_object",
+      maxTokens: 5000,
+    });
+    assert.equal(deepseekV41Flash.structuredProfile?.family, "deepseek");
+    assert.equal(deepseekV41Flash.reasoningEnabled, false);
+    assert.equal(deepseekV41Flash.reasoningForcedOff, true);
+    assert.deepEqual(deepseekV41Flash.modelKwargs?.thinking, { type: "disabled" });
 
     const deepseekMax = await resolveLLMClientOptions("deepseek", {
       model: "deepseek-v4-pro",

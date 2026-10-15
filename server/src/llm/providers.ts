@@ -21,12 +21,14 @@ export const PROVIDERS: Record<BuiltinLLMProvider, ProviderConfig> = {
   deepseek: {
     name: "DeepSeek",
     baseURL: "https://api.deepseek.com/v1",
-    defaultModel: "deepseek-v4-flash",
-    models: ["deepseek-v4-flash", "deepseek-v4-pro"],
+    // DeepSeek-V4.1-Flash 的 API model ID 为 deepseek-flash（官方 /models 返回）。
+    defaultModel: "deepseek-flash",
+    models: ["deepseek-flash", "deepseek-v4-pro"],
     envKey: "DEEPSEEK_API_KEY",
     envBaseURLKey: "DEEPSEEK_BASE_URL",
     envModelKey: "DEEPSEEK_MODEL",
-    maxTokens: 8192,
+    // V4.1 Flash / V4 Pro 的官方最大输出均为 393216。
+    maxTokens: 393216,
   },
   siliconflow: {
     name: "SiliconFlow",

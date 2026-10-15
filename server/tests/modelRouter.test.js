@@ -11,7 +11,7 @@ test("resolveModel clamps DeepSeek route maxTokens to the provider limit", async
     provider: "deepseek",
     model: "deepseek-chat",
     temperature: 0.3,
-    maxTokens: 32768,
+    maxTokens: 500000,
     requestProtocol: "auto",
     structuredResponseFormat: "auto",
   });
@@ -21,7 +21,7 @@ test("resolveModel clamps DeepSeek route maxTokens to the provider limit", async
     assert.equal(resolved.provider, "deepseek");
     assert.equal(resolved.model, "deepseek-chat");
     assert.equal(resolved.temperature, 0.3);
-    assert.equal(resolved.maxTokens, 8192);
+    assert.equal(resolved.maxTokens, 393216);
   } finally {
     prisma.modelRouteConfig.findUnique = originalFindUnique;
   }
@@ -36,11 +36,11 @@ test("resolveModel clamps explicit DeepSeek overrides as well", async () => {
     const resolved = await resolveModel("planner", {
       provider: "deepseek",
       model: "deepseek-chat",
-      maxTokens: 12000,
+      maxTokens: 500000,
     });
     assert.equal(resolved.provider, "deepseek");
     assert.equal(resolved.model, "deepseek-chat");
-    assert.equal(resolved.maxTokens, 8192);
+    assert.equal(resolved.maxTokens, 393216);
   } finally {
     prisma.modelRouteConfig.findUnique = originalFindUnique;
   }

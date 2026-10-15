@@ -11,7 +11,7 @@ const STRUCTURED_FALLBACK_RETRY_COUNT_KEY = "structuredFallback.retryCount";
 const DEFAULT_STRUCTURED_FALLBACK_SETTINGS: StructuredFallbackSettings = {
   enabled: false,
   provider: "deepseek",
-  model: "deepseek-chat",
+  model: "deepseek-flash",
   temperature: 0.2,
   maxTokens: null,
   retryCount: 1,
