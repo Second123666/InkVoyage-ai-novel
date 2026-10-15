@@ -166,7 +166,7 @@ Prompt 合同、结构化后处理和 UI / 导出字段标签必须共享同一�
 
 ## 长期演进方向
 
-拆书模块正在从“全自动产出工具”演进为“用户协同的研究工作台”，覆盖学习、续写、素材库三类使用场景。完整演进方向、PR 路线、角色模块独立扩展方案见 [拆书模块扩展长期方案](../../plans/book-analysis-expansion-plan.md)。
+拆书模块正在从“全自动产出工具”演进为“用户协同的研究工作台”，覆盖学习、续写、素材库三类使用场景。
 
 当前已落地的关键扩展是独立深度角色档案、角色配图、升格到正式角色库和诊断模式。后续对话式精读、增量追读或多书对比仍应保持阶段边界：不要把正式小说角色、图片资产、诊断入口或后续研究能力的职责反向塞进基础拆书生成链路。
 
@@ -175,4 +175,3 @@ Prompt 合同、结构化后处理和 UI / 导出字段标签必须共享同一�
 - [Prompt Registry 与结构化输出](../prompts/prompt-registry-and-structured-output.md)
 - [知识库与上下文组装](../rag/knowledge-and-context-assembly.md)
 - [新手优先与整本小说完成原则](../product/beginner-first-novel-completion.md)
-- [拆书模块扩展长期方案](../../plans/book-analysis-expansion-plan.md)

@@ -71,7 +71,5 @@ Book Contract 的 `chapter3Payoff / chapter10Payoff / chapter30Payoff` 是 Payof
 
 ## Source Documents
 
-- `docs/plans/payoff-ledger-foundation-phase-two.md`
-- `docs/plans/payoff-ledger-safety-phase-three.md`
 - `docs/wiki/workflows/reader-experience-contract.md`
 - `docs/wiki/workflows/novel-fact-ledger.md`

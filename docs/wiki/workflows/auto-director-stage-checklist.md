@@ -74,7 +74,3 @@
 - `server/src/services/novel/director/projections/novelDirectorProgress.ts`
 - `client/src/components/layout/NovelWorkspaceRail.tsx`
 - `server/src/prompting/materials/materialGroups.ts`
-
-## Source Documents
-
-- `docs/plans/director-stage-hardening-plan.md`

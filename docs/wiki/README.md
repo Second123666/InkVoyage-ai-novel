@@ -71,7 +71,6 @@ Wiki 不应写：
 
 - `docs/wiki/`：稳定知识和原因。
 - `docs/plans/`：仍有执行价值的方案和任务拆解。
-- `docs/checkpoints/`：阶段性进度、迁移里程碑和审计记录。
 - `docs/design/`：系统设计、领域模型和产品机制。
 - `docs/releases/`：用户可见更新历史。
 - `README.md`：对外入口和最新公开摘要。

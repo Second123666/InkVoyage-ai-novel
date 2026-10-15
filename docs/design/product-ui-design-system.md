@@ -343,4 +343,3 @@ AI 自动执行必须可视化为用户能理解的流程。
 - `site/DESIGN.md`：公开文档站和 GitHub Pages 介绍站规范。
 - `docs/design/product-ui-design-system.md`：客户端产品 UI 和组件构建规范。
 - `docs/wiki/product/beginner-first-novel-completion.md`：产品目标和新手完成整本小说的长期原则。
-- `docs/plans/assistant-ui-plan.md`：创作中枢和 assistant-ui 迁移计划。

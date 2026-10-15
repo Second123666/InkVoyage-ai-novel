@@ -6,7 +6,6 @@
 
 - [自动导演 Runtime 与恢复边界](../wiki/workflows/auto-director-runtime.md)
 - [导演模式模块化与状态治理改造清单](./director-mode-module-state-refactor-checklist.md)
-- [提示词工作台、上下文装配与统一步骤运行时方案](./prompt-workbench-context-and-step-runtime-plan.md)
 
 ## 1. 背景与事故结论
 

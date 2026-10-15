@@ -85,6 +85,5 @@ Creative Hub 前端按“创作线程 + 当前小说 + 执行活动”组织，�
 
 ## 来源文档
 
-- [提示词工作台、上下文装配与统一步骤运行时方案](../../plans/prompt-workbench-context-and-step-runtime-plan.md)
 - [自动导演执行面隔离与 API 保活计划](../../plans/auto-director-execution-plane-isolation-plan.md)
 - [README 项目定位](../../../README.md)

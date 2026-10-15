@@ -90,6 +90,4 @@
 
 ## 来源文档
 
-- [知识库与向量化管理模块改造历史方案](../../archive/outdated/knowledge-module-plan-implemented-reference.md)
-- [提示词工作台、上下文装配与统一步骤运行时方案](../../plans/prompt-workbench-context-and-step-runtime-plan.md)
 - [README 当前能力说明](../../../README.md)

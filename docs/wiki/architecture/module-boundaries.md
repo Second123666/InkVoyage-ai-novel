@@ -15,7 +15,7 @@ Wiki 记录稳定规则，计划和检查点保留历史语境。模块治理以
 ## 当前规则
 
 - 根目录只保留入口说明、协作规则、路线图和工具链配置；长期知识进入 `docs/wiki/`。
-- `docs/plans/` 保留执行方案，`docs/checkpoints/` 保留阶段记录，`docs/design/` 保留模块设计，`docs/releases/` 保留用户可见变化。
+- `docs/plans/` 保留执行方案，`docs/design/` 保留模块设计，`docs/releases/` 保留用户可见变化。
 - 单个源码文件接近 1200 行时应评估职责；1000 到 1300 行之间可在职责仍清晰时保持内聚，超过 1300 行后继续扩展前必须拆分。
 - 高密度目录新增能力前应先判断是否需要下级责任目录。
 - 高优先级硬约束：控制入口可以不同，但正文生成与正文修复的业务执行链必须唯一；批量执行、自动导演、手动单章生成、手动单章修复不得各自维护独立实现。
@@ -51,7 +51,7 @@ Wiki 记录稳定规则，计划和检查点保留历史语境。模块治理以
 - 章节生产链路新增质量检查时，先判断它属于热路径接收闸门、局部修复还是异步资产回灌。
 - 章节生产新增时间线规则时，应先进入 timeline 模块的 policy、context、checker 或 extractor，而不是散落到 writer prompt 或章节服务分支里。
 - 章节生产新增正文写入或正文修复入口时，应先接入 `ChapterRuntimeCoordinator`，再复用 `ChapterTimelineFinalizationService`；不能先写正文再由调用方自行决定是否补 timeline。
-- 新文档如果解释长期规则，进入 `docs/wiki/`；如果只是某阶段实施清单，进入 `docs/plans/` 或 `docs/checkpoints/`。
+- 新文档如果解释长期规则，进入 `docs/wiki/`；如果只是某阶段实施清单，进入 `docs/plans/`。
 
 禁止或不推荐做法：
 

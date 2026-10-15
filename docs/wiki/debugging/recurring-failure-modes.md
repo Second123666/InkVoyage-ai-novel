@@ -54,6 +54,4 @@
 
 - [自动导演执行面隔离与 API 保活计划](../../plans/auto-director-execution-plane-isolation-plan.md)
 - [导演模式模块化与状态治理改造清单](../../plans/director-mode-module-state-refactor-checklist.md)
-- [正文产出链路瘦身与资产回灌优化计划](../../plans/chapter-output-pipeline-optimization-plan.md)
-- [Prompt Governance Audit 2026-05-08](../../checkpoints/prompt-governance-audit-2026-05-08.md)
 - [README 最新更新](../../../README.md)

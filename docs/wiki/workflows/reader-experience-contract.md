@@ -74,6 +74,5 @@
 
 ## Source Documents
 
-- `docs/plans/reader-experience-contract-phase-one.md`
 - `docs/wiki/workflows/chapter-production-chain.md`
 - `docs/wiki/workflows/novel-fact-ledger.md`

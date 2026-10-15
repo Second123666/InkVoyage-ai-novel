@@ -226,8 +226,6 @@
 
 ## 来源文档
 
-- [正文产出链路瘦身与资产回灌优化计划](../../plans/chapter-output-pipeline-optimization-plan.md)
-- [仿写能力与生成链路加固方案](../../plans/imitation-writing-and-chain-hardening-plan.md)
 - [README 最新更新](../../../README.md)
 - [版本更新说明](../../releases/release-notes.md)
 

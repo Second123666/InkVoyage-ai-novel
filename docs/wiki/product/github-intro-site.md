@@ -40,8 +40,6 @@
 公开文档入口不应默认展示：
 
 - `docs/wiki/` 内部产品原则、工作流边界、架构规则、Prompt / RAG 维护规则。
-- `docs/archive/` 历史归档。
-- `docs/checkpoints/` 阶段检查点。
 - `docs/plans/` 执行计划。
 - `TASK.md`、临时任务清单和未整理检查项。
 

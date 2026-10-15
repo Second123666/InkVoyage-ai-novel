@@ -144,9 +144,6 @@
 
 - [Prompting Registry](../../../server/src/prompting/README.md)
 - [平台写法配置与正文 Prompt 可编辑合同](./platform-writing-profiles.md)
-- [Prompt Governance Audit 2026-05-08](../../checkpoints/prompt-governance-audit-2026-05-08.md)
-- [提示词工作台、上下文装配与统一步骤运行时方案](../../plans/prompt-workbench-context-and-step-runtime-plan.md)
-- [LLM Schema Refactor Checkpoint](../../checkpoints/llm-schema-refactor-checkpoint.md)
 
 ## 紧凑篇幅与结局 Prompt
 

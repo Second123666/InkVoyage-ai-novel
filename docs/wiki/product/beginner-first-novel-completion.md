@@ -200,8 +200,6 @@ AI 实况属于全局运行观察能力，统一由应用顶部入口承载。�
 
 - [README 项目定位](../../../README.md)
 - [自动导演执行面隔离与 API 保活计划](../../plans/auto-director-execution-plane-isolation-plan.md)
-- [提示词工作台、上下文装配与统一步骤运行时方案](../../plans/prompt-workbench-context-and-step-runtime-plan.md)
-- [紧张度曲线展示 / 编辑分离方案](../../plans/tension-curve-display-edit-split-plan.md)
 
 ## 短篇幅也要完整收尾
 
