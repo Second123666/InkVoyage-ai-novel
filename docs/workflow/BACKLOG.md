@@ -9,12 +9,13 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 
 ## 轮次入口建议(2026-10-15)
 
-1. **LOOP-1 项目体检基线**(BUG-0):全量跑测试 + 主链冒烟 + 收集 bug/技术债,产出 BUG 区具体清单。
-2. **LOOP-2 衍生工坊实验化**(FEAT-1/2):漫画/短剧降级,收束创作入口复杂度。
-3. **LOOP-3 统一任务投影契约**(INN-B2):修"后端状态 / 运行记录 / 前端展示三者不一致"这个自用最疼的点。
-4. **LOOP-4 伏笔账本 MVP**(INN-A1):创新第一弹,写作质量方向。
-5. **UI 线并行入口**(UI-1 第一批):纯前端、验收明确、风险低,适合穿插在创作线轮次之间,不与主链轮次抢验证资源。
-6. 之后按 P 标记 + 体检结果 + 所有者兴趣排。
+1. ~~**LOOP-1 项目体检基线**(BUG-0)~~ ✅ 已完成(2026-10-16):基线 = server 33 失败 / client 5 失败 / typecheck 绿 / 冒烟 7 页 0 报错。
+2. **LOOP-2 套件绿化**(BUG-1/2):分诊并修掉 38 个失败测试 —— 基线不绿会让之后每轮验证失真,优先级最高。
+3. **LOOP-3 衍生工坊实验化**(FEAT-1/2):漫画/短剧降级,收束创作入口复杂度。
+4. **LOOP-4 统一任务投影契约**(INN-B2):修"后端状态 / 运行记录 / 前端展示三者不一致"这个自用最疼的点。
+5. **LOOP-5 伏笔账本 MVP**(INN-A1):创新第一弹,写作质量方向。
+6. **UI 线并行入口**(UI-1 第一批):纯前端、验收明确、风险低,适合穿插在创作线轮次之间,不与主链轮次抢验证资源。
+7. 之后按 P 标记 + 体检结果 + 所有者兴趣排。
 
 ---
 
@@ -114,9 +115,25 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 
 ## 4. 缺陷与稳定性(BUG)
 
-- [ ] **BUG-0 项目体检与缺陷清单**(= LOOP-1 产出) · S · P0
-  全量测试 + 主链冒烟 + 已知问题收集,产出具体缺陷条目 BUG-1..N(各带复现步骤/影响面/建议修法)。
-- [ ] BUG-1..N:待 LOOP-1 产出。
+- [x] **BUG-0 项目体检与缺陷清单**(= LOOP-1) · S · P0
+  已产出:测试基线见 BUG-1/BUG-2/BUG-3;冒烟结论与全部证据见 PROGRESS LOOP-1 条目(2026-10-16)。
+
+- [ ] **BUG-1 server fast 套件 33 个失败** · M–L · P0
+  基线(Node v24.14.0):1383 测试 / 1338 过 / **33 失败** / 12 跳过,失败散布 20 个测试文件(全名单见 PROGRESS LOOP-1)。
+  初判至少三类:①契约漂移(如 `worldContextGateway` 多传 `openingOnly: undefined`、资源提取 schema 超上限、审批审计条数);②状态断言陈旧(如 `'failed' !== 'done'`);③可能的 Node v24 `deepStrictEqual` 对 undefined 自有键的严格化差异。
+  做法:逐条分诊 —— 真 bug 修代码 / 测试陈旧改测试 / 环境差异记档;先修高频文件(bookAnalysisCharacterCandidate ×4、pipelineExecutionLease ×2 等)。
+  验收:fast 套件全绿,或有明确豁免清单并写入基线。
+
+- [ ] **BUG-2 client 套件 5 个失败** · S · P1
+  基线:92 测试 / 87 过 / **5 失败**。两类:
+  ① 移动端合同簇 ×4(`every routed page has a route-specific mobile CSS landing point`、`mobile more menu contains all non-primary registered pages`、`mobile route metadata covers every registered page`、`mobile task filters stay in a compact three-column control grid`);
+  ② 设置路由契约 ×1(测试期望 `/settings/model-routes` 重定向到 `/settings/models`,代码已是独立 `ModelRoutesSettingsPage`)。
+  初判:多为测试陈旧(路由已演进);需确认移动端 metadata 是测试没更新还是新页面漏注册。
+  验收:client test 全绿。
+
+- [ ] **BUG-3 pnpm 配置迁移卫生** · S · P3
+  根 `package.json` 的 `pnpm.onlyBuiltDependencies` 已不被 pnpm 读取(每次运行报 WARN),应迁到 `pnpm-workspace.yaml` 或 `.npmrc` 等新位置。
+  验收:启动/测试输出无该 WARN。
 
 ## 5. 前端 UI 改进(UI)
 
