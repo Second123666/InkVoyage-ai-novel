@@ -34,7 +34,9 @@ export class BookAnalysisBudgetGuard {
 
   async onSectionFinished(usage: LlmTokenUsageSnapshot | null | undefined): Promise<void> {
     const tokenCount = readUsageTokens(usage);
-    // Prisma increment on NULL yields NULL — read first and compute manually as fallback.
+    // Prisma increment on a NULL column yields NULL — bootstrap the column with an
+    // absolute write once, then always use atomic increments so concurrent section
+    // generation cannot lose token counts through read-modify-write races.
     const current = await prisma.bookAnalysis.findUnique({
       where: { id: this.analysisId },
       select: { budgetTokens: true, usedTokens: true },
@@ -42,7 +44,9 @@ export class BookAnalysisBudgetGuard {
     const updated = tokenCount > 0
       ? await prisma.bookAnalysis.update({
           where: { id: this.analysisId },
-          data: { usedTokens: (current?.usedTokens ?? 0) + tokenCount },
+          data: current?.usedTokens === null || current?.usedTokens === undefined
+            ? { usedTokens: tokenCount }
+            : { usedTokens: { increment: tokenCount } },
           select: { budgetTokens: true, usedTokens: true },
         })
       : current;
