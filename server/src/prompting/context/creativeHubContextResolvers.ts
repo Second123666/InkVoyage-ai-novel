@@ -1,8 +1,17 @@
-import { novelProductionStatusService } from "../../services/novel/NovelProductionStatusService";
-import { novelSetupStatusService } from "../../services/novel/NovelSetupStatusService";
 import type { PromptContextBlock } from "../core/promptTypes";
 import { estimateContextTokens } from "./ContextBroker";
 import type { PromptContextResolver, PromptExecutionContext } from "./types";
+
+// 服务层单例必须在调用时才加载：提示词上下文解析器位于 prompting 装载链早期，
+// 顶层 import services 会形成 prompting → services → prompting 的循环依赖，
+// 在冷启动/隔离加载时表现为 “xxx is not a constructor”。
+function getNovelProductionStatusService() {
+  return require("../../services/novel/NovelProductionStatusService").novelProductionStatusService;
+}
+
+function getNovelSetupStatusService() {
+  return require("../../services/novel/NovelSetupStatusService").novelSetupStatusService;
+}
 
 function safeJsonStringify(value: unknown): string {
   try {
@@ -103,7 +112,7 @@ const creativeHubNovelSetupStatusResolver: PromptContextResolver = {
     if (!novelId) {
       return null;
     }
-    const setup = await novelSetupStatusService.getNovelSetupStatus(novelId);
+    const setup = await getNovelSetupStatusService().getNovelSetupStatus(novelId);
     if (!setup) {
       return null;
     }
@@ -126,7 +135,7 @@ const creativeHubProductionStatusResolver: PromptContextResolver = {
     if (!novelId) {
       return null;
     }
-    const status = await novelProductionStatusService.getNovelProductionStatus({ novelId });
+    const status = await getNovelProductionStatusService().getNovelProductionStatus({ novelId });
     return createContextBlock({
       id: `creative_hub.production_status:${novelId}`,
       group: "creative_hub.production_status",

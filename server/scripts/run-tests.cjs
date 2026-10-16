@@ -53,13 +53,9 @@ if (files.length === 0) {
   process.exit(1);
 }
 
-if (mode === "fast") {
-  for (const file of files) {
-    require(file);
-  }
-  return;
-}
-
+// fast 与 integration 都必须进程隔离：部分测试会向 require.cache 注入
+// 假 prisma / promptRunner 模块且不还原，单进程 require 全部文件会造成
+// 跨文件污染（曾导致 pipelineExecutionLease、dramaPipelineContract 假失败）。
 const result = spawnSync(process.execPath, ["--test", ...files], {
   cwd: serverRoot,
   stdio: "inherit",
