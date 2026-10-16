@@ -5,13 +5,14 @@ import { readFile } from "node:fs/promises";
 const root = new URL("..", import.meta.url);
 const read = (path) => readFile(new URL(path, root), "utf8");
 
-test("设置路由提供四个独立页面并兼容旧模型路由链接", async () => {
+test("设置路由提供独立页面并兼容旧模型路由链接", async () => {
   const source = await read("src/router/index.tsx");
   assert.match(source, /path: "settings\/models", element: <ModelsSettingsPage \/>/);
   assert.match(source, /path: "settings\/director", element: <DirectorSettingsPage \/>/);
   assert.match(source, /path: "settings\/knowledge", element: <KnowledgeSettingsPage \/>/);
   assert.match(source, /path: "settings\/maintenance", element: <MaintenanceSettingsPage \/>/);
-  assert.match(source, /path: "settings\/model-routes", element: <Navigate to="\/settings\/models" replace \/>/);
+  // 旧模型路由链接现在落到独立的模型路由管理页，而不是重定向；链接兼容性保持。
+  assert.match(source, /path: "settings\/model-routes", element: <ModelRoutesSettingsPage \/>/);
 });
 
 test("系统导航只保留设置入口，设置页提供稳定二级导航", async () => {

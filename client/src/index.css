@@ -549,6 +549,7 @@ body {
   .mobile-route-creative-hub,
   .mobile-route-chat-legacy,
   .mobile-route-book-analysis,
+  .mobile-route-market-radar,
   .mobile-route-tasks,
   .mobile-route-auto-director-follow-ups,
   .mobile-route-knowledge,
@@ -557,6 +558,10 @@ body {
   .mobile-route-titles,
   .mobile-route-prompt-workbench,
   .mobile-route-model-routes,
+  .mobile-route-settings-models,
+  .mobile-route-settings-director,
+  .mobile-route-settings-knowledge,
+  .mobile-route-settings-maintenance,
   .mobile-route-settings,
   .mobile-route-worlds,
   .mobile-route-world-generator,
@@ -578,6 +583,7 @@ body {
   .mobile-route-creative-hub,
   .mobile-route-chat-legacy,
   .mobile-route-book-analysis,
+  .mobile-route-market-radar,
   .mobile-route-tasks,
   .mobile-route-auto-director-follow-ups,
   .mobile-route-knowledge,
@@ -586,6 +592,10 @@ body {
   .mobile-route-titles,
   .mobile-route-prompt-workbench,
   .mobile-route-model-routes,
+  .mobile-route-settings-models,
+  .mobile-route-settings-director,
+  .mobile-route-settings-knowledge,
+  .mobile-route-settings-maintenance,
   .mobile-route-settings,
   .mobile-route-worlds,
   .mobile-route-world-generator,
@@ -995,4 +1005,10 @@ body {
   .mobile-chapter-editor-shell > div > .flex > .grid > :nth-child(3) {
     order: 3;
   }
+}
+
+/* 任务筛选“只看需处理”激活态：全断点生效（覆盖 hover:bg-muted 的同特异性规则）。 */
+.task-filter-pill[data-only-anomaly] {
+  background-color: hsl(var(--destructive) / 0.1);
+  color: hsl(var(--destructive));
 }
