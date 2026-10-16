@@ -119,7 +119,8 @@ test("checkpoint: partial failure marks failed, fresh instance reclaims, success
 test("checkpoint: active running claim does not start another extraction", async () => {
   const f = fixture({ initialStatus: "running" });
   const result = await sync(f.create());
-  assert.equal(result.status, "pending");
+  // deferred 模式下并发占用与部分失败同样返回 degraded；strict 模式才返回 pending。
+  assert.equal(result.status, "degraded");
   assert.equal(f.calls, 0);
   assert.equal(f.status, "running");
   assert.deepEqual(f.transitions, []);

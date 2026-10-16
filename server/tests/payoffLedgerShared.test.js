@@ -174,6 +174,8 @@ test("buildPayoffLedgerResponse orders items by risk and computes summary counts
       ledgerKey: "overdue",
       title: "黑市账户异常",
       currentStatus: "overdue",
+      // 窗口在第 5 章前已结束，按现行分类规则才计入 overdue。
+      targetEndChapterOrder: 4,
       updatedAt: "2026-04-05T10:00:04.000Z",
     }),
   ], 5);
@@ -183,6 +185,17 @@ test("buildPayoffLedgerResponse orders items by risk and computes summary counts
   assert.equal(response.summary.overdueCount, 1);
   assert.equal(response.summary.paidOffCount, 1);
   assert.equal(response.updatedAt, "2026-04-05T10:00:04.000Z");
+
+  // 窗口内的 overdue 尚未到回收章，保持在 pending 集（不提前触发重规划）。
+  const withinWindow = buildPayoffLedgerResponse([
+    createLedgerItem({
+      ledgerKey: "overdue-within-window",
+      currentStatus: "overdue",
+      targetEndChapterOrder: 6,
+    }),
+  ], 5);
+  assert.equal(withinWindow.summary.pendingCount, 1);
+  assert.equal(withinWindow.summary.overdueCount, 0);
 });
 
 test("normalizePayoffLedgerIdentity removes spacing and common punctuation", () => {

@@ -61,11 +61,12 @@ test("display state maps chapter draft execution into chapter stage and uses fac
 
   assert.equal(displayState.stageKey, "chapter_execution");
   assert.equal(displayState.stageLabel, "章节执行");
-  assert.equal(displayState.stepIndex, 5);
+  // 展示目录新增 world_setup 阶段后，chapter_execution 位于第 7 步（索引 6）。
+  assert.equal(displayState.stepIndex, 6);
   assert.equal(displayState.progressPercent, 45);
   assert.equal(displayState.currentAction, "正在推进第 10 章");
   assert.equal(displayState.nextActionLabel, "继续章节执行");
-  assert.equal(displayState.steps[5].status, "running");
+  assert.equal(displayState.steps[6].status, "running");
 });
 
 test("display state keeps running mode when recovery flag exists but live runtime progress is visible", () => {
@@ -165,7 +166,8 @@ test("display state keeps running mode when task is running despite stale approv
   assert.equal(displayState.mode, "running");
   assert.equal(displayState.requiresUserAction, false);
   assert.equal(displayState.isLiveRunning, true);
-  assert.equal(displayState.steps[4].status, "running");
+  // structured_outline（节奏 / 拆章）在含 world_setup 的目录中为索引 5。
+  assert.equal(displayState.steps[5].status, "running");
 });
 
 test("display state does not mark succeeded task as completed before facts close", () => {

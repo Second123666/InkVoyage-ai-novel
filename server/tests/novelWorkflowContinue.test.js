@@ -112,9 +112,11 @@ test("novel workflow auto director route returns null when only historical visib
   }
 });
 
-test("novel workflow continue route accepts range and full-book continuation modes", { concurrency: false }, async () => {
+test("novel workflow continue route accepts range, skip and resume continuation modes", { concurrency: false }, async () => {
   const calls = [];
+  const approveGateCalls = [];
   const originalEnqueue = DirectorCommandService.prototype.enqueueContinueCommand;
+  const originalApproveGate = DirectorCommandService.prototype.enqueueApproveGateCommand;
   const originalDetail = NovelWorkflowTaskAdapter.prototype.detail;
 
   DirectorCommandService.prototype.enqueueContinueCommand = async function enqueueContinueCommandMock(taskId, input) {
@@ -124,6 +126,17 @@ test("novel workflow continue route accepts range and full-book continuation mod
       taskId,
       novelId: "novel-1",
       commandType: "continue",
+      status: "queued",
+      leaseExpiresAt: null,
+    };
+  };
+  DirectorCommandService.prototype.enqueueApproveGateCommand = async function enqueueApproveGateCommandMock(taskId, input) {
+    approveGateCalls.push({ taskId, input });
+    return {
+      commandId: "command-2",
+      taskId,
+      novelId: "novel-1",
+      commandType: "approve_gate",
       status: "queued",
       leaseExpiresAt: null,
     };
@@ -155,14 +168,31 @@ test("novel workflow continue route accepts range and full-book continuation mod
     const payload = await response.json();
     assert.equal(payload.success, true);
     assert.equal(payload.data.commandId, "command-1");
-    const fullBookResponse = await fetch(`http://127.0.0.1:${port}/api/novel-workflows/workflow-auto-exec/continue`, {
+    const skipResponse = await fetch(`http://127.0.0.1:${port}/api/novel-workflows/workflow-auto-exec/continue`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        continuationMode: "skip_quality_repair",
+      }),
+    });
+    assert.equal(skipResponse.status, 202);
+    const resumeResponse = await fetch(`http://127.0.0.1:${port}/api/novel-workflows/workflow-auto-exec/continue`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        continuationMode: "resume",
+      }),
+    });
+    assert.equal(resumeResponse.status, 202);
+    // full_book_autopilot 已从 continue 枚举退役（现为 runMode，由 production-experience 入口设置）。
+    const rejectedFullBook = await fetch(`http://127.0.0.1:${port}/api/novel-workflows/workflow-auto-exec/continue`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         continuationMode: "full_book_autopilot",
       }),
     });
-    assert.equal(fullBookResponse.status, 202);
+    assert.equal(rejectedFullBook.status, 400);
     assert.deepEqual(calls, [
       {
         taskId: "workflow-auto-exec",
@@ -173,12 +203,21 @@ test("novel workflow continue route accepts range and full-book continuation mod
       {
         taskId: "workflow-auto-exec",
         input: {
-          continuationMode: "full_book_autopilot",
+          continuationMode: "skip_quality_repair",
+        },
+      },
+    ]);
+    assert.deepEqual(approveGateCalls, [
+      {
+        taskId: "workflow-auto-exec",
+        input: {
+          continuationMode: "resume",
         },
       },
     ]);
   } finally {
     DirectorCommandService.prototype.enqueueContinueCommand = originalEnqueue;
+    DirectorCommandService.prototype.enqueueApproveGateCommand = originalApproveGate;
     NovelWorkflowTaskAdapter.prototype.detail = originalDetail;
     await new Promise((resolve, reject) => server.close((error) => (error ? reject(error) : resolve())));
   }

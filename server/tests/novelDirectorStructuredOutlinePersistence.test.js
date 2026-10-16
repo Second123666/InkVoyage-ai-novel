@@ -171,6 +171,7 @@ test("runDirectorStructuredOutlinePhase persists chapter detail after each compl
   const resetDeletions = [];
   let lastSyncedWorkspace = clone(baseWorkspace);
   const rebuildCalls = [];
+  const volumeUpdateOptionCalls = [];
   prisma.chapter.findMany = async (input) => {
     resetFindManyCalls.push(input);
     return [
@@ -212,7 +213,10 @@ test("runDirectorStructuredOutlinePhase persists chapter detail after each compl
       return workspace;
     },
     updateVolumes: async (_novelId, workspace) => clone(workspace),
-    updateVolumesWithOptions: async (_novelId, workspace) => clone(workspace),
+    updateVolumesWithOptions: async (_novelId, workspace, options) => {
+      volumeUpdateOptionCalls.push(options ?? {});
+      return clone(workspace);
+    },
     syncVolumeChapters: async (_novelId, input) => {
       const snapshot = clone(input.volumes);
       syncedSnapshots.push(snapshot);
@@ -305,10 +309,11 @@ test("runDirectorStructuredOutlinePhase persists chapter detail after each compl
       endOrder: 2,
     },
   ]);
-  assert.deepEqual(rebuildCalls, [{
-    novelId: "novel-demo",
-    options: { sourceType: "rebuild_projection" },
-  }]);
+  // 现行合同：outline 阶段不再直接重建角色动态（42732301 起移入事件驱动路径，
+  // volume:updated 的 shouldRebuildCharacterDynamics 对 chapter_execution_contract_refined 显式排除），
+  // 阶段只负责以该 reason 持久化卷工作区；是否重建由事件侧效应统一裁决。
+  assert.equal(rebuildCalls.length, 0);
+  assert.ok(volumeUpdateOptionCalls.some((options) => options.volumeUpdateReason === "chapter_execution_contract_refined"));
   assert.deepEqual(resetFindManyCalls[0].where.order, { gte: 1, lte: 2 });
   assert.ok(resetDeletions.some(([table]) => table === "stateChangeProposal"));
   assert.ok(resetDeletions.some(([table]) => table === "openConflict"));
@@ -391,6 +396,7 @@ test("runDirectorStructuredOutlinePhase resumes from the next incomplete chapter
   const resetFindManyCalls = [];
   let lastSyncedWorkspace = clone(baseWorkspace);
   const rebuildCalls = [];
+  const volumeUpdateOptionCalls = [];
   prisma.chapter.findMany = async (input) => {
     resetFindManyCalls.push(input);
     return [
@@ -425,7 +431,10 @@ test("runDirectorStructuredOutlinePhase resumes from the next incomplete chapter
       return workspace;
     },
     updateVolumes: async (_novelId, workspace) => clone(workspace),
-    updateVolumesWithOptions: async (_novelId, workspace) => clone(workspace),
+    updateVolumesWithOptions: async (_novelId, workspace, options) => {
+      volumeUpdateOptionCalls.push(options ?? {});
+      return clone(workspace);
+    },
     syncVolumeChapters: async (_novelId, input) => {
       lastSyncedWorkspace = {
         ...lastSyncedWorkspace,
@@ -511,8 +520,9 @@ test("runDirectorStructuredOutlinePhase resumes from the next incomplete chapter
     },
   ]);
   assert.deepEqual(resetFindManyCalls[0].where.order, { gte: 1, lte: 2 });
-  assert.deepEqual(rebuildCalls, [{
-    novelId: "novel-demo",
-    options: { sourceType: "rebuild_projection" },
-  }]);
+  // 现行合同：outline 阶段不再直接重建角色动态（42732301 起移入事件驱动路径，
+  // volume:updated 的 shouldRebuildCharacterDynamics 对 chapter_execution_contract_refined 显式排除），
+  // 阶段只负责以该 reason 持久化卷工作区；是否重建由事件侧效应统一裁决。
+  assert.equal(rebuildCalls.length, 0);
+  assert.ok(volumeUpdateOptionCalls.some((options) => options.volumeUpdateReason === "chapter_execution_contract_refined"));
 });

@@ -493,7 +493,13 @@ test("continue_existing chapter takeover does not reuse the requested auto execu
   });
 
   assert.equal(preparedInput, null);
-  assert.equal(bootstrapInput.seedPayload.autoExecutionPlan, undefined);
+  // 现行合同：continue_existing 会复用请求的区间，但起点钳制到可执行起点
+  // （nextChapterOrder=3，已完成的 1-2 章不重跑），并写入 seed payload。
+  assert.deepEqual(bootstrapInput.seedPayload.autoExecutionPlan, {
+    mode: "chapter_range",
+    startOrder: 3,
+    endOrder: 10,
+  });
   assert.equal(checkpointInput.checkpointType, "production_experience_required");
 });
 

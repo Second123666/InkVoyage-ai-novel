@@ -6,8 +6,11 @@ const {
   pickApplicableVisibleProfileFields,
 } = require("../dist/services/novel/characterProfile/CharacterVisibleProfileService");
 const {
-  buildCharactersContextText,
-} = require("../dist/services/novel/runtime/runtimeContextBlocks");
+  buildDynamicCharacterGuidance,
+} = require("../dist/prompting/prompts/novel/chapterLayeredContextCharacters");
+const {
+  buildCharacterGuidanceText,
+} = require("../dist/prompting/prompts/novel/chapterLayeredContextShared");
 const {
   characterVisibleProfileCompletionPrompt,
 } = require("../dist/prompting/prompts/novel/characterVisibleProfile.prompts");
@@ -51,8 +54,34 @@ test("visible profile validator treats generic prose as vague", () => {
 });
 
 test("chapter character context includes compact visible profile summary", () => {
-  const text = buildCharactersContextText([
-    {
+  const contextPackage = {
+    chapter: { order: 1 },
+    plan: { participants: [] },
+    openConflicts: [],
+    characterMindStates: [],
+    characterDialogueGuidances: [],
+    characterDynamics: {
+      relations: [],
+      candidates: [],
+      characters: [{
+        characterId: "c-1",
+        name: "林照",
+        role: "主角",
+        isCoreInVolume: true,
+        plannedChapterOrders: [1],
+        absenceRisk: "none",
+        absenceSpan: 0,
+        volumeRoleLabel: null,
+        volumeResponsibility: null,
+        currentGoal: null,
+        currentState: null,
+        factionLabel: null,
+        stanceLabel: null,
+        castRole: null,
+      }],
+    },
+    characterRoster: [{
+      id: "c-1",
       name: "林照",
       role: "主角",
       personality: "谨慎但不退让",
@@ -60,10 +89,13 @@ test("chapter character context includes compact visible profile summary", () =>
       physique: "少年感偏瘦，肩背却很稳",
       signatureDetail: "思考时会用拇指摩挲旧铜戒",
       voiceTexture: "声音偏低，短句多，越危险越慢",
-    },
-  ]);
+    }],
+  };
 
-  assert.match(text, /外显/);
+  const { characterBehaviorGuides } = buildDynamicCharacterGuidance(contextPackage);
+  const text = buildCharacterGuidanceText({ characterBehaviorGuides });
+
+  assert.match(text, /可见表现/);
   assert.match(text, /样貌\/体态=/);
   assert.match(text, /标志=/);
   assert.match(text, /声音=/);

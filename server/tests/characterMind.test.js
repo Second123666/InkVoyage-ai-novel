@@ -25,9 +25,14 @@ test("character mind persistence archives the old current snapshot before creati
   const service = new CharacterMindService();
   const originalTransaction = prisma.$transaction;
   const archivalCalls = [];
+  const deleteCalls = [];
   const createdRows = [];
   prisma.$transaction = async (callback) => callback({
     characterMindSnapshot: {
+      deleteMany: async (args) => {
+        deleteCalls.push(args);
+        return { count: 1 };
+      },
       updateMany: async (args) => {
         archivalCalls.push(args);
         return { count: 1 };
@@ -56,6 +61,14 @@ test("character mind persistence archives the old current snapshot before creati
     assert.deepEqual(archivalCalls[0], {
       where: { novelId: "novel-1", characterId: "character-1", isCurrent: true },
       data: { isCurrent: false },
+    });
+    assert.deepEqual(deleteCalls[0], {
+      where: {
+        novelId: "novel-1",
+        sourceType: "artifact_delta",
+        sourceChapterId: "chapter-8",
+        characterId: { in: ["character-1"] },
+      },
     });
     assert.equal(createdRows[0].isCurrent, true);
     assert.equal(snapshots[0].sourceType, "artifact_delta");
