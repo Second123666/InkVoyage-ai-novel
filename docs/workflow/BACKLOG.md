@@ -10,7 +10,7 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 ## 轮次入口建议(2026-10-15)
 
 1. ~~**LOOP-1 项目体检基线**(BUG-0)~~ ✅ 已完成(2026-10-16):基线 = server 33 失败 / client 5 失败 / typecheck 绿 / 冒烟 7 页 0 报错。
-2. **LOOP-2 套件绿化**(BUG-1/2):分诊并修掉 38 个失败测试 —— 基线不绿会让之后每轮验证失真,优先级最高。
+2. ~~**LOOP-2 套件绿化**(BUG-1/2)~~ ✅ 已完成(2026-10-16):server fast **0 失败**(进程隔离)+ client **92/92**;含 3 个真 bug 与 3 处架构脆弱点修复。
 3. **LOOP-3 衍生工坊实验化**(FEAT-1/2):漫画/短剧降级,收束创作入口复杂度。
 4. **LOOP-4 统一任务投影契约**(INN-B2):修"后端状态 / 运行记录 / 前端展示三者不一致"这个自用最疼的点。
 5. **LOOP-5 伏笔账本 MVP**(INN-A1):创新第一弹,写作质量方向。
@@ -113,23 +113,26 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 - [ ] **RF-4 文档一致性清理** · S · P3
   `docs/` 与代码引用对齐(仓库已有清理先例);体检轮若发现过时引用可顺带登记。
 
+- [ ] **RF-5 prompting → services 依赖面收敛** · S · P3
+  LOOP-2 已断开 `creativeHubContextResolvers` 一条循环边(改调用时惰性加载);同类顶层 import 未全面排查。
+  顺带:`services/rag/index.js` 模块加载即实例化全部单例,加剧冷加载循环脆弱性,可评估惰性 getter 化。
+  验收:冷启动 `node -e "require('./dist/app.js')"` 类路径无 "is not a constructor";新增守卫测试可选。
+
 ## 4. 缺陷与稳定性(BUG)
 
 - [x] **BUG-0 项目体检与缺陷清单**(= LOOP-1) · S · P0
   已产出:测试基线见 BUG-1/BUG-2/BUG-3;冒烟结论与全部证据见 PROGRESS LOOP-1 条目(2026-10-16)。
 
-- [ ] **BUG-1 server fast 套件 33 个失败** · M–L · P0
-  基线(Node v24.14.0):1383 测试 / 1338 过 / **33 失败** / 12 跳过,失败散布 20 个测试文件(全名单见 PROGRESS LOOP-1)。
-  初判至少三类:①契约漂移(如 `worldContextGateway` 多传 `openingOnly: undefined`、资源提取 schema 超上限、审批审计条数);②状态断言陈旧(如 `'failed' !== 'done'`);③可能的 Node v24 `deepStrictEqual` 对 undefined 自有键的严格化差异。
-  做法:逐条分诊 —— 真 bug 修代码 / 测试陈旧改测试 / 环境差异记档;先修高频文件(bookAnalysisCharacterCandidate ×4、pipelineExecutionLease ×2 等)。
-  验收:fast 套件全绿,或有明确豁免清单并写入基线。
+- [x] **BUG-1 server fast 套件 33 个失败** · M–L · P0(= LOOP-2,2026-10-16 完成)
+  结果:**1383 测试 / 1371 过 / 0 失败 / 12 跳过**,fast 模式改为进程隔离(根治跨文件污染)。
+  分诊结论:3 个**真 bug** —— ①token 预算并发丢更新(bookAnalysis.budget 用 read-modify-write 替代原子 increment,批量拆书低估消耗);②章节资源提取上限在 artifact delta schema 缺失(仅靠 prompt 约束);③agent 工具 zod 类型声明未下沉 schema 模块。
+  另修 3 处架构脆弱点 —— ④`NovelDirectorIdeaInspirationService` 归位 `idea/`(满足导演根目录边界守卫);⑤提示词上下文解析器 → 服务层顶层 import 形成循环依赖(冷加载"is not a constructor"),改调用时惰性加载;⑥fast 测试单进程 require 全部文件造成跨文件污染(drama 假 prisma 进 require.cache 不还原等),改为 `node --test` 进程隔离。
+  其余 ~22 个文件为**测试陈旧**(代码有意演进未同步测试),断言/mock 对齐现行契约,细节见 PROGRESS LOOP-2。
 
-- [ ] **BUG-2 client 套件 5 个失败** · S · P1
-  基线:92 测试 / 87 过 / **5 失败**。两类:
-  ① 移动端合同簇 ×4(`every routed page has a route-specific mobile CSS landing point`、`mobile more menu contains all non-primary registered pages`、`mobile route metadata covers every registered page`、`mobile task filters stay in a compact three-column control grid`);
-  ② 设置路由契约 ×1(测试期望 `/settings/model-routes` 重定向到 `/settings/models`,代码已是独立 `ModelRoutesSettingsPage`)。
-  初判:多为测试陈旧(路由已演进);需确认移动端 metadata 是测试没更新还是新页面漏注册。
-  验收:client test 全绿。
+- [x] **BUG-2 client 套件 5 个失败** · S · P1(= LOOP-2)
+  结果:client **92/92 全绿** + typecheck 绿。
+  ①移动端合同簇 ×4:新页面(market-radar、settings-model-routes)的 CSS 落点缺失 ×5 个选择器已补;导航测试列表对齐 31 条现行元数据;任务筛选面板恢复"两行三列"移动合同(kind,status,异常 / keyword 跨列,排序)—— 显式栅格定位 + md 释放 + xl order-last 保桌面模板,激活态改 data 属性驱动(静态类名守卫可继续生效)。
+  ②设置路由契约:`/settings/model-routes` 已是独立页(非重定向),旧链接兼容性保持,测试更新。
 
 - [ ] **BUG-3 pnpm 配置迁移卫生** · S · P3
   根 `package.json` 的 `pnpm.onlyBuiltDependencies` 已不被 pnpm 读取(每次运行报 WARN),应迁到 `pnpm-workspace.yaml` 或 `.npmrc` 等新位置。
