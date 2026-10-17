@@ -202,6 +202,8 @@ function dashboardModeToBookStatus(mode: DirectorDashboardMode): DirectorBookAut
       return "waiting_recovery";
     case "failed":
       return "failed";
+    case "cancelled":
+      return "cancelled";
     case "completed":
       return "completed";
     default:

@@ -874,6 +874,7 @@ export type DirectorDisplayMode =
   | "waiting"
   | "needs_recovery"
   | "failed"
+  | "cancelled"
   | "completed";
 
 export type DirectorDisplayStepStatus =
@@ -917,6 +918,7 @@ export type DirectorDashboardMode =
   | "waiting_user"
   | "recovering"
   | "failed"
+  | "cancelled"
   | "completed";
 
 export type DirectorDashboardProgressSource =

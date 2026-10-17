@@ -12,6 +12,7 @@ import type { NovelApplicationServices } from "../novel/application/NovelApplica
 import { getSharedNovelServices } from "../novel/application/sharedNovelServices";
 import { DirectorCommandService } from "../novel/director/commands/DirectorCommandService";
 import { NovelWorkflowRuntimeService } from "../novel/workflow/NovelWorkflowRuntimeService";
+import { buildNovelWorkflowSourceRoute } from "../novel/workflow/novelWorkflow.shared";
 import { styleExtractionTaskService } from "../styleEngine/StyleExtractionTaskService";
 
 interface RecoveryInitializationDeps {
@@ -29,20 +30,6 @@ interface AutoDirectorRecoveryCommandPort {
 
 function toRunningStatus(status: string): RecoverableTaskSummary["status"] {
   return status === "running" ? "running" : "queued";
-}
-
-function buildWorkflowSourceRoute(row: {
-  id: string;
-  novelId: string | null;
-  creationExperience?: "simple" | "professional" | null;
-}): string {
-  if (!row.novelId) {
-    return `/tasks?kind=novel_workflow&id=${row.id}`;
-  }
-  if (row.creationExperience === "simple") {
-    return `/novels/${row.novelId}/simple`;
-  }
-  return `/novels/${row.novelId}/edit?directorTaskId=${row.id}&taskPanel=1`;
 }
 
 function buildImagePresentation(row: {
@@ -125,8 +112,12 @@ export class RecoveryTaskService {
           title: true,
           status: true,
           currentStage: true,
+          currentItemKey: true,
           currentItemLabel: true,
+          checkpointType: true,
           checkpointSummary: true,
+          resumeTargetJson: true,
+          seedPayloadJson: true,
           lastError: true,
           updatedAt: true,
           novel: { select: { title: true, creationExperience: true } },
@@ -218,9 +209,14 @@ export class RecoveryTaskService {
         currentStage: row.currentStage,
         currentItemLabel: row.currentItemLabel,
         resumeAction: "恢复自动导演",
-        sourceRoute: buildWorkflowSourceRoute({
+        // Delegates to the shared sourceRoute constructor so the recovery dialog and the
+        // task center always point the same director task at the same page.
+        sourceRoute: buildNovelWorkflowSourceRoute({
           id: row.id,
-          novelId: row.novelId,
+          checkpointType: row.checkpointType,
+          currentItemKey: row.currentItemKey,
+          resumeTargetJson: row.resumeTargetJson,
+          seedPayloadJson: row.seedPayloadJson,
           creationExperience: row.novel?.creationExperience,
         }),
         recoveryHint: row.lastError?.trim() || row.checkpointSummary?.trim() || "服务重启后任务已暂停，等待恢复。",

@@ -100,9 +100,21 @@ export function buildNovelEditResumeTarget(params: {
   };
 }
 
-export function resumeTargetToRoute(target: NovelWorkflowResumeTarget | null | undefined): string {
+export interface NovelWorkflowSourceRouteContext {
+  taskId?: string | null;
+  creationExperience?: "simple" | "professional" | null;
+}
+
+export function resumeTargetToRoute(
+  target: NovelWorkflowResumeTarget | null | undefined,
+  context: NovelWorkflowSourceRouteContext = {},
+): string {
+  // Fall back to the task center deep link so a route-less task still lands on its own record.
+  const taskFallbackRoute = context.taskId
+    ? `/tasks?kind=novel_workflow&id=${encodeURIComponent(context.taskId)}`
+    : "/tasks";
   if (!target) {
-    return "/tasks";
+    return taskFallbackRoute;
   }
   if (target.route === "/create") {
     return target.taskId ? `/create?taskId=${encodeURIComponent(target.taskId)}` : "/create";
@@ -128,7 +140,13 @@ export function resumeTargetToRoute(target: NovelWorkflowResumeTarget | null | u
   }
 
   if (!target.novelId) {
-    return "/tasks";
+    return taskFallbackRoute;
+  }
+
+  // The simple creation experience opens the reading shelf instead of the full edit workspace.
+  if (target.route === "/novels/:id/simple"
+    || (target.route === "/novels/:id/edit" && context.creationExperience === "simple")) {
+    return `/novels/${target.novelId}/simple`;
   }
 
   if (target.route === "/novels/:id/story") {
@@ -154,6 +172,29 @@ export function resumeTargetToRoute(target: NovelWorkflowResumeTarget | null | u
   }
   const query = searchParams.toString();
   return query ? `/novels/${target.novelId}/edit?${query}` : `/novels/${target.novelId}/edit`;
+}
+
+export function buildNovelWorkflowSourceRoute(input: {
+  id: string;
+  checkpointType?: string | null;
+  currentItemKey?: string | null;
+  resumeTargetJson?: string | null;
+  seedPayloadJson?: string | null;
+  creationExperience?: "simple" | "professional" | null;
+}): string {
+  // Single sourceRoute constructor shared by the task center and the recovery candidates so
+  // both surfaces always route the same director task to the same page.
+  const resumeTarget = normalizeWorkflowResumeTargetForCandidateSelection({
+    id: input.id,
+    checkpointType: input.checkpointType ?? null,
+    currentItemKey: input.currentItemKey ?? null,
+    resumeTargetJson: input.resumeTargetJson ?? null,
+    seedPayloadJson: input.seedPayloadJson,
+  });
+  return resumeTargetToRoute(resumeTarget, {
+    taskId: input.id,
+    creationExperience: input.creationExperience ?? null,
+  });
 }
 
 export function parseMilestones(value: string | null | undefined): NovelWorkflowMilestone[] {
@@ -219,6 +260,72 @@ export function parseSeedPayload<T>(value: string | null | undefined): T | null 
   } catch {
     return null;
   }
+}
+
+interface CandidateSelectionSeedPayloadShape {
+  candidateStage?: unknown;
+  directorSession?: { phase?: unknown } | null;
+}
+
+function mergeResumeTargets(
+  primary: NovelWorkflowResumeTarget | null,
+  fallback: NovelWorkflowResumeTarget | null,
+): NovelWorkflowResumeTarget | null {
+  if (!primary) {
+    return fallback;
+  }
+  if (!fallback) {
+    return primary;
+  }
+  return {
+    ...fallback,
+    ...primary,
+    stage: primary.stage === "basic" && fallback.stage !== "basic"
+      ? fallback.stage
+      : primary.stage,
+    chapterId: primary.chapterId ?? fallback.chapterId ?? null,
+    volumeId: primary.volumeId ?? fallback.volumeId ?? null,
+  };
+}
+
+function hasCandidateSelectionPhase(seedPayloadJson?: string | null): boolean {
+  const seedPayload = parseSeedPayload<CandidateSelectionSeedPayloadShape>(seedPayloadJson);
+  if (!seedPayload) {
+    return false;
+  }
+  if (seedPayload.candidateStage) {
+    return true;
+  }
+  const phase = seedPayload.directorSession && typeof seedPayload.directorSession === "object"
+    ? seedPayload.directorSession.phase
+    : null;
+  return phase === "candidate_selection";
+}
+
+export function normalizeWorkflowResumeTargetForCandidateSelection(input: {
+  id: string;
+  checkpointType: string | null;
+  currentItemKey: string | null;
+  resumeTargetJson: string | null;
+  seedPayloadJson?: string | null;
+}): NovelWorkflowResumeTarget | null {
+  const seedResumeTarget = parseSeedPayload<{ resumeTarget?: unknown }>(input.seedPayloadJson)?.resumeTarget;
+  const parsed = mergeResumeTargets(
+    parseResumeTarget(input.resumeTargetJson),
+    typeof seedResumeTarget === "string"
+      ? parseResumeTarget(seedResumeTarget)
+      : (seedResumeTarget && typeof seedResumeTarget === "object"
+        ? seedResumeTarget as NovelWorkflowResumeTarget
+        : null),
+  );
+  const isCandidateSelectionTask = input.checkpointType === "candidate_selection_required"
+    || input.currentItemKey === "auto_director"
+    || input.currentItemKey?.startsWith("candidate_") === true
+    || hasCandidateSelectionPhase(input.seedPayloadJson);
+  if (!isCandidateSelectionTask) {
+    return parsed;
+  }
+  return buildNovelCreateResumeTarget(input.id, "director");
 }
 
 export function mergeSeedPayload<T extends Record<string, unknown>>(

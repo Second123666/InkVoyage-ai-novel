@@ -42,6 +42,7 @@ type PipelineRow = {
   heartbeatAt: Date | null;
   payload: string | null;
   lastErrorType: string | null;
+  pendingManualRecovery: boolean;
   promptTokens: number;
   completionTokens: number;
   totalTokens: number;
@@ -85,6 +86,7 @@ export class PipelineTaskAdapter {
       createdAt: row.createdAt.toISOString(),
       updatedAt: row.updatedAt.toISOString(),
       heartbeatAt: row.heartbeatAt?.toISOString() ?? null,
+      pendingManualRecovery: row.pendingManualRecovery ?? false,
       ownerId: row.novelId,
       ownerLabel: row.novel.title,
       sourceRoute: `/novels/${row.novelId}/edit`,

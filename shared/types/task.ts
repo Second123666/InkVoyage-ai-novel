@@ -89,6 +89,8 @@ export interface TaskOverviewSummary {
   queuedCount: number;
   runningCount: number;
   failedCount: number;
+  /** 需要用户处理的任务数：失败（排除纯质量提醒失败）、待手动恢复、需要重规划。 */
+  attentionCount: number;
   cancelledCount: number;
   waitingApprovalCount: number;
   recoveryCandidateCount: number;

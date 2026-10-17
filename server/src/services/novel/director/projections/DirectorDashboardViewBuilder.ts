@@ -94,7 +94,10 @@ function buildMode(input: {
 }): DirectorDashboardMode {
   const liveRunning = hasLiveRunningEvidence(input);
   const workerState = input.workerHealth?.derivedState ?? null;
-  if (input.task.status === "failed" || input.task.status === "cancelled") {
+  if (input.task.status === "cancelled") {
+    return "cancelled";
+  }
+  if (input.task.status === "failed") {
     return "failed";
   }
   if (workerState === "queued_waiting_worker") {
@@ -157,6 +160,8 @@ function statusLabel(mode: DirectorDashboardMode): string {
       return "等待恢复";
     case "failed":
       return "执行异常";
+    case "cancelled":
+      return "已取消";
     case "completed":
       return "已完成";
     default:
@@ -176,6 +181,8 @@ function headlineForMode(mode: DirectorDashboardMode, displayState: DirectorDisp
       return "等待恢复";
     case "failed":
       return "执行受阻";
+    case "cancelled":
+      return "已取消";
     case "completed":
       return "导演已完成";
     default:
@@ -195,6 +202,8 @@ function descriptionForMode(mode: DirectorDashboardMode, displayState: DirectorD
       return "后台执行器连接中断后正在恢复，系统会优先从最近进度继续。";
     case "failed":
       return "当前导演流程停在最近一步。可以先查看执行详情，再决定是否重试或继续。";
+    case "cancelled":
+      return "本轮导演流程已取消。你可以查看已生成的结果，或重新发起自动导演。";
     case "completed":
       return "本轮导演流程已收尾，你可以继续推进章节、查看结果，或发起下一轮自动导演。";
     default:

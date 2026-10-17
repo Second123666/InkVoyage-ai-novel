@@ -126,6 +126,7 @@ export class ImageTaskAdapter {
       createdAt: row.createdAt.toISOString(),
       updatedAt: row.updatedAt.toISOString(),
       heartbeatAt: row.heartbeatAt?.toISOString() ?? null,
+      pendingManualRecovery: row.pendingManualRecovery ?? false,
       failureCode: row.status === "failed" ? "IMAGE_GENERATION_FAILED" : null,
       failureSummary: row.status === "failed"
         ? normalizeFailureSummary(row.error, "图像任务失败，但没有记录明确错误。")
@@ -176,6 +177,7 @@ export class ImageTaskAdapter {
       createdAt: row.createdAt.toISOString(),
       updatedAt: row.updatedAt.toISOString(),
       heartbeatAt: row.heartbeatAt?.toISOString() ?? null,
+      pendingManualRecovery: row.pendingManualRecovery ?? false,
       failureCode: row.status === "failed" ? "IMAGE_GENERATION_FAILED" : null,
       failureSummary: row.status === "failed"
         ? normalizeFailureSummary(row.error, "图像任务失败，但没有记录明确错误。")

@@ -82,10 +82,12 @@ function buildMode(input: {
   if (input.showPendingManualRecovery) {
     return "needs_recovery";
   }
+  if (input.task.status === "cancelled") {
+    return "cancelled";
+  }
   if (
     input.projection?.status === "failed"
     || input.task.status === "failed"
-    || input.task.status === "cancelled"
   ) {
     return "failed";
   }
@@ -123,6 +125,8 @@ function buildDescription(mode: DirectorDisplayMode): string {
       return "当前导演流程停在需要确认的位置。你可以先查看结果，再决定是否继续。";
     case "failed":
       return "当前导演流程停在最近一步。可以先查看执行详情，再决定是否重试或继续。";
+    case "cancelled":
+      return "本轮导演流程已取消。你可以查看已生成的结果，或重新发起自动导演。";
     case "completed":
       return "本轮导演流程已收尾，你可以继续推进章节、查看结果，或发起下一轮自动导演。";
     case "running":
@@ -140,6 +144,8 @@ function buildHeadline(mode: DirectorDisplayMode): string {
       return "等待确认";
     case "failed":
       return "执行受阻";
+    case "cancelled":
+      return "已取消";
     case "completed":
       return "导演已完成";
     case "running":
@@ -170,6 +176,13 @@ function buildCurrentAction(input: {
       || input.projection?.blockingReason?.trim()
       || input.projection?.lastEventSummary?.trim()
       || "系统会从最近进度继续恢复。"
+    );
+  }
+  if (input.mode === "cancelled") {
+    return (
+      input.task.checkpointSummary?.trim()
+      || input.task.currentItemLabel?.trim()
+      || "本轮导演流程已取消"
     );
   }
   if (
@@ -259,9 +272,12 @@ function buildSteps(currentStageKey: DirectorDisplayStageKey, mode: DirectorDisp
     } else if (index < currentIndex) {
       status = "completed";
     } else if (index === currentIndex) {
+      // 已取消的流程不进入"推进中"或"需要处理"任何一侧,当前步保持中性 pending。
       status = mode === "waiting" || mode === "needs_recovery" || mode === "failed"
         ? "attention"
-        : "running";
+        : mode === "cancelled"
+          ? "pending"
+          : "running";
     }
     return {
       key: stage.key,

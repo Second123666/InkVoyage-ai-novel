@@ -84,9 +84,11 @@ export function buildNovelWorkflowDetailSteps(input: {
 }): UnifiedTaskStep[] {
   const currentStage = resolveWorkflowDisplayStage(input);
   if (input.pendingManualRecovery) {
+    // Pending manual recovery is a neutral wait state, not a failure. Keep the
+    // current step queued so the step list matches the "等待手动恢复" header.
     return buildSteps(
       NOVEL_WORKFLOW_STAGE_STEPS,
-      "failed",
+      "queued",
       currentStage,
       input.createdAt,
       input.updatedAt,

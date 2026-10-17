@@ -9,6 +9,7 @@ import type {
 import type { DirectorLLMOptions } from "@ai-novel/shared/types/novelDirector";
 import { prisma } from "../../db/prisma";
 import { AppError } from "../../middleware/errorHandler";
+import { parsePipelinePayload } from "../novel/pipelineJobState";
 import { getSharedNovelServices } from "../novel/application/sharedNovelServices";
 import { AgentRunTaskAdapter } from "./adapters/AgentRunTaskAdapter";
 import { BookTaskAdapter } from "./adapters/BookTaskAdapter";
@@ -38,6 +39,10 @@ const overviewTaskKinds: TaskKind[] = [
   "novel_workflow",
   "style_extraction",
 ];
+
+// 纯质量提醒失败码:任务虽然标记失败,但只保留质量债或标题提醒,不需要用户按「任务失败」处理。
+// 与 client/src/pages/tasks/taskCenterUtils.ts 的 isTaskFailureQualityReminder 保持同一口径。
+const QUALITY_REMINDER_FAILURE_CODES = ["PIPELINE_QUALITY_REVIEW", "CHAPTER_TITLE_DIVERSITY"];
 
 export class TaskCenterService {
   private readonly novelService = getSharedNovelServices();
@@ -79,6 +84,7 @@ export class TaskCenterService {
       imageRecoveryCount,
       workflowRecoveryCount,
       styleExtractionRecoveryCount,
+      attentionCount,
     ] = await Promise.all([
       prisma.bookAnalysis.groupBy({
         by: ["status"],
@@ -168,12 +174,14 @@ export class TaskCenterService {
           ...(archivedStyleExtractionIds.length ? { id: { notIn: archivedStyleExtractionIds } } : {}),
         },
       }),
+      this.countAttentionTasks(archivedIdsByKind),
     ]);
 
     const overview: TaskOverviewSummary = {
       queuedCount: 0,
       runningCount: 0,
       failedCount: 0,
+      attentionCount,
       cancelledCount: 0,
       waitingApprovalCount: 0,
       recoveryCandidateCount: bookRecoveryCount + pipelineRecoveryCount + imageRecoveryCount + workflowRecoveryCount + styleExtractionRecoveryCount,
@@ -197,6 +205,116 @@ export class TaskCenterService {
     }
 
     return overview;
+  }
+
+  // 「需要处理」任务计数,与 client 侧 must-handle 口径一致:
+  // - 待手动恢复(pendingManualRecovery=true)对任意 kind 都是阻塞项;
+  // - 需要重规划:novel_workflow 的 checkpointType,或章节流水线保留的 replan 提醒;
+  // - 失败任务,但排除纯质量提醒失败(failureCode 为质量码时前端按「质量提醒」展示);
+  // pmr/重规划/失败在同一任务上只计一次。
+  private async countAttentionTasks(archivedIdsByKind: Map<TaskKind, string[]>): Promise<number> {
+    const notArchived = (kind: TaskKind) => {
+      const ids = archivedIdsByKind.get(kind) ?? [];
+      return ids.length ? { id: { notIn: ids } } : {};
+    };
+    const [
+      bookCount,
+      pipelineCount,
+      knowledgeCount,
+      imageCount,
+      agentCount,
+      workflowCount,
+      styleCount,
+      pipelineReplanRows,
+    ] = await Promise.all([
+      prisma.bookAnalysis.count({
+        where: {
+          status: { in: ["queued", "running", "succeeded", "failed", "cancelled"] },
+          OR: [
+            { pendingManualRecovery: true },
+            { status: "failed" },
+          ],
+          ...notArchived("book_analysis"),
+        },
+      }),
+      prisma.generationJob.count({
+        where: {
+          OR: [
+            { pendingManualRecovery: true },
+            {
+              status: "failed",
+              OR: [
+                { lastErrorType: null },
+                { lastErrorType: { notIn: QUALITY_REMINDER_FAILURE_CODES } },
+              ],
+            },
+          ],
+          ...notArchived("novel_pipeline"),
+        },
+      }),
+      prisma.ragIndexJob.count({
+        where: {
+          ownerType: "knowledge_document",
+          status: "failed",
+          ...notArchived("knowledge_document"),
+        },
+      }),
+      prisma.imageGenerationTask.count({
+        where: {
+          OR: [
+            { pendingManualRecovery: true },
+            { status: "failed" },
+          ],
+          ...notArchived("image_generation"),
+        },
+      }),
+      prisma.agentRun.count({
+        where: {
+          status: "failed",
+          ...notArchived("agent_run"),
+        },
+      }),
+      prisma.novelWorkflowTask.count({
+        where: {
+          lane: "auto_director",
+          OR: [
+            { pendingManualRecovery: true },
+            { status: "failed" },
+            { checkpointType: "replan_required" },
+          ],
+          ...notArchived("novel_workflow"),
+        },
+      }),
+      prisma.styleExtractionTask.count({
+        where: {
+          OR: [
+            { pendingManualRecovery: true },
+            { status: "failed" },
+          ],
+          ...notArchived("style_extraction"),
+        },
+      }),
+      prisma.generationJob.findMany({
+        where: {
+          status: "succeeded",
+          payload: { contains: "replanAlertDetails" },
+          ...notArchived("novel_pipeline"),
+        },
+        select: { payload: true },
+      }),
+    ]);
+    const pipelineReplanCount = pipelineReplanRows.filter(
+      (row) => (parsePipelinePayload(row.payload).replanAlertDetails?.length ?? 0) > 0,
+    ).length;
+
+    return bookCount
+      + pipelineCount
+      + pipelineReplanCount
+      + knowledgeCount
+      + imageCount
+      + agentCount
+      + workflowCount
+      + styleCount;
   }
 
   async listTasks(filters: ListTasksFilters = {}): Promise<UnifiedTaskListResponse> {

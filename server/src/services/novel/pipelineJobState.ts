@@ -373,7 +373,7 @@ export function decoratePipelineJob<T extends PipelineJobLike>(job: T): Decorate
     : qualityNotice.noticeSummary
       ? {
         ...qualityNotice,
-        displayStatus: "Failed with generation alerts",
+        displayStatus: "存在待处理的质量提醒",
       }
     : {
       displayStatus: null,
