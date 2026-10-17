@@ -12,7 +12,7 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 1. ~~**LOOP-1 项目体检基线**(BUG-0)~~ ✅ 已完成(2026-10-16):基线 = server 33 失败 / client 5 失败 / typecheck 绿 / 冒烟 7 页 0 报错。
 2. ~~**LOOP-2 套件绿化**(BUG-1/2)~~ ✅ 已完成(2026-10-16):server fast **0 失败**(进程隔离)+ client **92/92**;含 3 个真 bug 与 3 处架构脆弱点修复。
 3. **LOOP-3 衍生工坊实验化**(FEAT-1/2):漫画/短剧降级,收束创作入口复杂度。
-4. **LOOP-4 统一任务投影契约**(INN-B2):修"后端状态 / 运行记录 / 前端展示三者不一致"这个自用最疼的点。
+4. ~~**LOOP-4 统一任务投影契约**(INN-B2)~~ ✅ 已完成(2026-10-17):审计 17 项发现收敛落地,三层可对照 + 守卫测试;残留发现登记为 BUG-5..8。
 5. **LOOP-5 伏笔账本 MVP**(INN-A1):创新第一弹,写作质量方向。
 6. **UI 线并行入口**(UI-1 第一批):纯前端、验收明确、风险低,适合穿插在创作线轮次之间,不与主链轮次抢验证资源。
 7. 之后按 P 标记 + 体检结果 + 所有者兴趣排。
@@ -61,9 +61,9 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 
 ### B · Agent 架构工程
 
-- [ ] **INN-B2 统一任务投影契约** · M · P0(roadmap 开发重点 #3)
-  消除后端实际状态 / 运行记录 / 前端展示三者不一致;先做契约审计(三处字段对照表),再收敛实现,补守卫测试。
-  验收:任一长链任务状态在三处可对照;不一致会被守卫测试拦下。
+- [x] **INN-B2 统一任务投影契约** · M · P0(= LOOP-4,2026-10-17 完成)
+  结果:契约审计(17 项发现,对抗核实 7 confirmed / 2 refuted)→ 收敛落地 8 项(pmr 全 kind 投影、读路径去 heal、步骤区 pmr 中性、displayStatus 中文化、sourceRoute 单一构造器、attentionCount 权威计数、cancelled 全链中性、小说页映射守卫)+ 六条三层守卫测试。持久契约见 `docs/wiki/architecture/task-projection-contract.md`;计划与处置表见 `docs/plans/task-projection-contract.md`。
+  残留:阶段词表/拆书步骤/入队清 pmr/混合视图计数 → BUG-5..8。
 
 - [ ] **INN-B1 全链路 Trace 与决策回放** · M · P2
   把 retrieval trace 扩展为生成链 trace:每章的上下文装配、模型选择、审核决策可回放。既是排障工具,也是作品集展示点(可解释 Agent)。
@@ -141,6 +141,23 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 - [ ] **BUG-4 移动端路由元数据缺 /settings/appearance 登记** · S · P3
   `MOBILE_ROUTE_PATTERNS` 登记了多个 settings 子页但缺 `settings/appearance`,该页在移动端回退到通用落点与"更多功能"页头标题,没有专属 CSS 落点(LOOP-3 侦察发现,范围外未动)。
   验收:补登记后导航合同测试与该页 CSS 落点齐全;不改路由本身。
+
+- [ ] **BUG-5 任务阶段词表中英分裂** · M · P2(LOOP-4 审计 INC-8,partly)
+  `NovelWorkflowTask.currentStage` 持久化中文标签,通用步骤表用英文键,且存在英文写入混入(如 `chapter_execution`);list 路径步骤索引可能回落 0。需独立一轮统一阶段词表(持久化值 ↔ 步骤键 ↔ 展示标签的映射收敛),涉及写入点迁移。
+  验收:任一 currentStage 值在步骤解析中命中正确索引;守卫测试覆盖中英混写。
+
+- [ ] **BUG-6 拆书任务步骤词表缺口** · S · P2(LOOP-4 审计 INC-9,partly)
+  `BOOK_ANALYSIS_STEPS` 缺 `loading_cache`/`generating_overview` 阶段键,拆书中段进度停在第一步;draft/archived 静默丢弃无归档可见性说明。
+  验收:拆书全阶段进度正确推进;draft/archived 处置有明确产品语义(过滤并说明,或单独呈现)。
+
+- [ ] **BUG-7 命令入队无条件清除待手动恢复标记** · S · P1(LOOP-4 审计 INC-3,partly;**需所有者产品语义决策**)
+  `DirectorCommandService.markCommandAcceptedOnTask` 在任何导演命令入队时把 `pendingManualRecovery` 清回 false 并置 queued;agent 工具 enqueueContinueCommand 属可达路径。与"仅显式用户恢复可清除 pmr"的 AGENTS 契约存在张力。
+  待决策:哪些入队路径可视作"显式恢复"(用户 UI 动作 / 用户批准的 agent 运行 / 后台自动)?决策后加守卫并在非豁免路径保留 pmr。
+  验收:决策落地 + 守卫测试锁定允许清除的路径清单。
+
+- [ ] **BUG-8 混合视图隐藏行与 overview 计数不对齐** · S · P3(LOOP-4 审计 INC-17,low 未核)
+  被关联 workflow 隐藏的 pipeline 行在"全部"视图不可见、按 kind 筛选却可见;overview 原始计数含这些行,列表条数对不上。
+  验收:计数与可见性规则同源(同查询或同过滤),切换筛选不出现"任务凭空出现/消失"。
 
 ## 5. 前端 UI 改进(UI)
 
