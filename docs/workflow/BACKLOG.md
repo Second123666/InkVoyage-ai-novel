@@ -138,6 +138,10 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
   根 `package.json` 的 `pnpm.onlyBuiltDependencies` 已不被 pnpm 读取(每次运行报 WARN),应迁到 `pnpm-workspace.yaml` 或 `.npmrc` 等新位置。
   验收:启动/测试输出无该 WARN。
 
+- [ ] **BUG-4 移动端路由元数据缺 /settings/appearance 登记** · S · P3
+  `MOBILE_ROUTE_PATTERNS` 登记了多个 settings 子页但缺 `settings/appearance`,该页在移动端回退到通用落点与"更多功能"页头标题,没有专属 CSS 落点(LOOP-3 侦察发现,范围外未动)。
+  验收:补登记后导航合同测试与该页 CSS 落点齐全;不改路由本身。
+
 ## 5. 前端 UI 改进(UI)
 
 > 挂靠三份既有决策,不另起炉灶:设计规范 `docs/design/product-ui-design-system.md`、
