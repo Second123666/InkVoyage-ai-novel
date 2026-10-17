@@ -17,8 +17,11 @@ import AppVersionBadge from "../AppVersionBadge";
 import DesktopBrandMark from "../DesktopBrandMark";
 import ProjectGithubLink from "../ProjectGithubLink";
 import LiveExecutionDialog from "@/components/liveExecution/LiveExecutionDialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { VisualAssetLibraryDialog } from "@/components/visualAssets";
+import { getExperimentalFeatureForPath } from "@/config/experimentalFeatures";
+import { useExperimentalFeatures } from "@/hooks/useExperimentalFeatures";
 import { cn } from "@/lib/utils";
 import {
   getMobileMoreNavGroups,
@@ -46,10 +49,17 @@ export default function MobileSiteShell({ children }: MobileSiteShellProps) {
   const navigate = useNavigate();
   const [moreOpen, setMoreOpen] = useState(false);
   const [visualAssetLibraryOpen, setVisualAssetLibraryOpen] = useState(false);
+  const { isHidden: isExperimentalFeatureHidden } = useExperimentalFeatures();
   const activeGroup = getMobileNavGroupForPath(location.pathname);
   const pageTitle = getMobilePageTitle(location.pathname);
   const primaryNavItems = getMobilePrimaryNavItems();
-  const moreNavGroups = getMobileMoreNavGroups();
+  const moreNavGroups = getMobileMoreNavGroups().map((group) => ({
+    ...group,
+    items: group.items.filter((item) => {
+      const feature = getExperimentalFeatureForPath(item.to);
+      return !(feature && isExperimentalFeatureHidden(feature.key));
+    }),
+  }));
 
   const openPrimaryItem = (key: MobilePrimaryNavKey, to: string) => {
     if (key === "more") {
@@ -133,20 +143,33 @@ export default function MobileSiteShell({ children }: MobileSiteShellProps) {
                     {group.title}
                   </div>
                   <div className="grid gap-2">
-                    {group.items.map((item) => (
-                      <Link
-                        key={item.key}
-                        to={item.to}
-                        className={cn(
-                          "flex items-center justify-between rounded-2xl border bg-muted/20 px-3 py-3 text-sm transition hover:border-primary/40 hover:bg-primary/5",
-                          location.pathname === item.to && "border-primary/50 bg-primary/10 font-semibold",
-                        )}
-                        onClick={() => setMoreOpen(false)}
-                      >
-                        <span>{item.label}</span>
-                        <ChevronRight className="h-4 w-4 text-muted-foreground" />
-                      </Link>
-                    ))}
+                    {group.items.map((item) => {
+                      const experimentalFeature = getExperimentalFeatureForPath(item.to);
+                      return (
+                        <Link
+                          key={item.key}
+                          to={item.to}
+                          className={cn(
+                            "flex items-center justify-between rounded-2xl border bg-muted/20 px-3 py-3 text-sm transition hover:border-primary/40 hover:bg-primary/5",
+                            location.pathname === item.to && "border-primary/50 bg-primary/10 font-semibold",
+                          )}
+                          onClick={() => setMoreOpen(false)}
+                        >
+                          <span className="flex items-center gap-2">
+                            {item.label}
+                            {experimentalFeature ? (
+                              <Badge
+                                variant="outline"
+                                className="h-5 border-amber-300 bg-amber-50 px-1.5 text-[10px] font-medium text-amber-700"
+                              >
+                                实验
+                              </Badge>
+                            ) : null}
+                          </span>
+                          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                        </Link>
+                      );
+                    })}
                   </div>
                 </section>
               ))}

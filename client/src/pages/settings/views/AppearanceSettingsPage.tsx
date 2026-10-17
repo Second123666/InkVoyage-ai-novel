@@ -1,9 +1,15 @@
-import { Palette, RotateCcw } from "lucide-react";
+import { FlaskConical, Palette, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 import { SettingsShell } from "../components/SettingsShell";
 import { useTheme } from "@/components/theme/ThemeProvider";
+import {
+  EXPERIMENTAL_FEATURES,
+  type ExperimentalFeatureKey,
+} from "@/config/experimentalFeatures";
+import { useExperimentalFeatures } from "@/hooks/useExperimentalFeatures";
 
 const palettes = [
   { value: "ink", label: "墨砚", description: "克制的蓝灰色，适合日常创作。" },
@@ -13,6 +19,12 @@ const palettes = [
 
 export default function AppearanceSettingsPage() {
   const { mode, palette, density, setMode, setPalette, setDensity, reset } = useTheme();
+  const { hidden, setHidden } = useExperimentalFeatures();
+  const allFeatureKeys = EXPERIMENTAL_FEATURES.map((feature) => feature.key);
+  const allVisible = allFeatureKeys.every((key) => !hidden.includes(key));
+  const handleExperimentalToggle = (show: boolean) => {
+    allFeatureKeys.forEach((key: ExperimentalFeatureKey) => setHidden(key, !show));
+  };
   return (
     <SettingsShell title="外观与主题" description="选择适合长时间创作的界面颜色和显示密度。">
       <Card>
@@ -54,6 +66,22 @@ export default function AppearanceSettingsPage() {
           <div className="flex justify-end">
             <Button type="button" variant="outline" onClick={reset}><RotateCcw className="mr-2 h-4 w-4" />恢复默认主题</Button>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base"><FlaskConical className="h-4 w-4" />实验特性</CardTitle>
+          <CardDescription>实验特性仍在打磨，入口和流程可能调整。</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <label className="flex items-center justify-between gap-4 text-sm font-medium">
+            <span>在导航中显示实验特性入口</span>
+            <Switch checked={allVisible} onCheckedChange={handleExperimentalToggle} />
+          </label>
+          <p className="text-xs text-muted-foreground">
+            当前实验特性：漫画工作台、短剧工作台。关闭后这两个入口会从导航中隐藏；通过链接仍可打开页面，已有内容不受影响。
+          </p>
         </CardContent>
       </Card>
     </SettingsShell>

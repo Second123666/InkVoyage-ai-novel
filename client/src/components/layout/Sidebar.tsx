@@ -33,6 +33,8 @@ import { getTaskOverview } from "@/api/tasks";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { VisualAssetLibraryDialog } from "@/components/visualAssets";
+import { getExperimentalFeatureForPath } from "@/config/experimentalFeatures";
+import { useExperimentalFeatures } from "@/hooks/useExperimentalFeatures";
 import { cn } from "@/lib/utils";
 
 interface NavItem {
@@ -56,7 +58,7 @@ const navGroups: NavGroup[] = [
       { to: "/help", label: "创作向导", icon: CircleHelp },
       { to: "/market-radar", label: "热门题材雷达", icon: Radar },
       { to: "/novels", label: "小说列表", icon: BookOpenText },
-      { to: "/drama", label: "短剧工作台", icon: MonitorPlay, disabled: true },
+      { to: "/drama", label: "短剧工作台", icon: MonitorPlay },
       { to: "/comic", label: "漫画工作台", icon: SquareStack },
       { to: "/creative-hub", label: "创作中枢", icon: LayoutDashboard },
       { to: "/book-analysis", label: "拆书", icon: ScanSearch },
@@ -95,6 +97,7 @@ interface SidebarProps {
 export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const [badgeQueriesEnabled, setBadgeQueriesEnabled] = useState(false);
   const [visualAssetLibraryOpen, setVisualAssetLibraryOpen] = useState(false);
+  const { isHidden: isExperimentalFeatureHidden } = useExperimentalFeatures();
 
   useEffect(() => {
     const timer = window.setTimeout(() => setBadgeQueriesEnabled(true), 500);
@@ -135,17 +138,18 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
   const failedIndexCount = knowledgeDocuments.filter((item) => item.latestIndexStatus === "failed").length;
 
   const renderBadge = (to: string) => {
-    if (to === "/comic") {
+    if (to === "/comic" || to === "/drama") {
       if (collapsed) {
         return null;
       }
+      const label = to === "/comic" ? "漫画工作台" : "短剧工作台";
       return (
         <Badge
           variant="outline"
           className="ml-auto h-5 border-amber-300 bg-amber-50 px-1.5 text-[10px] font-medium text-amber-700"
-          title="漫画工作台仍在 Beta 阶段"
+          title={`${label}为实验特性，可在系统设置中隐藏`}
         >
-          Beta
+          实验
         </Badge>
       );
     }
@@ -219,102 +223,109 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
       </div>
 
       <nav className="min-h-0 flex-1 space-y-4 overflow-y-auto overscroll-contain pr-1">
-        {navGroups.map((group) => (
-          <div key={group.title} className="space-y-1">
-            {!collapsed ? (
-              <div className="px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground/80">
-                {group.title}
-              </div>
-            ) : (
-              <div className="mx-auto h-px w-8 bg-border/70" />
-            )}
+        {navGroups.map((group) => {
+          const visibleItems = group.items.filter((item) => {
+            const feature = getExperimentalFeatureForPath(item.to);
+            return !(feature && isExperimentalFeatureHidden(feature.key));
+          });
 
-            {group.items.map((item) => {
-              const Icon = item.icon;
-              const isNovelEntry = item.to === "/novels";
+          return (
+            <div key={group.title} className="space-y-1">
+              {!collapsed ? (
+                <div className="px-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground/80">
+                  {group.title}
+                </div>
+              ) : (
+                <div className="mx-auto h-px w-8 bg-border/70" />
+              )}
 
-              if (item.action === "visual_asset_library") {
-                return (
-                  <button
-                    key={item.to}
-                    type="button"
-                    title={collapsed ? item.label : undefined}
-                    className={cn(
-                      "relative flex w-full items-center rounded-md text-sm text-foreground transition-colors hover:bg-accent hover:text-accent-foreground",
-                      collapsed ? "justify-center px-2 py-2.5" : "py-2 pl-4 pr-2",
-                    )}
-                    onClick={() => setVisualAssetLibraryOpen(true)}
-                  >
-                    <Icon className={cn("h-[18px] w-[18px] shrink-0", collapsed ? "mx-auto" : "mr-3")} />
-                    {!collapsed ? <span className="truncate">{item.label}</span> : null}
-                  </button>
-                );
-              }
+              {visibleItems.map((item) => {
+                const Icon = item.icon;
+                const isNovelEntry = item.to === "/novels";
 
-              if (item.disabled) {
-                return (
-                  <div
-                    key={item.to}
-                    title={collapsed ? item.label : "即将推出"}
-                    className={cn(
-                      "relative flex cursor-not-allowed items-center rounded-md text-sm opacity-40",
-                      collapsed ? "justify-center px-2 py-2.5" : "py-2 pl-4 pr-2",
-                    )}
-                  >
-                    <Icon className={cn("h-[18px] w-[18px] shrink-0", collapsed ? "mx-auto" : "mr-3")} />
-                    {!collapsed ? (
-                      <span className="truncate">{item.label}</span>
-                    ) : null}
-                    {!collapsed ? (
-                      <span className="ml-auto text-[10px] text-muted-foreground/60">即将推出</span>
-                    ) : null}
-                  </div>
-                );
-              }
-
-              return (
-                <NavLink key={item.to} to={item.to} title={collapsed ? item.label : undefined}>
-                  {({ isActive }) => (
-                    <div
+                if (item.action === "visual_asset_library") {
+                  return (
+                    <button
+                      key={item.to}
+                      type="button"
+                      title={collapsed ? item.label : undefined}
                       className={cn(
-                        "relative flex items-center rounded-md text-sm transition-colors",
+                        "relative flex w-full items-center rounded-md text-sm text-foreground transition-colors hover:bg-accent hover:text-accent-foreground",
                         collapsed ? "justify-center px-2 py-2.5" : "py-2 pl-4 pr-2",
-                        isActive
-                          ? "bg-accent/90 font-semibold text-accent-foreground"
-                          : "text-foreground hover:bg-accent hover:text-accent-foreground",
-                        isNovelEntry && !collapsed && (isActive ? "ring-1 ring-primary/20" : "bg-primary/5 hover:bg-primary/10"),
+                      )}
+                      onClick={() => setVisualAssetLibraryOpen(true)}
+                    >
+                      <Icon className={cn("h-[18px] w-[18px] shrink-0", collapsed ? "mx-auto" : "mr-3")} />
+                      {!collapsed ? <span className="truncate">{item.label}</span> : null}
+                    </button>
+                  );
+                }
+
+                if (item.disabled) {
+                  return (
+                    <div
+                      key={item.to}
+                      title={collapsed ? item.label : "即将推出"}
+                      className={cn(
+                        "relative flex cursor-not-allowed items-center rounded-md text-sm opacity-40",
+                        collapsed ? "justify-center px-2 py-2.5" : "py-2 pl-4 pr-2",
                       )}
                     >
-                      <span
-                        className={cn(
-                          "absolute left-1 top-1/2 h-5 w-1 -translate-y-1/2 rounded-full bg-transparent",
-                          isActive && "bg-primary",
-                          collapsed && "left-0.5 h-6",
-                        )}
-                      />
-
-                      <Icon
-                        className={cn(
-                          "h-[18px] w-[18px] shrink-0",
-                          collapsed ? "mx-auto" : "mr-3",
-                          isNovelEntry && "text-primary",
-                        )}
-                      />
-
+                      <Icon className={cn("h-[18px] w-[18px] shrink-0", collapsed ? "mx-auto" : "mr-3")} />
                       {!collapsed ? (
-                        <span className={cn("truncate", isNovelEntry && "font-semibold")}>
-                          {item.label}
-                        </span>
+                        <span className="truncate">{item.label}</span>
                       ) : null}
-
-                      {renderBadge(item.to)}
+                      {!collapsed ? (
+                        <span className="ml-auto text-[10px] text-muted-foreground/60">即将推出</span>
+                      ) : null}
                     </div>
-                  )}
-                </NavLink>
-              );
-            })}
-          </div>
-        ))}
+                  );
+                }
+
+                return (
+                  <NavLink key={item.to} to={item.to} title={collapsed ? item.label : undefined}>
+                    {({ isActive }) => (
+                      <div
+                        className={cn(
+                          "relative flex items-center rounded-md text-sm transition-colors",
+                          collapsed ? "justify-center px-2 py-2.5" : "py-2 pl-4 pr-2",
+                          isActive
+                            ? "bg-accent/90 font-semibold text-accent-foreground"
+                            : "text-foreground hover:bg-accent hover:text-accent-foreground",
+                          isNovelEntry && !collapsed && (isActive ? "ring-1 ring-primary/20" : "bg-primary/5 hover:bg-primary/10"),
+                        )}
+                      >
+                        <span
+                          className={cn(
+                            "absolute left-1 top-1/2 h-5 w-1 -translate-y-1/2 rounded-full bg-transparent",
+                            isActive && "bg-primary",
+                            collapsed && "left-0.5 h-6",
+                          )}
+                        />
+
+                        <Icon
+                          className={cn(
+                            "h-[18px] w-[18px] shrink-0",
+                            collapsed ? "mx-auto" : "mr-3",
+                            isNovelEntry && "text-primary",
+                          )}
+                        />
+
+                        {!collapsed ? (
+                          <span className={cn("truncate", isNovelEntry && "font-semibold")}>
+                            {item.label}
+                          </span>
+                        ) : null}
+
+                        {renderBadge(item.to)}
+                      </div>
+                    )}
+                  </NavLink>
+                );
+              })}
+            </div>
+          );
+        })}
       </nav>
       <VisualAssetLibraryDialog open={visualAssetLibraryOpen} onOpenChange={setVisualAssetLibraryOpen} />
     </aside>
