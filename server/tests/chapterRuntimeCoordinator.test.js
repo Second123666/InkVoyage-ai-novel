@@ -410,7 +410,6 @@ test("finalizeChapterContent runs acceptance gate once and finalizes the current
       },
     });
 
-    const start = Date.now();
     const deferredInput = {
       novelId: "novel-1",
       chapterId: "chapter-1",
@@ -425,7 +424,6 @@ test("finalizeChapterContent runs acceptance gate once and finalizes the current
       deferTerminalCommit: true,
     };
     const deferredEvaluation = await coordinator.contentFinalizationService.finalizeChapterContent(deferredInput);
-    const duration = Date.now() - start;
 
     const firstAcceptanceStart = gateCalls.find((item) => item[0] === "acceptance-start")[1];
     const firstAcceptanceEnd = gateCalls.find((item) => item[0] === "acceptance-end")[1];
@@ -440,7 +438,8 @@ test("finalizeChapterContent runs acceptance gate once and finalizes the current
     assert.equal(timelineFinalizationCalls[0].mode, "stable");
     assert.equal(timelineFinalizationCalls[0].sourceStage, "chapter_content_finalization");
     assert.equal(timelineFinalizationCalls[0].qualityDebt, false);
-    assert.ok(duration < 160);
+    // 不再用墙钟阈值(如 duration < 160)判断「验收门只跑一次」:满负载下单次验收门就可能超过该阈值,
+    // 而重复执行会被 acceptanceCalls===1、延迟提交会被 timelineFinalizationCalls.length===0 确定性拦住。
 
     await coordinator.contentFinalizationService.finalizeChapterContent({
       novelId: "novel-1",

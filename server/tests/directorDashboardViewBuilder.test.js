@@ -103,6 +103,29 @@ test("dashboard keeps running mode when task is running despite stale approval p
   assert.ok(view.diagnostics.some((item) => item.code === "stale_action_projection_ignored"));
 });
 
+test("dashboard keeps cancelled as a neutral terminal instead of folding into failed", () => {
+  const view = buildView({
+    task: { status: "cancelled" },
+  });
+
+  assert.equal(view.mode, "cancelled");
+  assert.notEqual(view.mode, "failed", "已取消任务不得以失败态呈现(dashboard 层)");
+  assert.equal(view.statusLabel, "已取消");
+  assert.equal(view.requiresUserAction, false);
+
+  const actionLabels = [
+    view.primaryAction,
+    ...view.secondaryActions,
+  ]
+    .filter(Boolean)
+    .map((action) => action.label);
+  assert.equal(
+    actionLabels.includes("从最近进度恢复"),
+    false,
+    "已取消任务不得提供「从最近进度恢复」动作",
+  );
+});
+
 test("dashboard uses waiting mode only for explicit approval task checkpoints", () => {
   const view = buildView({
     task: {

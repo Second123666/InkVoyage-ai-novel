@@ -269,6 +269,22 @@ function buildMinimalDisplayState(patch) {
   });
 }
 
+test("display state keeps cancelled as a neutral mode instead of folding into failed", () => {
+  const displayState = buildMinimalDisplayState({
+    task: { status: "cancelled" },
+  });
+
+  assert.equal(displayState.mode, "cancelled");
+  assert.notEqual(displayState.mode, "failed", "已取消是中性终态,不得折入失败");
+  assert.equal(displayState.headline, "已取消");
+  assert.equal(displayState.requiresUserAction, false);
+  assert.equal(displayState.needsRecovery, false);
+
+  const currentStep = displayState.steps.find((step) => step.isCurrent);
+  assert.ok(currentStep, "已取消任务仍应有当前步用于定位停点");
+  assert.equal(currentStep.status, "pending", "已取消的当前步保持中性,不进入推进中/需要处理任一侧");
+});
+
 test("display state resolves stage from catalog fact step, node alias, checkpoint and task stage", () => {
   assert.equal(
     buildMinimalDisplayState({
