@@ -100,6 +100,35 @@ test("must-handle filtering follows structured impact instead of failed and canc
   }), false);
 });
 
+test("pending manual recovery is a blocker for every task kind", () => {
+  const kinds = [
+    "book_analysis",
+    "novel_pipeline",
+    "knowledge_document",
+    "image_generation",
+    "agent_run",
+    "novel_workflow",
+    "style_extraction",
+  ];
+  for (const kind of kinds) {
+    const task = { ...baseTask, kind, status: "queued", pendingManualRecovery: true };
+    assert.equal(getTaskQueueTone(task), "danger", `${kind} pmr should stay blocking`);
+    assert.equal(getTaskQueueLevelLabel(task), "需要恢复", `${kind} pmr should read as recovery`);
+    assert.equal(isTaskMustHandle(task), true, `${kind} pmr should be must-handle`);
+  }
+});
+
+test("pending manual recovery outranks residual quality notices", () => {
+  const task = {
+    ...baseTask,
+    status: "failed",
+    pendingManualRecovery: true,
+    failureCode: "PIPELINE_QUALITY_REVIEW",
+  };
+  assert.equal(getTaskQueueTone(task), "danger");
+  assert.equal(getTaskQueueLevelLabel(task), "需要恢复");
+});
+
 test("task queue distinguishes running and completed ordinary tasks", () => {
   assert.equal(getTaskQueueTone({ ...baseTask, status: "running" }), "info");
   assert.equal(getTaskQueueTone({ ...baseTask, status: "succeeded" }), "success");

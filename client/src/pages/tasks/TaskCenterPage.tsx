@@ -25,10 +25,8 @@ import {
   getTaskNoticeSeverity,
   getTaskNoticeTitle,
   getTaskQueueSeverity,
-  getTaskQueueTone,
   isTaskFailureQualityReminder,
   isTaskMustHandle,
-  isTaskReplanRequired,
   getTimestamp,
   serializeListParams,
   type TaskSortMode,
@@ -167,14 +165,9 @@ export default function TaskCenterPage() {
   const queuedCount = taskOverview?.queuedCount ?? allRows.filter((item) => item.status === "queued").length;
   const waitingActionCount = taskOverview?.waitingApprovalCount
     ?? allRows.filter((item) => item.status === "waiting_approval").length;
-  const failedTaskCount = taskOverview?.failedCount
-    ?? allRows.filter((item) => item.status === "failed" && isTaskMustHandle(item)).length;
-  const recoveryCandidateCount = taskOverview?.recoveryCandidateCount
-    ?? recoveryCandidatesQuery.data?.data?.items.length
-    ?? allRows.filter((item) => item.pendingManualRecovery).length;
-  const blockingCount = allRows.filter((item) => getTaskQueueTone(item) === "danger").length;
-  const visibleReplanCount = allRows.filter(isTaskReplanRequired).length;
-  const mustHandleCount = failedTaskCount + recoveryCandidateCount + visibleReplanCount;
+  const failedTaskCount = taskOverview?.failedCount ?? 0;
+  // 「需要处理」计数以服务端 overview.attentionCount 为唯一口径：排除纯质量提醒失败，包含待恢复与重规划任务。
+  const mustHandleCount = taskOverview?.attentionCount ?? 0;
   const qualityReminderCount = allRows.filter((item) => getTaskQueueSeverity(item) === "quality").length;
 
   const selectedTask = detailQuery.data?.data;
@@ -234,7 +227,7 @@ export default function TaskCenterPage() {
     : overviewQuery.isError ? "任务概览读取失败，请重试。" : null;
   const detailErrorMessage = detailQuery.error instanceof Error ? detailQuery.error.message : detailQuery.isError ? "任务详情读取失败，请重试。" : null;
   const recommendedBlockingTask = allRows.find(isTaskMustHandle) ?? null;
-  const hasMustHandleTask = mustHandleCount > 0 || blockingCount > 0;
+  const hasMustHandleTask = mustHandleCount > 0;
   const recommendedRecoveryCandidate = failedTaskCount === 0
     ? recoveryCandidatesQuery.data?.data?.items[0] ?? null
     : null;

@@ -1,5 +1,8 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
 import {
   buildDisplayAutoDirectorTask,
@@ -10,6 +13,17 @@ import {
   shouldAutofocusProjectedDirectorTask,
   shouldShowPinnedBookAutomationProjection,
 } from "./novelEditAutomationStatus.ts";
+
+const sharedTypesRoot = join(dirname(fileURLToPath(import.meta.url)), "../../../../shared/types");
+
+const TASK_STATUS_CONTRACT = ["queued", "running", "waiting_approval", "succeeded", "failed", "cancelled"];
+
+function readSharedUnionMembers(fileName, typeName) {
+  const source = readFileSync(join(sharedTypesRoot, fileName), "utf8");
+  const unionMatch = source.match(new RegExp(`export type ${typeName} =([\\s\\S]*?);`));
+  assert.ok(unionMatch, `${typeName} should stay readable from shared/types/${fileName}`);
+  return [...unionMatch[1].matchAll(/"([a-z_]+)"/g)].map((match) => match[1]);
+}
 
 function buildTask(overrides = {}) {
   return {
@@ -213,4 +227,61 @@ test("rail keeps the pinned failed projection visible without an active task", (
     }),
     false,
   );
+});
+
+test("editor task status mapping stays inside the unified task status contract", () => {
+  const automationStatuses = readSharedUnionMembers("directorRuntime.ts", "DirectorBookAutomationStatus");
+  assert.deepEqual(automationStatuses, [
+    "idle",
+    "queued",
+    "running",
+    "waiting_approval",
+    "waiting_recovery",
+    "blocked",
+    "failed",
+    "cancelled",
+    "completed",
+  ]);
+
+  const emittedStatuses = new Set();
+  for (const projectionStatus of automationStatuses) {
+    const result = buildDisplayAutoDirectorTask(
+      { id: "task-guard", status: "waiting_approval", pendingManualRecovery: false },
+      { latestTask: { id: "task-guard", status: projectionStatus }, status: projectionStatus },
+    );
+    assert.ok(result, `${projectionStatus} projection should keep the task visible`);
+    emittedStatuses.add(result.status);
+    assert.ok(
+      TASK_STATUS_CONTRACT.includes(result.status),
+      `projection ${projectionStatus} must map into TaskStatus, received ${result.status}`,
+    );
+  }
+  assert.deepEqual(
+    [...emittedStatuses].sort(),
+    [...TASK_STATUS_CONTRACT].sort(),
+    "editor status vocabulary should cover the unified task status contract",
+  );
+});
+
+test("editor recovery and blocked projections keep the task center degradation contract", () => {
+  const recoveryTask = buildDisplayAutoDirectorTask(
+    { id: "task-recovery", status: "queued", pendingManualRecovery: false },
+    {
+      latestTask: { id: "task-recovery", status: "running" },
+      status: "waiting_recovery",
+      blockedReason: "等待手动恢复",
+    },
+  );
+  assert.equal(recoveryTask.status, "queued");
+  assert.equal(recoveryTask.pendingManualRecovery, true);
+
+  const blockedTask = buildDisplayAutoDirectorTask(
+    { id: "task-blocked", status: "running", pendingManualRecovery: false },
+    {
+      latestTask: { id: "task-blocked", status: "running" },
+      status: "blocked",
+      blockedReason: "需要确认后继续",
+    },
+  );
+  assert.equal(blockedTask.status, "failed");
 });

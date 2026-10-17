@@ -21,6 +21,8 @@ function modeLabel(mode: NovelEditTakeoverState["mode"]): string {
       return "等待确认";
     case "action_required":
       return "待处理";
+    case "cancelled":
+      return "已取消";
     case "failed":
     default:
       return "异常";
@@ -28,6 +30,9 @@ function modeLabel(mode: NovelEditTakeoverState["mode"]): string {
 }
 
 function progressTone(mode: NovelEditTakeoverState["mode"]): WorkflowProgressTone {
+  if (mode === "cancelled") {
+    return "default";
+  }
   if (mode === "failed") {
     return "failed";
   }
@@ -46,6 +51,9 @@ function cardClass(mode: NovelEditTakeoverState["mode"]): string {
   }
   if (mode === "waiting" || mode === "action_required") {
     return "border-amber-500/35 bg-amber-50/80";
+  }
+  if (mode === "cancelled") {
+    return "bg-muted/40";
   }
   return "border-primary/25 bg-primary/[0.04]";
 }

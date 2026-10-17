@@ -265,6 +265,8 @@ function mapDashboardModeToContainerMode(mode: DirectorDashboardMode | null | un
   switch (mode) {
     case "failed":
       return "failed";
+    case "cancelled":
+      return "cancelled";
     case "recovering":
       return "action_required";
     case "waiting_user":

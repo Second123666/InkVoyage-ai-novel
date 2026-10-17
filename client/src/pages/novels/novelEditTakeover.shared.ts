@@ -80,6 +80,9 @@ export function buildTakeoverTitle(input: {
     }
     return `《${input.novelTitle}》自动导演已中断`;
   }
+  if (input.mode === "cancelled") {
+    return `《${input.novelTitle}》自动导演已取消`;
+  }
   if (input.mode === "loading") {
     return `《${input.novelTitle}》自动导演状态同步中`;
   }
@@ -123,6 +126,9 @@ export function buildTakeoverDescription(input: {
       return `${input.scopeLabel}自动执行已暂停。可以先查看执行详情或质量修复区，再决定是否继续自动执行。`;
     }
     return "后台导演流程已中断。可以先查看执行详情，再决定是否从最近进度点恢复。";
+  }
+  if (input.mode === "cancelled") {
+    return "本轮自动导演已取消。你可以查看已生成的结果，或重新发起自动导演。";
   }
   if (input.mode === "loading") {
     return "正在同步当前自动导演状态。";

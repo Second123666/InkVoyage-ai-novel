@@ -71,6 +71,7 @@ export function isTaskMustHandle(task: TaskQueuePresentationInput): boolean {
 }
 
 export function getTaskQueueTone(task: TaskQueuePresentationInput): WorkspaceTone {
+  // 待手动恢复对任意任务种类都是阻塞语义：只要后端投影出 pendingManualRecovery=true，就按「需要恢复」处理。
   if (task.pendingManualRecovery || isTaskReplanRequired(task)) {
     return "danger";
   }

@@ -132,7 +132,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
     },
   });
 
-  const failedTaskCount = taskQuery.data?.data?.failedCount ?? 0;
+  const attentionCount = taskQuery.data?.data?.attentionCount ?? 0;
   const autoDirectorFollowUpCount = autoDirectorFollowUpQuery.data?.data?.totalCount ?? 0;
   const knowledgeDocuments = knowledgeQuery.data?.data ?? [];
   const failedIndexCount = knowledgeDocuments.filter((item) => item.latestIndexStatus === "failed").length;
@@ -155,7 +155,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
     }
 
     if (to === "/tasks") {
-      if (failedTaskCount <= 0) {
+      if (attentionCount <= 0) {
         return null;
       }
       return (
@@ -164,7 +164,7 @@ export default function Sidebar({ collapsed, onToggle }: SidebarProps) {
             variant="destructive"
             className={cn("h-5 px-1.5 text-[10px]", collapsed && "h-4 min-w-4 px-1 text-[9px]")}
           >
-            {collapsed ? failedTaskCount : `F${failedTaskCount}`}
+            {collapsed ? attentionCount : `F${attentionCount}`}
           </Badge>
         </div>
       );

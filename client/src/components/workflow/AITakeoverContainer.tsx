@@ -7,7 +7,7 @@ import WorkflowProgressBar, {
   type WorkflowProgressTone,
 } from "./WorkflowProgressBar";
 
-export type AITakeoverMode = "loading" | "running" | "waiting" | "action_required" | "failed";
+export type AITakeoverMode = "loading" | "running" | "waiting" | "action_required" | "failed" | "cancelled";
 
 export interface AITakeoverAction {
   label: string;
@@ -38,6 +38,8 @@ function modeLabel(mode: AITakeoverMode): string {
       return "等待确认";
     case "action_required":
       return "待处理";
+    case "cancelled":
+      return "已取消";
     case "failed":
     default:
       return "执行异常";
@@ -47,6 +49,7 @@ function modeLabel(mode: AITakeoverMode): string {
 function shellClass(mode: AITakeoverMode): string {
   switch (mode) {
     case "loading":
+    case "cancelled":
       return "border-border bg-gradient-to-br from-background via-background to-muted/35";
     case "failed":
       return "border-destructive/20 bg-gradient-to-br from-background via-background to-destructive/5";
@@ -63,6 +66,7 @@ function shellClass(mode: AITakeoverMode): string {
 function progressShellClass(mode: AITakeoverMode): string {
   switch (mode) {
     case "loading":
+    case "cancelled":
       return "bg-background/70";
     case "failed":
       return "bg-background/65";
@@ -78,6 +82,8 @@ function progressShellClass(mode: AITakeoverMode): string {
 
 function progressTone(mode: AITakeoverMode): WorkflowProgressTone {
   switch (mode) {
+    case "cancelled":
+      return "default";
     case "loading":
       return "loading";
     case "failed":
@@ -101,6 +107,8 @@ function progressStatusLabel(mode: AITakeoverMode): string | null {
       return "需要你处理";
     case "failed":
       return "已中断";
+    case "cancelled":
+      return "已取消";
     default:
       return null;
   }
@@ -110,7 +118,7 @@ function badgeVariant(mode: AITakeoverMode): "default" | "secondary" | "destruct
   if (mode === "failed") {
     return "destructive";
   }
-  if (mode === "loading" || mode === "waiting" || mode === "action_required") {
+  if (mode === "loading" || mode === "waiting" || mode === "action_required" || mode === "cancelled") {
     return "secondary";
   }
   return "default";

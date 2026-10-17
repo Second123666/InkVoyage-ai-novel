@@ -199,14 +199,24 @@ export function buildHomeNextAction(primaryNovel: HomeNovelItem | null): HomeNex
       tone: "success",
     };
   }
-  if (task?.status === "failed" || task?.status === "cancelled") {
+  if (task?.status === "failed") {
     return {
       kind: "novel",
       eyebrow: "需要处理",
       title: "处理创作中断",
       description: getNovelLeadSummary(primaryNovel),
-      reason: "任务存在暂停或失败记录，先查看详情再决定恢复、重试或调整。",
+      reason: "任务存在失败记录，先查看详情再决定恢复、重试或调整。",
       tone: "danger",
+    };
+  }
+  if (task?.status === "cancelled") {
+    return {
+      kind: "novel",
+      eyebrow: "已取消",
+      title: "查看已取消的创作",
+      description: getNovelLeadSummary(primaryNovel),
+      reason: "这次创作已停止，不会继续执行；可以查看记录，或重新发起创作。",
+      tone: "neutral",
     };
   }
   return {

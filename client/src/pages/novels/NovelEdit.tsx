@@ -119,6 +119,8 @@ function mapDashboardModeToTakeoverMode(mode: DirectorDashboardMode | null | und
       return "action_required";
     case "failed":
       return "failed";
+    case "cancelled":
+      return "cancelled";
     case "idle":
       return "loading";
     default:
