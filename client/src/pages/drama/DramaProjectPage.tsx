@@ -46,6 +46,7 @@ import { DramaQualityPanel } from "@/pages/drama/components/DramaQualityPanel";
 import { DramaSourcePanel } from "@/pages/drama/components/DramaSourcePanel";
 import { DramaVisualPanel } from "@/pages/drama/components/DramaVisualPanel";
 import { dramaTrackLabel } from "@/pages/drama/dramaDisplay";
+import { DramaVideoNotice } from "@/pages/drama/DramaVideoNotice";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -562,6 +563,8 @@ export default function DramaProjectPage() {
           刷新
         </Button>
       </div>
+
+      <DramaVideoNotice />
 
       <ProjectProgress project={project} />
 

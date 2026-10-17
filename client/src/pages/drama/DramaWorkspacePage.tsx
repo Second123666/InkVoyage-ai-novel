@@ -21,6 +21,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { toast } from "@/components/ui/toast";
 import { getNovelList } from "@/api/novel/core";
 import { DRAMA_SOURCE_LABELS, DRAMA_TRACK_OPTIONS, dramaTrackLabel } from "./dramaDisplay";
+import { DramaVideoNotice } from "@/pages/drama/DramaVideoNotice";
 import SelectControl from "@/components/common/SelectControl";
 
 const WIZARD_STEPS = [
@@ -317,6 +318,8 @@ export default function DramaWorkspacePage() {
           从小说、原创灵感或导入文本整理短剧素材，再生成竖屏付费短剧策略和分集台本。
         </p>
       </div>
+
+      <DramaVideoNotice />
 
       <div className="grid gap-4 xl:grid-cols-[minmax(320px,420px)_1fr]">
         <Card className="rounded-lg">
