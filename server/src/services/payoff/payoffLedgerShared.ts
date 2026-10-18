@@ -28,6 +28,7 @@ type PayoffLedgerRowLike = {
   riskSignalsJson: string | null;
   statusReason: string | null;
   confidence: number | null;
+  manualLocked?: boolean | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -217,6 +218,7 @@ export function mapPayoffLedgerRow(row: PayoffLedgerRowLike): PayoffLedgerItem {
     riskSignals: safeParseJson<PayoffLedgerRiskSignal[]>(row.riskSignalsJson, []),
     statusReason: row.statusReason,
     confidence: row.confidence,
+    manualLocked: row.manualLocked ?? false,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
   };
@@ -252,10 +254,12 @@ export function classifyPayoffLedgerItems(
   // the explicit end of its payoff window. During the window, keep the item
   // in the pending set so it can guide the current chapter without forcing a
   // replan before the promised chapter has actually completed.
+  // 已过窗的 pending-like 条目会被读时升格进 overdueItems(INN-A1 A1-G4),
+  // 因此 pending 侧必须显式排除,避免同一项同时计入两个桶。
   const overdueItems = items.filter((item) => isPayoffOverdueAtChapter(item, chapterOrder));
   const pendingItems = items.filter((item) => (
-    isPendingLike(item.currentStatus)
-    || (item.currentStatus === "overdue" && !isPayoffOverdueAtChapter(item, chapterOrder))
+    (isPendingLike(item.currentStatus) || item.currentStatus === "overdue")
+    && !isPayoffOverdueAtChapter(item, chapterOrder)
   ));
   const urgentItems = pendingItems.filter((item) => isUrgent(item, chapterOrder));
   const paidOffItems = items.filter((item) => item.currentStatus === "paid_off");
@@ -271,12 +275,18 @@ export function isPayoffOverdueAtChapter(
   item: Pick<PayoffLedgerItem, "currentStatus" | "targetEndChapterOrder">,
   chapterOrder?: number | null,
 ): boolean {
-  return item.currentStatus === "overdue"
-    && (
-      chapterOrder == null
+  if (item.currentStatus === "overdue") {
+    // 存储态逾期:窗口内(或无窗口语境)先降级回待推进,避免催办早于承诺章节。
+    return chapterOrder == null
       || item.targetEndChapterOrder == null
-      || item.targetEndChapterOrder < chapterOrder
-    );
+      || item.targetEndChapterOrder < chapterOrder;
+  }
+  // A1-G4 确定性兜底:pending-like 且显式窗口已过 → 读时升格为逾期,
+  // 不依赖 AI 下次对账补标(对已结构化 AI 输出的确定性后处理)。
+  return isPendingLike(item.currentStatus)
+    && typeof item.targetEndChapterOrder === "number"
+    && chapterOrder != null
+    && item.targetEndChapterOrder < chapterOrder;
 }
 
 export function buildPayoffLedgerSummary(
@@ -319,6 +329,10 @@ export function buildPayoffLedgerResponse(
   };
 }
 
+// A1-G17:长期未回收判定阈值 —— 距最近一次触碰超过该章节数且未终结即视为停滞。
+// 与角色资源的 stale 扫描(10)不同,伏笔跨章更长,取 30。
+export const PAYOFF_STALE_AFTER_CHAPTERS = 30;
+
 export function buildSyntheticPayoffIssues(
   items: PayoffLedgerItem[],
   chapterOrder?: number | null,
@@ -350,6 +364,29 @@ export function buildSyntheticPayoffIssues(
           || item.evidence[0]?.summary
           || `目标窗口 ${item.targetStartChapterOrder ?? "?"}-${item.targetEndChapterOrder ?? "?"}。`,
         fixSuggestion: "在本章计划、正文或修复中补上推进动作，避免继续拖延。",
+      });
+    }
+  }
+
+  // A1-G17 停滞扫描:未终结且长期未再触碰的伏笔产生提醒(复用 payoff_missing_progress 语义;
+  // 与上面紧急项按 ledgerKey:code 去重,紧急措辞优先)。
+  if (chapterOrder) {
+    for (const item of classified.pendingItems) {
+      if (item.currentStatus === "overdue") {
+        continue;
+      }
+      const anchorOrder = item.lastTouchedChapterOrder ?? item.firstSeenChapterOrder;
+      if (anchorOrder == null || chapterOrder - anchorOrder <= PAYOFF_STALE_AFTER_CHAPTERS) {
+        continue;
+      }
+      issues.push({
+        ledgerKey: item.ledgerKey,
+        code: "payoff_missing_progress",
+        severity: "medium",
+        description: `伏笔“${item.title}”已超过 ${PAYOFF_STALE_AFTER_CHAPTERS} 章未再推进，可能被遗忘。`,
+        evidence: item.statusReason?.trim()
+          || `最近触碰第 ${anchorOrder} 章，当前第 ${chapterOrder} 章。`,
+        fixSuggestion: "在后续章节安排推进或兑现，或调整目标窗口；确认已无用可标记放弃。",
       });
     }
   }

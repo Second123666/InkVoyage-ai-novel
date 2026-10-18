@@ -131,6 +131,13 @@ export const canonicalNarrativeStateSchema = z.object({
   pendingPayoffs: z.array(canonicalPayoffStateSchema).default([]),
   urgentPayoffs: z.array(canonicalPayoffStateSchema).default([]),
   overduePayoffs: z.array(canonicalPayoffStateSchema).default([]),
+  // A1-G21:回收/失败计数随快照落库;旧快照无此字段时按 0 解析(向后兼容)。
+  payoffCounts: z
+    .object({
+      paidOffCount: z.number().int().default(0),
+      failedCount: z.number().int().default(0),
+    })
+    .optional(),
   publicKnowledge: z.array(z.string()).default([]),
   hiddenKnowledge: z.array(z.string()).default([]),
   suspenseThreads: z.array(z.string()).default([]),

@@ -3,7 +3,12 @@ import type {
   CanonicalTimelineEventState,
 } from "@ai-novel/shared/types/canonicalState";
 import type { GenerationContextPackage } from "@ai-novel/shared/types/chapterRuntime";
+import type { PayoffLedgerItem } from "@ai-novel/shared/types/payoffLedger";
 import { prisma } from "../../../db/prisma";
+import {
+  classifyPayoffLedgerItems,
+  mapPayoffLedgerRow,
+} from "../../payoff/payoffLedgerShared";
 import { characterResourceLedgerService } from "../characterResource/CharacterResourceLedgerService";
 
 function compactText(value: string | null | undefined, fallback = ""): string {
@@ -255,51 +260,36 @@ export class CanonicalStateService {
       };
     });
 
-    const pendingPayoffs = payoffItems
-      .filter((item) => item.currentStatus === "setup" || item.currentStatus === "hinted" || item.currentStatus === "pending_payoff")
-      .map((item) => ({
-        id: item.id,
-        ledgerKey: item.ledgerKey,
-        title: item.title,
-        summary: item.summary,
-        scopeType: item.scopeType,
-        currentStatus: item.currentStatus,
-        targetStartChapterOrder: item.targetStartChapterOrder,
-        targetEndChapterOrder: item.targetEndChapterOrder,
-        firstSeenChapterOrder: item.firstSeenChapterOrder,
-        lastTouchedChapterOrder: item.lastTouchedChapterOrder,
-        lastTouchedChapterId: item.lastTouchedChapterId,
-        setupChapterId: item.setupChapterId,
-        payoffChapterId: item.payoffChapterId,
-        statusReason: item.statusReason,
-        confidence: item.confidence,
-        createdAt: item.createdAt.toISOString(),
-        updatedAt: item.updatedAt.toISOString(),
-      }));
-    const urgentPayoffs = pendingPayoffs.filter((item) => typeof item.targetEndChapterOrder === "number"
-      && typeof chapterOrder === "number"
-      && item.targetEndChapterOrder <= chapterOrder + 1);
-    const overduePayoffs = payoffItems
-      .filter((item) => item.currentStatus === "overdue")
-      .map((item) => ({
-        id: item.id,
-        ledgerKey: item.ledgerKey,
-        title: item.title,
-        summary: item.summary,
-        scopeType: item.scopeType,
-        currentStatus: item.currentStatus,
-        targetStartChapterOrder: item.targetStartChapterOrder,
-        targetEndChapterOrder: item.targetEndChapterOrder,
-        firstSeenChapterOrder: item.firstSeenChapterOrder,
-        lastTouchedChapterOrder: item.lastTouchedChapterOrder,
-        lastTouchedChapterId: item.lastTouchedChapterId,
-        setupChapterId: item.setupChapterId,
-        payoffChapterId: item.payoffChapterId,
-        statusReason: item.statusReason,
-        confidence: item.confidence,
-        createdAt: item.createdAt.toISOString(),
-        updatedAt: item.updatedAt.toISOString(),
-      }));
+    // A1-G4:注入侧分类统一走共享分类函数(读时升格 / 窗口降级 / 紧急判定),
+    // 消除「注入侧 urgent 无 targetStart 条件、overdue 不看窗口」的双口径。
+    const classifiedPayoffs = classifyPayoffLedgerItems(payoffItems.map(mapPayoffLedgerRow), chapterOrder);
+    const toCanonicalPayoff = (item: PayoffLedgerItem) => ({
+      id: item.id,
+      ledgerKey: item.ledgerKey,
+      title: item.title,
+      summary: item.summary,
+      scopeType: item.scopeType,
+      currentStatus: item.currentStatus,
+      targetStartChapterOrder: item.targetStartChapterOrder,
+      targetEndChapterOrder: item.targetEndChapterOrder,
+      firstSeenChapterOrder: item.firstSeenChapterOrder,
+      lastTouchedChapterOrder: item.lastTouchedChapterOrder,
+      lastTouchedChapterId: item.lastTouchedChapterId,
+      setupChapterId: item.setupChapterId,
+      payoffChapterId: item.payoffChapterId,
+      statusReason: item.statusReason,
+      confidence: item.confidence,
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
+    });
+    const pendingPayoffs = classifiedPayoffs.pendingItems.map(toCanonicalPayoff);
+    const urgentPayoffs = classifiedPayoffs.urgentItems.map(toCanonicalPayoff);
+    const overduePayoffs = classifiedPayoffs.overdueItems.map(toCanonicalPayoff);
+    // A1-G21:回收/失败计数随快照落库,让运行时账本摘要能反映真实回收进度(此前恒 0)。
+    const payoffCounts = {
+      paidOffCount: classifiedPayoffs.paidOffItems.length,
+      failedCount: payoffItems.filter((item) => item.currentStatus === "failed").length,
+    };
 
     const publicKnowledge = takeUnique(
       latestSnapshot?.informationStates
@@ -416,6 +406,7 @@ export class CanonicalStateService {
         pendingPayoffs,
         urgentPayoffs,
         overduePayoffs,
+        payoffCounts,
         publicKnowledge,
         hiddenKnowledge,
         suspenseThreads,
@@ -549,12 +540,16 @@ export function buildRuntimeLedgerFromCanonical(
     ledgerUrgentItems: urgentItems,
     ledgerOverdueItems: overdueItems,
     ledgerSummary: {
-      totalCount: pendingItems.length + overdueItems.length,
+      // totalCount 覆盖账本全部在册条目(待推进 + 逾期 + 已兑现 + 已放弃),
+      // 让「回收率 = paidOff / totalCount」类评估有正确分母。
+      totalCount: pendingItems.length + overdueItems.length
+        + (snapshot.narrative.payoffCounts?.paidOffCount ?? 0)
+        + (snapshot.narrative.payoffCounts?.failedCount ?? 0),
       pendingCount: pendingItems.length,
       urgentCount: urgentItems.length,
       overdueCount: overdueItems.length,
-      paidOffCount: 0,
-      failedCount: 0,
+      paidOffCount: snapshot.narrative.payoffCounts?.paidOffCount ?? 0,
+      failedCount: snapshot.narrative.payoffCounts?.failedCount ?? 0,
       updatedAt: snapshot.createdAt,
     },
   };
