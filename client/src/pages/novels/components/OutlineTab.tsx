@@ -119,6 +119,10 @@ export default function OutlineTab(props: OutlineTabViewProps) {
     onGoToStructuredTab,
     latestStateSnapshot,
     payoffLedger,
+    payoffLedgerNovelId,
+    payoffLedgerLoading,
+    payoffLedgerError,
+    onRetryPayoffLedger,
     characterResources = [],
     draftText,
     volumes,
@@ -530,7 +534,17 @@ export default function OutlineTab(props: OutlineTabViewProps) {
           <TabsList className="h-auto flex-wrap justify-start bg-muted/60 p-1">
             <TabsTrigger value="current">当前卷</TabsTrigger>
             <TabsTrigger value="strategy">战略总览</TabsTrigger>
-            <TabsTrigger value="assets">资产约束</TabsTrigger>
+            <TabsTrigger value="assets" className="relative">
+              资产约束
+              {(payoffLedger?.summary.overdueCount ?? 0) > 0 ? (
+                <Badge
+                  variant="secondary"
+                  className="ml-1.5 border-amber-300 bg-amber-50 px-1.5 text-[10px] font-medium text-amber-700"
+                >
+                  逾期 {payoffLedger?.summary.overdueCount}
+                </Badge>
+              ) : null}
+            </TabsTrigger>
           </TabsList>
 
         <TabsContent value="strategy" className="mt-0 space-y-4">
@@ -588,8 +602,12 @@ export default function OutlineTab(props: OutlineTabViewProps) {
 
         <TabsContent value="assets" className="mt-0 space-y-4">
         <BookPayoffLedgerCard
+          novelId={payoffLedgerNovelId}
           latestStateSnapshot={latestStateSnapshot}
           payoffLedger={payoffLedger}
+          loading={payoffLedgerLoading}
+          loadError={payoffLedgerError}
+          onRetryLoad={onRetryPayoffLedger}
         />
 
         <OutlineResourceCommitments

@@ -94,6 +94,10 @@ interface BuildNovelEditPlanningTabsInput {
   onGoToStructuredTab: () => void;
   latestStateSnapshot?: OutlineTabViewProps["latestStateSnapshot"];
   payoffLedger?: OutlineTabViewProps["payoffLedger"];
+  payoffLedgerNovelId?: OutlineTabViewProps["payoffLedgerNovelId"];
+  payoffLedgerLoading?: OutlineTabViewProps["payoffLedgerLoading"];
+  payoffLedgerError?: OutlineTabViewProps["payoffLedgerError"];
+  onRetryPayoffLedger?: OutlineTabViewProps["onRetryPayoffLedger"];
   characterResources?: OutlineTabViewProps["characterResources"];
   outlineText: string;
   structuredDraftText: string;
@@ -227,6 +231,10 @@ export function buildNovelEditPlanningTabs(input: BuildNovelEditPlanningTabsInpu
     onGoToStructuredTab: input.onGoToStructuredTab,
     latestStateSnapshot: input.latestStateSnapshot,
     payoffLedger: input.payoffLedger,
+    payoffLedgerNovelId: input.payoffLedgerNovelId,
+    payoffLedgerLoading: input.payoffLedgerLoading,
+    payoffLedgerError: input.payoffLedgerError,
+    onRetryPayoffLedger: input.onRetryPayoffLedger,
     characterResources: input.characterResources,
     draftText: input.outlineText,
     volumes: input.volumes,

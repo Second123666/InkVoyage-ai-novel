@@ -349,7 +349,9 @@ export default function NovelEdit() {
   const shouldLoadWorldSlice = activeTab === "basic" || activeTab === "world";
   const shouldLoadQualityReport = activeTab === "pipeline";
   const shouldLoadLatestState = activeTab === "chapter" || activeTab === "pipeline";
-  const shouldLoadPayoffLedger = activeTab === "structured" || activeTab === "chapter" || activeTab === "pipeline";
+  // A1-G12:大纲页签的「资产约束」子页常驻账本卡片,门控必须包含 outline,
+  // 否则直接进入大纲页时数据禁用、卡片误显「账本为空」。
+  const shouldLoadPayoffLedger = activeTab === "structured" || activeTab === "chapter" || activeTab === "pipeline" || activeTab === "outline";
   const shouldLoadCharacterResources = activeTab === "character" || activeTab === "chapter" || activeTab === "pipeline";
   const shouldLoadChapterContext = activeTab === "chapter" && Boolean(selectedChapterId);
   const shouldLoadChapterTimeline = activeTab === "chapter" && Boolean(selectedChapterId);
@@ -394,9 +396,25 @@ export default function NovelEdit() {
     enabled: Boolean(id && selectedChapterId),
   });
   const payoffLedgerChapterOrder = useMemo(() => {
-    const orders = novelDetailQuery.data?.data?.chapters?.map((chapter) => chapter.order) ?? [];
+    const detailChapters = novelDetailQuery.data?.data?.chapters ?? [];
+    // A1-G13:紧急/逾期参照取「当前写作进度」而非全书最后一章 —— 优先用户选中的章节,
+    // 其次最后一个已有正文的章节,最后退到最后一章,避免几乎所有带窗口条目都被判「紧急」。
+    const selectedOrder = detailChapters.find((chapter) => chapter.id === selectedChapterId)?.order;
+    if (typeof selectedOrder === "number") {
+      return selectedOrder;
+    }
+    const lastWrittenOrder = detailChapters.reduce<number | undefined>((latest, chapter) => {
+      if (!chapter.content?.trim()) {
+        return latest;
+      }
+      return latest == null || chapter.order > latest ? chapter.order : latest;
+    }, undefined);
+    if (lastWrittenOrder != null) {
+      return lastWrittenOrder;
+    }
+    const orders = detailChapters.map((chapter) => chapter.order);
     return orders.length > 0 ? Math.max(...orders) : undefined;
-  }, [novelDetailQuery.data?.data?.chapters]);
+  }, [novelDetailQuery.data?.data?.chapters, selectedChapterId]);
   const payoffLedgerQuery = useQuery({
     queryKey: queryKeys.novels.payoffLedger(id, payoffLedgerChapterOrder),
     queryFn: () => getNovelPayoffLedger(id, payoffLedgerChapterOrder),
@@ -2499,6 +2517,12 @@ export default function NovelEdit() {
     onGoToStructuredTab: goToStructuredTab,
     latestStateSnapshot,
     payoffLedger,
+    payoffLedgerNovelId: id,
+    payoffLedgerLoading: payoffLedgerQuery.isPending || payoffLedgerQuery.isFetching,
+    payoffLedgerError: payoffLedgerQuery.isError,
+    onRetryPayoffLedger: () => {
+      void payoffLedgerQuery.refetch();
+    },
     characterResources,
     outlineText,
     structuredDraftText,

@@ -12,6 +12,11 @@ import type {
   StoryPlan,
   StoryStateSnapshot,
 } from "@ai-novel/shared/types/novel";
+import type {
+  CreatePayoffLedgerItemPayload,
+  PayoffLedgerItem,
+  UpdatePayoffLedgerItemPayload,
+} from "@ai-novel/shared/types/payoffLedger";
 import { apiClient } from "../client";
 import type { DraftOptimizePreview } from "./shared";
 
@@ -51,6 +56,29 @@ export async function getNovelPayoffLedger(id: string, chapterOrder?: number) {
   const { data } = await apiClient.get<ApiResponse<PayoffLedgerResponse>>(`/novels/${id}/payoff-ledger`, {
     params: typeof chapterOrder === "number" ? { chapterOrder } : undefined,
   });
+  return data;
+}
+
+export async function createNovelPayoffLedgerItem(
+  id: string,
+  payload: CreatePayoffLedgerItemPayload,
+) {
+  const { data } = await apiClient.post<ApiResponse<PayoffLedgerItem>>(
+    `/novels/${id}/payoff-ledger`,
+    payload,
+  );
+  return data;
+}
+
+export async function updateNovelPayoffLedgerItem(
+  id: string,
+  itemId: string,
+  payload: UpdatePayoffLedgerItemPayload,
+) {
+  const { data } = await apiClient.patch<ApiResponse<PayoffLedgerItem>>(
+    `/novels/${id}/payoff-ledger/${itemId}`,
+    payload,
+  );
   return data;
 }
 

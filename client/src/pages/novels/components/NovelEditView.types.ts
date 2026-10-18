@@ -193,6 +193,10 @@ export interface OutlineTabViewProps {
   onGoToStructuredTab: () => void;
   latestStateSnapshot?: StoryStateSnapshot | null;
   payoffLedger?: PayoffLedgerResponse | null;
+  payoffLedgerNovelId?: string;
+  payoffLedgerLoading?: boolean;
+  payoffLedgerError?: boolean;
+  onRetryPayoffLedger?: () => void;
   characterResources?: CharacterResourceLedgerItem[];
   draftText: string;
   volumes: VolumePlan[];
