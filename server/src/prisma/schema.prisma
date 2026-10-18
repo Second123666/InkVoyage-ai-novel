@@ -2782,6 +2782,7 @@ model PayoffLedgerItem {
   riskSignalsJson       String?
   statusReason          String?
   confidence            Float?
+  manualLocked          Boolean           @default(false)
   novel                 Novel                 @relation(fields: [novelId], references: [id], onDelete: Cascade)
   lastTouchedChapter    Chapter?              @relation("PayoffLedgerLastTouchedChapter", fields: [lastTouchedChapterId], references: [id], onDelete: SetNull)
   setupChapter          Chapter?              @relation("PayoffLedgerSetupChapter", fields: [setupChapterId], references: [id], onDelete: SetNull)

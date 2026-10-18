@@ -540,6 +540,14 @@ export class DefaultNovelApplicationServices {
     return this.core.getPayoffLedger(...args);
   }
 
+  createManualPayoffLedgerItem(...args: Parameters<NovelCoreService["createManualPayoffLedgerItem"]>) {
+    return this.core.createManualPayoffLedgerItem(...args);
+  }
+
+  updateManualPayoffLedgerItem(...args: Parameters<NovelCoreService["updateManualPayoffLedgerItem"]>) {
+    return this.core.updateManualPayoffLedgerItem(...args);
+  }
+
   getWorldSlice(...args: Parameters<NovelWorldSliceService["getWorldSliceView"]>) {
     return this.worldSliceService.getWorldSliceView(...args);
   }

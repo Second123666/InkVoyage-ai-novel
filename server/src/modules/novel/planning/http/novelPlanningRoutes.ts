@@ -17,6 +17,8 @@ interface RegisterNovelPlanningRoutesInput {
     | "getChapterPlan"
     | "replanNovel"
     | "getPayoffLedger"
+    | "createManualPayoffLedgerItem"
+    | "updateManualPayoffLedgerItem"
   >;
   idParamsSchema: z.ZodType<{ id: string }>;
   chapterParamsSchema: z.ZodType<{ id: string; chapterId: string }>;
@@ -38,6 +40,32 @@ export function registerNovelPlanningRoutes(input: RegisterNovelPlanningRoutesIn
   const payoffLedgerQuerySchema = z.object({
     chapterOrder: z.coerce.number().int().positive().optional(),
   });
+  const createPayoffLedgerItemSchema = z.object({
+    title: z.string().trim().min(1).max(120),
+    summary: z.string().trim().min(1).max(2000),
+    scopeType: z.enum(["book", "volume", "chapter"]).optional(),
+    targetStartChapterOrder: z.number().int().positive().nullable().optional(),
+    targetEndChapterOrder: z.number().int().positive().nullable().optional(),
+  }).refine(
+    (value) => value.targetStartChapterOrder == null
+      || value.targetEndChapterOrder == null
+      || value.targetStartChapterOrder <= value.targetEndChapterOrder,
+    { message: "目标窗口的起始章不能晚于结束章。", path: ["targetEndChapterOrder"] },
+  );
+  const updatePayoffLedgerItemParamsSchema = z.object({
+    id: z.string().min(1),
+    itemId: z.string().min(1),
+  });
+  const updatePayoffLedgerItemSchema = z.object({
+    currentStatus: z.enum(["paid_off", "failed", "pending_payoff"]).optional(),
+    statusReason: z.string().trim().max(500).nullable().optional(),
+    manualLocked: z.boolean().optional(),
+    targetStartChapterOrder: z.number().int().positive().nullable().optional(),
+    targetEndChapterOrder: z.number().int().positive().nullable().optional(),
+  }).refine(
+    (value) => Object.values(value).some((field) => field !== undefined),
+    { message: "至少提供一个可更新字段。" },
+  );
 
   router.get("/:id/state", validate({ params: idParamsSchema }), async (req, res, next) => {
     try {
@@ -79,6 +107,42 @@ export function registerNovelPlanningRoutes(input: RegisterNovelPlanningRoutesIn
           success: true,
           data,
           message: "Payoff ledger loaded.",
+        } satisfies ApiResponse<typeof data>);
+      } catch (error) {
+        next(error);
+      }
+    },
+  );
+
+  router.post(
+    "/:id/payoff-ledger",
+    validate({ params: idParamsSchema, body: createPayoffLedgerItemSchema }),
+    async (req, res, next) => {
+      try {
+        const { id } = req.params as z.infer<typeof idParamsSchema>;
+        const data = await novelService.createManualPayoffLedgerItem(id, req.body);
+        res.status(201).json({
+          success: true,
+          data,
+          message: "伏笔已登记。",
+        } satisfies ApiResponse<typeof data>);
+      } catch (error) {
+        next(error);
+      }
+    },
+  );
+
+  router.patch(
+    "/:id/payoff-ledger/:itemId",
+    validate({ params: updatePayoffLedgerItemParamsSchema, body: updatePayoffLedgerItemSchema }),
+    async (req, res, next) => {
+      try {
+        const { id, itemId } = req.params as z.infer<typeof updatePayoffLedgerItemParamsSchema>;
+        const data = await novelService.updateManualPayoffLedgerItem(id, itemId, req.body);
+        res.status(200).json({
+          success: true,
+          data,
+          message: "伏笔已更新。",
         } satisfies ApiResponse<typeof data>);
       } catch (error) {
         next(error);

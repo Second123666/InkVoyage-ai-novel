@@ -1,3 +1,7 @@
+import type {
+  CreatePayoffLedgerItemPayload,
+  UpdatePayoffLedgerItemPayload,
+} from "@ai-novel/shared/types/payoffLedger";
 import {
   ChapterGenerateOptions,
   ChapterInput,
@@ -268,6 +272,14 @@ export class NovelCoreService {
 
   async getPayoffLedger(novelId: string, chapterOrder?: number) {
     return this.reviewService.getPayoffLedger(novelId, chapterOrder);
+  }
+
+  async createManualPayoffLedgerItem(novelId: string, payload: CreatePayoffLedgerItemPayload) {
+    return this.reviewService.createManualPayoffLedgerItem(novelId, payload);
+  }
+
+  async updateManualPayoffLedgerItem(novelId: string, itemId: string, payload: UpdatePayoffLedgerItemPayload) {
+    return this.reviewService.updateManualPayoffLedgerItem(novelId, itemId, payload);
   }
 
   async generateChapterHook(novelId: string, options: HookGenerateOptions = {}) {

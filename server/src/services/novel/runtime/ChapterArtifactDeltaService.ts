@@ -19,6 +19,7 @@ import {
 import {
   clearStaleRiskSignal,
   dedupeRiskSignals,
+  sanitizePayoffLedgerSyncItem,
   serializeLedgerJson,
 } from "../../payoff/payoffLedgerShared";
 import { characterResourceLedgerService } from "../characterResource/CharacterResourceLedgerService";
@@ -959,8 +960,11 @@ export class ChapterArtifactDeltaService {
     const now = new Date();
     await prisma.$transaction(async (tx) => {
       await this.assertExpectedChapterContentInTransaction(tx, input);
-      for (const item of input.output.payoffDeltas) {
-        const ledgerKey = normalizeLedgerKey(item.ledgerKey, normalizeLedgerKey(item.title, `chapter_${input.chapterOrder}_payoff`));
+      for (const rawDelta of input.output.payoffDeltas) {
+        const ledgerKey = normalizeLedgerKey(rawDelta.ledgerKey, normalizeLedgerKey(rawDelta.title, `chapter_${input.chapterOrder}_payoff`));
+        // A1-G22:增量路径与全量对账共用同一守卫(无目标窗口的 overdue 降级回待推进),
+        // 杜绝两条写路径语义不一致。
+        const item = sanitizePayoffLedgerSyncItem({ ...rawDelta, ledgerKey });
         const previous = await tx.payoffLedgerItem.findUnique({
           where: {
             novelId_ledgerKey: {
@@ -969,6 +973,8 @@ export class ChapterArtifactDeltaService {
             },
           },
         });
+        // A1-G10:手动锁定条目不接受增量路径改写状态/原因/窗口。
+        const lockedByUser = previous?.manualLocked === true;
         const setupChapterId = this.resolveChapterReference({
           value: item.setupChapterId ?? item.setupChapterOrder ?? item.firstSeenChapterOrder,
           chapters: input.chapters,
@@ -1051,9 +1057,13 @@ export class ChapterArtifactDeltaService {
             title: item.title,
             summary: item.summary,
             scopeType: item.scopeType,
-            currentStatus: item.currentStatus,
-            targetStartChapterOrder: item.targetStartChapterOrder ?? null,
-            targetEndChapterOrder: item.targetEndChapterOrder ?? null,
+            currentStatus: lockedByUser ? previous.currentStatus : item.currentStatus,
+            targetStartChapterOrder: lockedByUser
+              ? previous.targetStartChapterOrder
+              : item.targetStartChapterOrder ?? null,
+            targetEndChapterOrder: lockedByUser
+              ? previous.targetEndChapterOrder
+              : item.targetEndChapterOrder ?? null,
             firstSeenChapterOrder: item.firstSeenChapterOrder ?? previous?.firstSeenChapterOrder ?? input.chapterOrder,
             lastTouchedChapterOrder: item.lastTouchedChapterOrder ?? input.chapterOrder,
             lastTouchedChapterId,
@@ -1063,7 +1073,7 @@ export class ChapterArtifactDeltaService {
             sourceRefsJson: serializeLedgerJson(sourceRefs),
             evidenceJson: serializeLedgerJson(evidence),
             riskSignalsJson: serializeLedgerJson(riskSignals),
-            statusReason: item.statusReason?.trim() || null,
+            statusReason: lockedByUser ? previous.statusReason : item.statusReason?.trim() || null,
             confidence: item.confidence ?? null,
             updatedAt: now,
           },

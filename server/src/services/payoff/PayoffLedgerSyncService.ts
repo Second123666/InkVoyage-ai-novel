@@ -1,7 +1,13 @@
+import { randomUUID } from "node:crypto";
 import type { LLMProvider } from "@ai-novel/shared/types/llm";
 import type { AuditReport, OpenConflict, PayoffLedgerResponse } from "@ai-novel/shared/types/novel";
-import type { PayoffLedgerItem } from "@ai-novel/shared/types/payoffLedger";
+import type {
+  CreatePayoffLedgerItemPayload,
+  PayoffLedgerItem,
+  UpdatePayoffLedgerItemPayload,
+} from "@ai-novel/shared/types/payoffLedger";
 import { prisma } from "../../db/prisma";
+import { AppError } from "../../middleware/errorHandler";
 import { runStructuredPrompt } from "../../prompting/core/promptRunner";
 import { payoffLedgerSyncPrompt } from "../../prompting/prompts/payoff/payoffLedgerSync.prompts";
 import {
@@ -366,6 +372,94 @@ export class PayoffLedgerSyncService {
     return buildPayoffLedgerResponse(rows.map(mapPayoffLedgerRow), options.chapterOrder);
   }
 
+  // A1-G1 用户手动登记伏笔:直接写 canonical 表,初始 setup、来源标记 manual;
+  // 不加锁 —— 后续 AI 对账/增量仍可推进这条伏笔的状态。
+  async createManualLedgerItem(
+    novelId: string,
+    payload: CreatePayoffLedgerItemPayload,
+  ): Promise<PayoffLedgerItem> {
+    const novel = await prisma.novel.findUnique({
+      where: { id: novelId },
+      select: { id: true },
+    });
+    if (!novel) {
+      throw new AppError("Novel not found.", 404);
+    }
+    const now = new Date();
+    const row = await prisma.payoffLedgerItem.create({
+      data: {
+        novelId,
+        ledgerKey: `manual_${randomUUID()}`,
+        title: payload.title.trim(),
+        summary: payload.summary.trim(),
+        scopeType: payload.scopeType ?? "book",
+        currentStatus: "setup",
+        targetStartChapterOrder: payload.targetStartChapterOrder ?? null,
+        targetEndChapterOrder: payload.targetEndChapterOrder ?? null,
+        sourceRefsJson: serializeLedgerJson([{
+          kind: "manual",
+          refLabel: "用户手动登记",
+          chapterId: null,
+          chapterOrder: null,
+          volumeId: null,
+          volumeSortOrder: null,
+        }]),
+        statusReason: "用户手动登记。",
+        manualLocked: false,
+        updatedAt: now,
+      },
+    });
+    return mapPayoffLedgerRow(row);
+  }
+
+  // A1-G10 用户手动标记回收/放弃/重新打开:任何状态标记都写 manualLocked,
+  // 之后 AI 对账与逐章增量不再改写该条状态/原因/目标窗口;「重新打开」显式解锁交还 AI。
+  async updateManualLedgerItem(
+    novelId: string,
+    itemId: string,
+    payload: UpdatePayoffLedgerItemPayload,
+  ): Promise<PayoffLedgerItem> {
+    const existing = await prisma.payoffLedgerItem.findFirst({
+      where: { id: itemId, novelId },
+    });
+    if (!existing) {
+      throw new AppError("Payoff ledger item not found.", 404);
+    }
+    const data: {
+      currentStatus?: "paid_off" | "failed" | "pending_payoff";
+      statusReason?: string | null;
+      manualLocked?: boolean;
+      targetStartChapterOrder?: number | null;
+      targetEndChapterOrder?: number | null;
+    } = {};
+    if (payload.currentStatus) {
+      data.currentStatus = payload.currentStatus;
+      data.manualLocked = payload.manualLocked ?? true;
+      data.statusReason = payload.statusReason?.trim()
+        || (payload.currentStatus === "paid_off"
+          ? "用户标记为已回收。"
+          : payload.currentStatus === "failed"
+            ? "用户标记为放弃。"
+            : "用户重新打开跟踪。");
+    } else if (payload.statusReason !== undefined) {
+      data.statusReason = payload.statusReason?.trim() || null;
+    }
+    if (payload.targetStartChapterOrder !== undefined) {
+      data.targetStartChapterOrder = payload.targetStartChapterOrder;
+    }
+    if (payload.targetEndChapterOrder !== undefined) {
+      data.targetEndChapterOrder = payload.targetEndChapterOrder;
+    }
+    const row = await prisma.payoffLedgerItem.update({
+      where: { id: existing.id },
+      data: {
+        ...data,
+        updatedAt: new Date(),
+      },
+    });
+    return mapPayoffLedgerRow(row);
+  }
+
   async syncLedger(novelId: string, options: PayoffLedgerSyncOptions = {}): Promise<PayoffLedgerResponse> {
     const existingRows = await this.loadLedgerRows(novelId);
     try {
@@ -414,6 +508,9 @@ export class PayoffLedgerSyncService {
       await prisma.$transaction(async (tx) => {
         for (const item of resolvedItems) {
           const previous = existingRows.find((row) => row.ledgerKey === item.ledgerKey);
+          // A1-G10 手动锁定语义:用户手动标记过的条目,AI 对账不得改写
+          // currentStatus / statusReason / 目标窗口(其余字段仍可更新)。
+          const lockedByUser = previous?.manualLocked === true;
           const normalizedChapterRefs = normalizePayoffLedgerPromptChapterRefs({
             item,
             previous,
@@ -459,9 +556,13 @@ export class PayoffLedgerSyncService {
               title: item.title,
               summary: item.summary,
               scopeType: item.scopeType,
-              currentStatus: item.currentStatus,
-              targetStartChapterOrder: item.targetStartChapterOrder ?? null,
-              targetEndChapterOrder: item.targetEndChapterOrder ?? null,
+              currentStatus: lockedByUser ? previous.currentStatus : item.currentStatus,
+              targetStartChapterOrder: lockedByUser
+                ? previous.targetStartChapterOrder
+                : item.targetStartChapterOrder ?? null,
+              targetEndChapterOrder: lockedByUser
+                ? previous.targetEndChapterOrder
+                : item.targetEndChapterOrder ?? null,
               firstSeenChapterOrder: item.firstSeenChapterOrder ?? previous?.firstSeenChapterOrder ?? null,
               lastTouchedChapterOrder: item.lastTouchedChapterOrder ?? previous?.lastTouchedChapterOrder ?? null,
               lastTouchedChapterId: normalizedChapterRefs.lastTouchedChapterId,
@@ -471,7 +572,7 @@ export class PayoffLedgerSyncService {
               sourceRefsJson: serializeLedgerJson(normalizedChapterRefs.sourceRefs),
               evidenceJson: serializeLedgerJson(normalizedChapterRefs.evidence),
               riskSignalsJson: serializeLedgerJson(riskSignals),
-              statusReason: item.statusReason?.trim() || null,
+              statusReason: lockedByUser ? previous.statusReason : item.statusReason?.trim() || null,
               confidence: item.confidence ?? null,
               updatedAt: now,
             },
@@ -479,6 +580,10 @@ export class PayoffLedgerSyncService {
         }
 
         for (const row of existingRows) {
+          // 手动锁定条目不接受任何系统侧状态/信号标记(对账主循环同规则)。
+          if (row.manualLocked === true) {
+            continue;
+          }
           if (supersededBookContractLedgerKeys.has(row.ledgerKey)) {
             const riskSignals = dedupeRiskSignals([
               ...clearStaleRiskSignal(safeParseJson(row.riskSignalsJson, [])),
@@ -529,6 +634,9 @@ export class PayoffLedgerSyncService {
       if (existingRows.length > 0) {
         await prisma.$transaction(async (tx) => {
           for (const row of existingRows) {
+            if (row.manualLocked === true) {
+              continue;
+            }
             const staleSignals = appendStaleRiskSignal(
               safeParseJson(row.riskSignalsJson, [] as Array<{ code: string; severity: "low" | "medium" | "high" | "critical"; summary: string; stale?: boolean }>),
               "伏笔账本同步失败，已保留上次成功结果。",

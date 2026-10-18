@@ -82,6 +82,8 @@ export interface NovelApplicationServices {
   listChapterAuditReports: NovelApplicationMethod;
   resolveAuditIssues: NovelApplicationMethod;
   getPayoffLedger: NovelApplicationMethod;
+  createManualPayoffLedgerItem: NovelApplicationMethod;
+  updateManualPayoffLedgerItem: NovelApplicationMethod;
   getWorldSlice: NovelApplicationMethod;
   refreshWorldSlice: NovelApplicationMethod;
   updateWorldSliceOverrides: NovelApplicationMethod;
@@ -200,6 +202,8 @@ export const novelApplicationServiceMethodNames = [
   "listChapterAuditReports",
   "resolveAuditIssues",
   "getPayoffLedger",
+  "createManualPayoffLedgerItem",
+  "updateManualPayoffLedgerItem",
   "getWorldSlice",
   "refreshWorldSlice",
   "updateWorldSliceOverrides",

@@ -214,6 +214,14 @@ export class NovelCoreReviewService {
     return payoffLedgerSyncService.getPayoffLedger(novelId, { chapterOrder });
   }
 
+  async createManualPayoffLedgerItem(novelId: string, payload: Parameters<typeof payoffLedgerSyncService.createManualLedgerItem>[1]) {
+    return payoffLedgerSyncService.createManualLedgerItem(novelId, payload);
+  }
+
+  async updateManualPayoffLedgerItem(novelId: string, itemId: string, payload: Parameters<typeof payoffLedgerSyncService.updateManualLedgerItem>[2]) {
+    return payoffLedgerSyncService.updateManualLedgerItem(novelId, itemId, payload);
+  }
+
   private async reviewChapterContent(
     novelTitle: string,
     chapterTitle: string,
