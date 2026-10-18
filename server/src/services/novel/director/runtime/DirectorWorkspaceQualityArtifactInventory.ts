@@ -118,7 +118,8 @@ export function pushQualityFoundationArtifacts(
       targetId: target.targetId,
       contentRef: { table: "PayoffLedgerItem", id: item.id },
       updatedAt: item.updatedAt,
-      status: item.currentStatus === "failed" ? "stale" : "active",
+      // A1-G14:逾期与失败同入「需复核」口径,让导演工作区的复核角标覆盖长期未回收伏笔。
+      status: item.currentStatus === "failed" || item.currentStatus === "overdue" ? "stale" : "active",
       contentHash: stableDirectorContentHash(compactHashParts([
         item.currentStatus,
         item.lastTouchedChapterId,

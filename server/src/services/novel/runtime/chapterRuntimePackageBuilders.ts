@@ -374,12 +374,19 @@ export function buildRuntimePackage(input: BuildRuntimePackageInput): ChapterRun
     }));
   }
 
+  // A1-G20:装配期合成的 payoff_overdue 问题降为质量债,不进入 blocking 判定 ——
+  // 否则修复重跑会复用同一份冻结的逾期结论,即使正文已补兑现也必然 pass=false,
+  // 系统性消耗单次修复预算。逾期仍以 openIssues/质量债可见并影响重规划建议。
+  const isSyntheticOverdueBlocker = (issueId: string, code: string) =>
+    code === "payoff_overdue" && issueId.startsWith("payoff-ledger:");
   const blockingIssueIds = openIssues
-    .filter((issue) => issue.severity === "high" || issue.severity === "critical")
+    .filter((issue) => (issue.severity === "high" || issue.severity === "critical")
+      && !isSyntheticOverdueBlocker(issue.id, issue.code))
     .map((issue) => issue.id);
   const blockingLedgerKeys = Array.from(new Set(
     syntheticPayoffIssues
-      .filter((issue) => issue.severity === "high" || issue.severity === "critical")
+      .filter((issue) => (issue.severity === "high" || issue.severity === "critical")
+        && issue.code !== "payoff_overdue")
       .map((issue) => issue.ledgerKey),
   ));
   const hasBlockingIssues = blockingIssueIds.length > 0 || input.acceptance.status === "needs_manual_review";
