@@ -17,6 +17,30 @@
 
 ---
 
+## 2026-10-18 · LOOP-5 · 伏笔账本 MVP(INN-A1)
+
+- **类别**: 创新(A 线写作质量与长篇记忆;先审计后补缺,非从零建)
+- **目标**: 把伏笔账本从「AI 只写、用户只看」变成**可登记、可标记、有确定性逾期兜底、有最小提醒面**的一等创作资产(验收①②③④)。
+- **审计结论**(Workflow 四路扫描 + 合成 + 对抗核实,26 条缺口全部 confirmed):上游基建完整(双 AI 写路径 + 注入通道 + 只读卡片),验收②已达成;①③用户侧缺失(无登记/无标记/入口门控错位误显"账本为空");④未达成(overdue 纯靠 AI 标记、无提醒通道)。计划:`docs/plans/payoff-ledger-mvp.md`。
+- **改动**(本轮 11 项收敛,全部手工实现——三个实现 agent 撞 429 配额阵亡后由主循环完成):
+  1. **登记**:`POST /novels/:id/payoff-ledger`(`manual_<uuid>` 键、sourceRefs=manual、初始 setup、不加锁)+ 卡片「新增伏笔」表单;
+  2. **标记**:`PATCH`(已回收/放弃/重新打开)+ `manualLocked` 双 schema 双迁移(纯增量列);锁定项在对账 upsert、逐章增量、系统 stale/failed 标记三处不被改写;「重新打开」解锁交还 AI;
+  3. **入口修复**:大纲页签门控补 `outline`(误显"账本为空"根因)+ 空态区分加载中/读取失败(可重试)/无数据;
+  4. **紧急参照**:改为当前写作进度(选中章节 → 最后有正文章节 → 最后一章),不再恒取全书最后一章;
+  5. **过窗读时升格**:pending-like 且 `targetEnd < chapterOrder` → 读时视为逾期(`isPayoffOverdueAtChapter` 唯一判定口);注入侧分类复用共享分类函数,消除双口径;
+  6. **停滞扫描**:未终结且超 30 章未触碰 → `payoff_missing_progress` 合成问题;
+  7. **回收计数**:canonical 快照携带 `payoffCounts`,运行时摘要 paidOff/failed 不再恒 0,totalCount 覆盖全部在册条目;
+  8. **逾期降质量债**:合成 `payoff_overdue` 从 blockingIssueIds/blockingLedgerKeys 剥离(修复重跑不再被冻结逾期结论拖死,符合 completion-first);
+  9. **增量守卫统一**:applyPayoffDeltas 复用 `sanitizePayoffLedgerSyncItem`(堵住"无窗口 overdue"从逐章增量漏入);
+  10. **提醒面**:导演质量工件 overdue→stale 进「N 项需复核」;大纲「资产约束」子页逾期数徽标;
+  11. **文案**:卡片标题/说明改用户视角,VolumeCard 改口文案清除;快照区标注「以伏笔台账为准」。
+  - 守卫测试 `server/tests/payoffLedgerMvp.test.js`(升格/停滞/计数/锁定行为/路由静态/客户端合同,含反证用例)。
+- **验证**: client typecheck **0 错误**;client **219/219**;server **1402 测试 / 0 失败 / 12 跳过**(含双迁移对齐测试);亲自三镜头审查通过(范围 22 文件全在计划内、无残留、锁定语义与 G4 语义逐行核对);中途修 1 个类型错误(statusReason 缺 `| null`)与 1 个我自己的断言写反(setup 参与升格是计划语义)。
+- **遗留**:
+  - 注入保底/排序调优、上下文遥测、窗口行内编辑、卡片筛选跳转、同步状态标记与重试入口、验收死字段接线、sync_stale 消费、双轨快照合并、Markdown 导出清单、planner 空账本回退摘要仍为 0 → 合并登记 INN-A1b;
+  - 子 agent 审查再次因 429 配额(23:05 重置)不可用,由主循环等价替代;审计本身 58.7 万 token。
+- **下一步**: UI-1 设计系统第一批(轮次入口建议第 6 项),或按所有者兴趣另选。
+
 ## 2026-10-17 · LOOP-4 · 统一任务投影契约(INN-B2)
 
 - **类别**: 创新(B 线 Agent 架构工程,P0;含契约修正类修复)
