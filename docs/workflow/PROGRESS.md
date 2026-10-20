@@ -17,6 +17,21 @@
 
 ---
 
+## 2026-10-20 · LOOP-7 · 全书一致性守卫(INN-A2)
+
+- **类别**: 创新(A 线写作质量;主对话执行)
+- **目标**: 章节生成后对**时间线矛盾、角色动机违背、世界规则冲突**做结构化校验,输出接入既有问题治理链(复用统一治理动作,执行器零新增分支)。
+- **现状审计**(避免重复造轮子):通用审校 `audit.chapter.full` 已注入角色状态/世界规则/最近章节等上下文,确定性时间线检查器只覆盖窄类;真实缺口 = 无三类矛盾的显式检查协议、无专用问题码、无确定性后处理、无链路级契约测试。
+- **改动**:
+  1. **审校 prompt v2→v3**:system message 新增「一致性守卫」协议 —— 三类必查(时间线/动机/世界规则)操作性定义;强制专用码 `continuity_timeline_conflict`/`continuity_motivation_conflict`/`continuity_world_rule_conflict`;evidence 必须引用被违背的具体事实(角色目标原文/规则条文/时间线事件),禁止空证据;severity 分级指引(影响后续执行→high/critical,仅本章读感→medium);注册表 key 同步 `@v3`(预算不变,addendum 按 id 挂载不受版本影响);
+  2. **确定性后处理** `services/audit/continuityGuard.ts`:守卫码规范化 —— 同码同描述去重(保留更严重版本)、按严重度排序、单报告上限 5 条、丢弃空/占位证据;非守卫码透传排后;纯规范化不做二次语义判定;
+  3. **接线** `AuditService.auditChapter`:审校报告组装处应用后处理,下游 openConflicts→运行时 openIssues→blocking/质量债→修复/重规划**全部复用现有链路**,不新增 LLM 调用、不新增执行器分支;
+  4. 版本引用同步(prompting/promptWorkbench 测试、prompting README 示例)。
+- **验证**: server **1405 测试 / 1393 过 / 0 失败 / 12 跳过**(新增 3 条:规范化行为含反例、v3 注册+协议契约、**治理链测试**——high→blockingIssueIds、medium→质量债继续、其它 high 仍阻塞的反证);client 本轮未动,沿用 LOOP-6 全绿(typecheck 0 / 222)。途中修 2 个自写测试缺陷:夹具缺 `acceptance.missingObligations`、去重键未考虑严重度(升级为"保留更严重版本"的正确语义)。
+- **验收对照**:「构造矛盾场景能检出」= prompt 协议 + 专用码 + 取证要求(真实检出依赖模型,由所有者实际审校验证);「产出治理动作」= 链路测试证明 high→blocking→修复/重规划、medium→质量债。
+- **遗留**: 检出质量依赖模型按协议输出,若模型不输出专用码守卫会静默退化为普通审校(已记 wiki 失效模式);跨章批量回溯重扫、A3 分层记忆等后续轮次。
+- **下一步**: 按所有者 2026-10-20 指示「按 backlog 顺序执行」→ **LOOP-8 = INN-A3 分层递归记忆(章→卷→全书摘要树)**。
+
 ## 2026-10-20 · LOOP-6 · 写法引擎视觉收敛(UI-1 第三批 A)
 
 - **类别**: UI(按用户要求全程主对话执行,未使用 Workflow)

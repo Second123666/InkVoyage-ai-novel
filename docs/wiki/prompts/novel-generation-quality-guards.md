@@ -85,6 +85,22 @@ keyMilestoneGuards: z.array(volumeKeyMilestoneGuardSchema).default([])
 
 **输出**：`repetitionClusters`、`openingPatternClusters`、`hasCriticalIssues` 和修复建议。
 
+### 八、一致性守卫(时间线/动机/世界规则,INN-A2)
+
+**定位**:完整审校 `audit.chapter.full`(v3 起)内置的三类矛盾检查协议,复用既有审校→治理链,不新增 LLM 调用、不新增执行器分支。
+
+**检查协议**(prompt 内约束):
+- 时间线矛盾(`continuity_timeline_conflict`):事件顺序/时间跨度/地点移动,或提前使用尚未发生、已过期的信息;
+- 角色动机违背(`continuity_motivation_conflict`):言行与上下文给出的当前目标/关系阶段/已知秘密/情绪状态冲突;
+- 世界规则冲突(`continuity_world_rule_conflict`):违反已给出的世界规则、禁忌或代价设定;
+- evidence 必须引用被违背的具体事实(角色目标原文/规则条文/时间线事件),禁止"与前文不符"式空证据;无明确依据不得输出。
+
+**确定性后处理**(`server/src/services/audit/continuityGuard.ts`):守卫码问题在写入审计报告前统一规范化 —— 去重(同码同描述)、按严重度排序、单报告上限 5 条、丢弃空证据/占位证据;非守卫码问题原样透传且排在守卫问题之后。
+
+**治理语义**:high/critical 守卫问题进入 blocking(触发修复/重规划治理动作);medium 作为章节质量债,允许继续推进(completion-first)。下游 openConflicts、运行时 openIssues、任务投影与修复链全部复用现有实现。
+
+**维护边界**:不要在 prompt 之外用关键字匹配补充"矛盾检测";检查口径若需调整,改 prompt 协议或 `continuityGuard.ts` 的确定性规则,并保持专用码不变(守卫测试依赖三码约定)。
+
 ## 失效模式
 
 - `completedMilestones` 和 `recentScenePatterns` 依赖上游服务在构建上下文时正确填入，若上游不填，这两个守卫就不生效。本次修改只建立了接口契约，数据填充需要在章节运行时协调器中实现。
@@ -95,6 +111,7 @@ keyMilestoneGuards: z.array(volumeKeyMilestoneGuardSchema).default([])
 
 - `buildCompressionLog()` 是观测工具。若日志显示 dropped，不代表实际生成已经丢弃同名 block，真实裁剪仍以 prompt runner 的 context selection 为准。
 - `rebuild_story_world_slice` 重建切片后，如果后续又触发了 `ensureStoryWorldSlice` 且 stale 检测显示为最新状态，则已重建的切片会被复用而非再次生成，这是预期行为。
+- 一致性守卫的检出质量依赖审校模型是否正确按协议输出专用码与证据;后处理只做规范化,不做二次判断。若模型未按协议输出,守卫会静默退化为普通审校报告 —— 排查时先看审计报告中的 code 是否为三个专用码。
 
 ## 相关模块
 
@@ -103,8 +120,10 @@ keyMilestoneGuards: z.array(volumeKeyMilestoneGuardSchema).default([])
 - `server/src/agents/tools/bookAnalysisTools.ts`（`audit_chapter_continuity`）
 - `server/src/prompting/prompts/novel/chapterLayeredContext.ts`
 - `server/src/prompting/prompts/novel/chapterWriter.prompts.ts`
+- `server/src/services/audit/continuityGuard.ts`、`server/src/prompting/prompts/audit/audit.prompts.ts`
 - `shared/types/chapterRuntime.ts`（`ChapterWriteContext`、`VolumeWindowContext`）
 
 ## 源文档
 
 - 2026-06-08 小说生成质量问题分析与优化方案（内部设计评审）
+- 2026-10-20 LOOP-7 一致性守卫计划:`docs/plans/continuity-guard.md`
