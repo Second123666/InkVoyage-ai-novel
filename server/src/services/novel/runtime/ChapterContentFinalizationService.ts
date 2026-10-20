@@ -10,6 +10,7 @@ import { ChapterArtifactSyncService } from "./ChapterArtifactSyncService";
 import type { ChapterRuntimeRequestInput } from "./chapterRuntimeSchema";
 import type { StyleReviewResult } from "./PostGenerationStyleReviewRunner";
 import { ChapterQualityGateService } from "./ChapterQualityGateService";
+import { chapterGenerationTraceService } from "./chapterGenerationTraceService";
 import type { ChapterTimelineFinalizationService } from "./ChapterTimelineFinalizationService";
 import {
   buildRuntimePackage,
@@ -144,6 +145,17 @@ export class ChapterContentFinalizationService {
       runId: input.runId,
       plannerService: this.plannerService,
     });
+    // INN-B1:定稿即快照生成轨迹(上下文装配/模型参数/审核与验收决策),供只读回放。
+    // 纯诊断数据,fire-and-forget,失败不得影响主链。
+    void chapterGenerationTraceService.record({
+      novelId: input.novelId,
+      chapterId: input.chapterId,
+      chapterOrder: input.contextPackage.chapter.order,
+      runId: input.runId,
+      contextPackage: input.contextPackage,
+      runtimePackage,
+      acceptance: acceptance.assessment,
+    }).catch(() => null);
     const needsRepair = acceptance.assessment.status === "repairable"
       || acceptance.assessment.status === "needs_manual_review"
       || runtimePackage.audit.hasBlockingIssues;

@@ -561,6 +561,16 @@ export const generationContextPackageSchema = z.object({
   bookStateSnapshot: z.array(z.string()).default([]).optional(),
   // INN-A4 角色弧线:角色 id → 近期演变事件行(装配期填充)。
   characterArcEvents: z.record(z.string(), z.array(z.string())).default({}).optional(),
+  // INN-B1 全链路 Trace:上下文压缩观测(装配期填充,定稿时快照进轨迹)。
+  contextCompressionLog: z
+    .object({
+      dropped: z.array(z.string()).default([]),
+      summarized: z.array(z.string()).default([]),
+      usedTokens: z.number().default(0),
+      budgetTokens: z.number().default(0),
+    })
+    .nullable()
+    .optional(),
   previousChapterTail: z.string().nullable().optional(),
   openingHint: z.string(),
   continuation: runtimeContinuationSchema,

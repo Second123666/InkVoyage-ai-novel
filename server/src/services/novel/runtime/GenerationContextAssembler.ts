@@ -681,6 +681,8 @@ export class GenerationContextAssembler {
       2600,
     );
     console.debug("[ctx-budget]", compressionLog);
+    // INN-B1:压缩观测随包传递,定稿时快照进生成轨迹(此前仅 console.debug)。
+    contextPackage.contextCompressionLog = compressionLog;
 
     return {
       novel: { id: novel.id, title: novel.title },

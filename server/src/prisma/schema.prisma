@@ -3408,6 +3408,23 @@ model RagRetrievalTrace {
   @@index([queryDigest])
 }
 
+// INN-B1 全链路 Trace:每章定稿时快照上下文装配、模型参数、审核与验收决策,供只读回放。
+model ChapterGenerationTrace {
+  id             String   @id @default(cuid())
+  novelId        String
+  chapterId      String
+  chapterOrder   Int
+  runId          String?
+  contextJson    String
+  generationJson String
+  auditJson      String
+  decisionJson   String
+  createdAt      DateTime @default(now())
+
+  @@index([novelId, chapterId, createdAt])
+  @@index([novelId, chapterOrder])
+}
+
 model NovelSideEffectJob {
   id               String    @id @default(cuid())
   novelId          String?
