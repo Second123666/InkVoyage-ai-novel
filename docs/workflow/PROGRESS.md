@@ -17,6 +17,22 @@
 
 ---
 
+## 2026-10-20 · LOOP-6 · 写法引擎视觉收敛(UI-1 第三批 A)
+
+- **类别**: UI(按用户要求全程主对话执行,未使用 Workflow)
+- **目标**: 落地 rollout 计划第三批中写法引擎的视觉收敛 —— 清除调色板硬编码色、删除局部暗色 hack、收敛超大创建弹窗。
+- **基线更正(审计结论)**: rollout 计划记载第一/二批已于 2026-07-14 完成,经代码复核**属实**(语义 token `success/warning/info` 存在、`components/assetLibrary/` 共享组件被知识库/题材/基础角色三页引用);BACKLOG UI-1 旧描述("第一批待做")已更正为「进行中」并列出第三批剩余。LOOP-6 实际执行的是第三批 A。
+- **改动**:
+  1. `writingFormula` 模块 11 个组件 + 页面根,**~300 处调色板硬编码色**全部迁移语义 token:text-slate→foreground/muted-foreground,背景→background/muted,border→border,sky→info、amber→warning、emerald→success、rose→destructive;反色块统一 `bg-foreground text-background(/xx)`;
+  2. 删除 `index.css` 中 40 行 `.writing-formula-theme` 暗色 hack 块(语义 token 自带明暗适配)与 4 处装饰渐变、1 处装饰阴影;
+  3. 创建写法弹窗收敛:`max-w-5xl`→`max-w-4xl`、`h-[min(780px,92vh)]`→`h-[min(720px,90vh)]`;功能型工作台弹窗保留;
+  4. 顺带修正 1 处改口式文案(「已经放到…里」→ 直述设置位置);
+  5. 新增守卫 `client/tests/styleEngineVisualContracts.test.js`(模块零调色板类/无主题 hack/弹窗尺寸,含文件覆盖断言);
+  6. 同步更正 BACKLOG UI-1 与 rollout 计划阶段状态。
+- **验证**: client typecheck **0 错误**;client **222/222**(219 + 3 条新守卫);server 未改动,沿用 LOOP-5 全绿结果(1395 测试 0 失败)。类名有效性经 Tailwind 3.4 源码实证(`hsl(var(--x))` 的 `/40` 修饰符会生成 `hsl(var(--x) / 0.4)`)。UI 观感验收(明暗两套 × 三种主题)按仓库规则留给所有者。执行期间平台 Bash 安全分类器曾持续限流,恢复后完成验证。
+- **遗留**: 第三批剩余(世界三页状态/推荐动作、设置页 17 处色值与 model-routes 组织、style-engine 嵌套 Card 与「资产库+编辑工作区」结构终态、anti-ai-rules 结构对齐)仍挂 UI-1;第四/五/六批未开始。
+- **下一步**: UI-1 第三批剩余(建议先世界三页,色值几乎干净、以结构对齐为主)。
+
 ## 2026-10-18 · LOOP-5 · 伏笔账本 MVP(INN-A1)
 
 - **类别**: 创新(A 线写作质量与长篇记忆;先审计后补缺,非从零建)

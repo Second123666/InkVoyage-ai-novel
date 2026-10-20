@@ -166,11 +166,15 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 > 分批落地计划 `docs/plans/product-ui-design-rollout-plan.md`、可视化栈 `docs/design/visualization-stack.md`。
 > 既有规则继续有效:低边框视觉规范、项目自有组件、**不新增 shadcn 组件**、不加装饰渐变、硬编码色值只减不增。
 
-- [ ] **UI-1 落实既有设计系统剩余批次** · M · P1
-  直接采用 rollout 计划已定批次,不重排:
-  第一批(资产库基础与新手入口):共享 Asset Library 页头/空态合同 + `success/warning/info` 语义 token + `/knowledge`、`/genres`、`/base-characters`;
-  第二批(核心创作与恢复工作台):`/creative-hub`、`/book-analysis`、`/tasks`、`/auto-director/follow-ups`(含 2A 任务恢复合同 / 2B 拆书工作台 / 2C 创作中枢三阶段);
-  随后收尾"部分对齐"8 页(`/novels/:id/preview`、`/edit`、`/chapters/:chapterId`、`/drama` ×2、`/settings`、`/worlds`、`/style-engine`)与"尚未完成"9 页(`/help`、`/comic` ×2、`/chat-legacy`、`/story-modes`、`/anti-ai-rules`、`/settings/model-routes`、`/worlds/generator`、`/worlds/:id/workspace`)。
+- [/] **UI-1 落实既有设计系统剩余批次** · M · P1(进行中)
+  **基线复核(2026-10-20)**:rollout 计划记载的第一批/第二批(2026-07-14)经代码验证属实(语义 token 存在、`components/assetLibrary/` 共享组件被知识库/题材/基础角色三页引用),原描述已过时。
+  **本轮完成(第三批 A,LOOP-6)**:写法引擎视觉收敛 —— `writingFormula` 模块 ~300 处调色板硬编码色全部迁移到语义 token,删除 `index.css` 的 `.writing-formula-theme` 暗色 hack 块与 4 处装饰渐变,创建弹窗收敛为常规尺寸;守卫测试 `client/tests/styleEngineVisualContracts.test.js`。
+  **第三批剩余**:
+  - 世界三页(`/worlds`、`/worlds/generator`、`/worlds/:id/workspace`):状态/推荐深化动作与分步工作区的结构对齐(色值仅 1 处,几乎干净);
+  - 设置(`/settings/model-routes` 组织 + 设置内部 17 处色值);
+  - `/style-engine` 嵌套 Card 收整与「资产库 + 编辑工作区」结构终态(本轮仅做色值与弹窗,结构留后续);
+  - `/anti-ai-rules` 结构对齐(色值已 0)。
+  **之后**:第四批(短剧/漫画衍生页)、第五批(阅读/帮助/兼容页)、第六批(全站一致性验收)。
   验收:以 rollout 计划各批验收条款为准(语义 token、无硬编码色、client typecheck、响应式无横向滚动);不新增后端 API/字段/路由。
 
 - [ ] **UI-2 视觉富化:主题与氛围层** · M · P2
