@@ -3,6 +3,7 @@
 
 const MAX_BOOK_STATE_EVENTS = 8;
 const MAX_VOLUME_RECAP_CHAPTERS = 8;
+const MAX_CHARACTER_ARC_EVENTS = 3;
 const SNIPPET_LIMIT = 100;
 
 function snippet(text: string | null | undefined): string {
@@ -55,4 +56,26 @@ export function buildVolumeRecapLines(
     .filter((row) => row.chapter.order < currentChapterOrder)
     .slice(-MAX_VOLUME_RECAP_CHAPTERS)
     .map((row) => `第${row.chapter.order}章 ${snippet(row.summary)}`);
+}
+
+/**
+ * 角色弧线事件:输入按 createdAt 倒序的角色时间线行,每角色保留最近 N 条。
+ * INN-A4:让性格/目标/关系的演变轨迹参与正文生成。
+ */
+export function buildCharacterArcEvents(
+  timelineRows: Array<{ characterId: string; chapterOrder: number | null; title: string; content: string }>,
+  perCharacterCap: number = MAX_CHARACTER_ARC_EVENTS,
+): Record<string, string[]> {
+  const grouped: Record<string, string[]> = {};
+  for (const row of timelineRows) {
+    if (!row.characterId) {
+      continue;
+    }
+    const lines = grouped[row.characterId] ?? (grouped[row.characterId] = []);
+    if (lines.length >= perCharacterCap) {
+      continue;
+    }
+    lines.push(`第${row.chapterOrder ?? "?"}章 ${row.title || "角色事件"}: ${snippet(row.content)}`);
+  }
+  return grouped;
 }

@@ -22,12 +22,14 @@ export const CHAPTER_CONTEXT_PROVIDER_CONTRACTS: readonly ChapterContextProvider
   // INN-A3 分层递归记忆:后段章节的全书快照与卷内回顾,缺失按降级语义继续并被 gating 记录。
   { id: "book_state_snapshot", stages: ["write"], inputDependencies: ["canonicalTimeline"], priority: 91, tier: "situational", required: false, tokenBudget: 450, failureSemantics: "degrade" },
   { id: "volume_recap", stages: ["write"], inputDependencies: ["volumePlans", "chapterSummary"], priority: 89, tier: "situational", required: false, tokenBudget: 450, failureSemantics: "degrade" },
+  // INN-A4 角色弧线:参与者近期演变轨迹,缺失按降级语义继续并被 gating 记录。
+  { id: "character_arc", stages: ["write"], inputDependencies: ["characterTimeline"], priority: 90, tier: "situational", required: false, tokenBudget: 350, failureSemantics: "degrade" },
 ] as const;
 
 export function evaluateChapterContextProviderContracts(input: {
   stage: ChapterContextProviderStage;
   chapterOrder: number;
-  contextPackage: Pick<GenerationContextPackage, "characterRoster" | "characterHardFacts" | "plan" | "chapterMission" | "previousChapterTail" | "previousChaptersSummary" | "storyWorldSlice" | "ragContext" | "bookStateSnapshot" | "volumeRecap">;
+  contextPackage: Pick<GenerationContextPackage, "characterRoster" | "characterHardFacts" | "plan" | "chapterMission" | "previousChapterTail" | "previousChaptersSummary" | "storyWorldSlice" | "ragContext" | "bookStateSnapshot" | "volumeRecap" | "characterArcEvents">;
 }): ContextGatingDecision[] {
   const decisions: ContextGatingDecision[] = [];
   for (const contract of CHAPTER_CONTEXT_PROVIDER_CONTRACTS) {
@@ -64,6 +66,12 @@ export function evaluateChapterContextProviderContracts(input: {
       reason = available
         ? "卷内回顾已提供"
         : applicable ? "后段章节缺少卷内回顾，按降级语义继续" : "早期章节暂不需要卷内回顾";
+    } else if (contract.id === "character_arc") {
+      applicable = input.chapterOrder > 3;
+      available = Object.values(input.contextPackage.characterArcEvents ?? {}).some((lines) => lines.length > 0);
+      reason = available
+        ? "角色弧线事件已提供"
+        : applicable ? "后段章节缺少角色弧线事件，按降级语义继续" : "早期章节暂不需要角色弧线";
     }
     if (applicable) decisions.push({ blockId: contract.id, tier: contract.tier, included: available, reason });
   }

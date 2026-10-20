@@ -384,6 +384,8 @@ export function buildChapterWriteContext(input: {
     // INN-A3:卷内回顾与全书状态快照由装配期填充(旧数据缺省为空,不渲染块)。
     volumeRecap: takeUnique(input.contextPackage.volumeRecap ?? [], 8),
     bookStateSnapshot: takeUnique(input.contextPackage.bookStateSnapshot ?? [], 8),
+    // INN-A4:角色弧线事件由装配期填充(旧数据缺省为空,不渲染块)。
+    characterArcEvents: input.contextPackage.characterArcEvents ?? {},
     previousChapterTail: compactText(input.contextPackage.previousChapterTail) || null,
     openingAntiRepeatHint: compactText(input.contextPackage.openingHint, "No recent opening guidance."),
     styleContract: input.contextPackage.styleContext?.compiledBlocks?.contract ?? null,

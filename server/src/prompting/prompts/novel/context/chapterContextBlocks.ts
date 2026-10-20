@@ -7,12 +7,14 @@ import { createContextBlock } from "../../../core/contextBudget";
 import type { PromptContextBlock } from "../../../core/promptTypes";
 import { buildWriterStyleContractText } from "../../../../services/styleEngine/styleContractText";
 import {
+  buildCharacterArcText,
   buildCharacterGuidanceText,
   buildLedgerItemLine,
   buildParticipantText,
   buildPendingCandidateGuardText,
   buildRelationStageText,
   compactText,
+  hasCharacterArcEvents,
   resolveTargetWordRange,
   takeUnique,
   toListBlock,
@@ -495,6 +497,16 @@ export function buildChapterWriterContextBlocks(
         priority: 89,
         required: false,
         content: toListBlock("本卷已完成章节回顾(volume recap)", writeContext.volumeRecap),
+      })
+      : null,
+    // INN-A4 角色弧线:参与者近期演变轨迹,后段生成稳定参与(有数据才渲染)。
+    mode === "full" && hasCharacterArcEvents(writeContext)
+      ? createContextBlock({
+        id: "character_arc",
+        group: "character_arc",
+        priority: 90,
+        required: false,
+        content: buildCharacterArcText(writeContext),
       })
       : null,
     mode === "full"

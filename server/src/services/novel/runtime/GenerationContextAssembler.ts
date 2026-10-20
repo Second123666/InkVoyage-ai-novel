@@ -53,6 +53,7 @@ import {
 } from "./context/bookAndVolumeRewardContext";
 import {
   buildBookStateSnapshotLines,
+  buildCharacterArcEvents,
   buildVolumeRecapLines,
   resolveCurrentVolumeChapterOrders,
 } from "./context/layeredMemoryContext";
@@ -313,6 +314,15 @@ export class GenerationContextAssembler {
       : [];
     const volumeRecap = buildVolumeRecapLines(volumeRecapRows, chapter.order);
     const bookStateSnapshot = buildBookStateSnapshotLines(canonicalState.timeline, chapter.order);
+    // INN-A4 角色弧线:取角色时间线近期事件,按角色分组(每角色 ≤3 条)。
+    const characterArcEvents = buildCharacterArcEvents(
+      await prisma.characterTimeline.findMany({
+        where: { novelId },
+        orderBy: [{ createdAt: "desc" }],
+        take: 30,
+        select: { characterId: true, chapterOrder: true, title: true, content: true },
+      }).catch(() => []),
+    );
     const activeStyleProfileId = styleContext.matchedBindings[0]?.styleProfileId?.trim()
       || styleContext.matchedBindings[0]?.styleProfile?.id?.trim()
       || request.taskStyleProfileId?.trim()
@@ -541,6 +551,7 @@ export class GenerationContextAssembler {
       previousChaptersSummary,
       volumeRecap,
       bookStateSnapshot,
+      characterArcEvents,
       previousChapterTail,
       openingHint,
       continuation: runtimeContinuation,

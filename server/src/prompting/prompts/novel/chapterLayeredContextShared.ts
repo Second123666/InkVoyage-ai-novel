@@ -438,3 +438,26 @@ export function buildPendingCandidateGuardText(writeContext: ChapterWriteContext
     }),
   ].join("\n");
 }
+
+// INN-A4 角色弧线:角色当前参与者的近期演变事件(数据由装配期填入 writeContext.characterArcEvents)。
+export function hasCharacterArcEvents(writeContext: ChapterWriteContext): boolean {
+  const arcs = writeContext.characterArcEvents ?? {};
+  return writeContext.participants.some((participant) => (arcs[participant.id]?.length ?? 0) > 0);
+}
+
+export function buildCharacterArcText(writeContext: ChapterWriteContext): string {
+  const arcs = writeContext.characterArcEvents ?? {};
+  return writeContext.participants
+    .map((participant) => {
+      const lines = arcs[participant.id] ?? [];
+      if (lines.length === 0) {
+        return "";
+      }
+      return [
+        `角色 ${participant.name} 的近期演变(目标/状态变化过程,延续此轨迹,不要凭空重置人设):`,
+        ...lines.map((line) => `- ${line}`),
+      ].join("\n");
+    })
+    .filter(Boolean)
+    .join("\n\n");
+}
