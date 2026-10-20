@@ -17,6 +17,23 @@
 
 ---
 
+## 2026-10-20 · LOOP-8 · 分层递归记忆(INN-A3 章→卷→全书)
+
+- **类别**: 创新(A 线长篇记忆;主对话执行)
+- **目标**: 落地 roadmap「长程上下文记忆」—— 卷摘要 + 全书状态快照稳定参与后段生成;验收:后段生成上下文含分层摘要。
+- **现状审计**: 章层已有(摘要 + `recent_chapters` **仅全局最近 3 章**);卷层只有计划期 mission;**canonical 时间线只喂 PlannerService,正文 writer 收不到**。缺口 = 卷内滚动回顾 + 全书时间线快照两层。
+- **改动**:
+  1. `GenerationContextPackage`/`chapterWriteContextSchema` 增加 `volumeRecap`、`bookStateSnapshot`(可选默认 [],旧数据向后兼容);
+  2. 新纯函数模块 `runtime/context/layeredMemoryContext.ts`:卷定位(`resolveCurrentVolumeChapterOrders`)、卷内回顾格式化(当前章之前 ≤8 条、截断 100 字)、全书快照(时间线过滤未来事件、按章序取最近 8 条);
+  3. `GenerationContextAssembler` 单点装配:当前卷章序 → 查卷内 `chapterSummary`(≤8)→ 两字段写入 contextPackage;
+  4. `buildChapterWriteContext` 映射(仿 previousChaptersSummary 模式);`chapterContextBlocks` 新增 `book_state_snapshot`(priority 91)/`volume_recap`(priority 89)两块,`mode==="full"` 且非空才渲染;
+  5. writer 资产 `contextRequirements` 登记两组 + 进 `preferredGroups`(防预算静默丢弃,吸取 A1-G2 教训);
+  6. provider contract 增两条(stages=write、章序>3 才评估、degrade 语义)—— 提供注入遥测(吸收 A1-G8 教训)。
+- **验证**: server **1410 测试 / 1398 过 / 0 失败 / 12 跳过**(新增 5 条:快照过滤/排序/截断、卷定位与回顾、writer 登记契约、块与装配静态契约、gating decisions 行为);client 本轮未动,沿用 LOOP-6 结论(typecheck 0 / 222)。中途修 1 个类型错误(canonical 时间线 `chapterOrder` 可 undefined → 参数类型放宽)。
+- **验收对照**: 「后段上下文含分层摘要」= writer 必达登记 + 门控 + 装配,测试锁定;「抽样对比漂移减少」= 真实生成对比,留所有者实测。
+- **遗留**: review/repair 模式未注入两层(本轮只保 writer,按 MVP);记忆条数/预算微调依据 `ctx-budget` 日志;wiki 已沉淀(rag/knowledge-and-context-assembly)。
+- **下一步**: 按 BACKLOG 顺序 → **LOOP-9 = INN-A4 角色弧线追踪(M/P3)**;其后 B1 决策回放。
+
 ## 2026-10-20 · LOOP-7 · 全书一致性守卫(INN-A2)
 
 - **类别**: 创新(A 线写作质量;主对话执行)

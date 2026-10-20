@@ -16,7 +16,8 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 5. ~~**LOOP-5 伏笔账本 MVP**(INN-A1)~~ ✅ 已完成(2026-10-18):审计 26 项缺口收敛落地 —— 手动登记/标记+锁定语义、过窗读时升格、停滞扫描、回收计数、逾期降质量债、最小提醒面;残留调优登记 INN-A1b。
 6. ~~**UI 线并行入口**(UI-1 第一批)~~ ✅ LOOP-6 完成(2026-10-20):复核发现第一/二批上游已完成,本轮执行真实剩余的第三批 A(写法引擎视觉收敛);UI-1 余项挂账。
 7. ~~**LOOP-7 一致性守卫**(INN-A2)~~ ✅ 完成(2026-10-20):审校 v3 三类矛盾协议 + 确定性规范化 + 治理链守卫。
-8. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **INN-A3 分层递归记忆(章→卷→全书摘要树,M/P2)**,随后 A4 → B1 → B3 → B4 → C 线 → D 线 → RF/BUG/UI/OPS 按 P 排。
+8. ~~**LOOP-8 分层递归记忆**(INN-A3)~~ ✅ 完成(2026-10-20):卷内回顾 + 全书时间线快照注入后段生成,含遥测与 5 条守卫。
+9. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **INN-A4 角色弧线追踪(M/P3)**,随后 B1 → B3 → B4 → C 线 → D 线 → RF/BUG/UI/OPS 按 P 排。
 
 ---
 
@@ -54,9 +55,9 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
   结果:审校 prompt v3 内置三类矛盾检查协议 + 专用问题码(时间线/动机/世界规则)与取证要求;`services/audit/continuityGuard.ts` 确定性规范化(去重保最严、排序、限量、丢空证据)接入既有治理链,零新增 LLM 调用与执行器分支;链路守卫测试覆盖 high→blocking、medium→质量债。契约见 wiki `novel-generation-quality-guards.md` 第八节;计划 `docs/plans/continuity-guard.md`。
   残留:真实检出质量依赖模型按协议输出(失效模式已记 wiki);跨章批量回溯重扫未做。
 
-- [ ] **INN-A3 分层递归记忆(章 → 卷 → 全书摘要树)** · M · P2
-  落地 roadmap"长程上下文记忆":卷摘要 + 全书状态快照(时间线、角色状态、伏笔面)稳定参与后段生成。
-  验收:长篇后段生成的上下文含分层摘要;抽样对比后段设定漂移减少。
+- [x] **INN-A3 分层递归记忆(章 → 卷 → 全书摘要树)** · M · P2(= LOOP-8,2026-10-20 完成)
+  结果:contextPackage/writeContext 新增 `volumeRecap`(卷内已写章节回顾,当前章前 ≤8 条)与 `bookStateSnapshot`(canonical 时间线已发生事件按章序 ≤8 条);纯函数模块 `layeredMemoryContext.ts` + 装配器单点装配 + writer 两块(priority 91/89)+ 资产 requirements/preferredGroups 登记 + provider contract 遥测(>3 章评估、degrade);5 条守卫测试。契约见 `docs/wiki/rag/knowledge-and-context-assembly.md`;计划 `docs/plans/layered-memory.md`。
+  遗留:review/repair 模式未注入(按 MVP 先保 writer);"抽样对比漂移减少"待所有者实测。
 
 - [ ] **INN-A4 角色弧线追踪** · M · P3
   拆书已有"角色形象演变";扩展到性格/目标/关系演变,生成时注入角色当前阶段状态。

@@ -39,6 +39,7 @@
 - RAG 质量改动必须有固定评测集做前后对比。评测至少覆盖角色事实、世界规则、章节连续性、风格设定和知识文档五类查询，输出 Hit@K、MRR、Context Precision、Context Recall 和 reranker 平均耗时。
 - Prompt 模板只声明需要哪些上下文；Context Broker / Resolver 负责读取、预算、过滤、摘要和组装。
 - RAG 与上下文组装的失败要在 preview 或 trace 中可解释，不能静默丢 required context。
+- **分层递归记忆(INN-A3,章→卷→全书)**:正文 writer 除最近 3 章摘要外,注入两层长程上下文 —— `volume_recap`(当前卷内、当前章之前的章节摘要,≤8 条)与 `book_state_snapshot`(canonical 时间线已发生事件按章序取最近 8 条)。数据在 `GenerationContextAssembler` 单点装配写入 `GenerationContextPackage` 的 `volumeRecap/bookStateSnapshot` 字段(纯函数在 `runtime/context/layeredMemoryContext.ts`),经 `buildChapterWriteContext` 映射为 writeContext 同名字段,块在 `chapterContextBlocks.ts` 以 `mode==="full"` 且非空才渲染;writer 资产的 `contextRequirements` + `preferredGroups` 均登记两组(防预算静默丢弃),provider contract(stages=write、章序>3 才评估、failureSemantics=degrade)提供注入遥测。旧数据字段缺省为空数组,向后兼容。
 
 ## 知识库入口的产品表达
 
@@ -76,6 +77,8 @@
 - 上下文前缀引入错误事实：检查 `rag.contextual_chunk.prefix@v1` 的 prompt 输出和输入 metadata，前缀只能归纳定位，不能新增设定；必要时提高评测集中对应查询的覆盖。
 - reranker 提升不稳定：先用固定评测集比较启用前后的 Hit@K / MRR，再检查候选数量是否过小、候选中是否已经缺少正确 chunk；不要用 reranker 掩盖基础召回范围错误。
 - 历史 trace 数据无限增长：检查服务启动时是否调用了 `ragRetrievalTraceRetention.start()`，以及 `RAG_RETRIEVAL_TRACE_RETENTION_DAYS` 是否设置合理。
+- 后段章节看不到卷内回顾或全书快照：检查当前章是否被卷计划覆盖(`resolveCurrentVolumeChapterOrders` 返回 null 则不查询)、canonical 时间线是否为空,以及 gating decisions 中 `book_state_snapshot/volume_recap` 的 included/reason;早期章节(≤3 章)不评估属预期。
+- 两层记忆块被预算丢弃:检查 writer `preferredGroups` 是否仍包含两组;不要把它们改成 required 来"保证出现"——先看 `ctx-budget` 压缩日志再调预算或条数上限。
 
 ## 相关模块
 
@@ -83,6 +86,8 @@
 - `server/src/services/knowledge/`
 - `server/src/services/bookAnalysis/bookAnalysis.publish.facets.ts`
 - `server/src/services/novel/runtime/GenerationContextAssembler.ts`
+- `server/src/services/novel/runtime/context/layeredMemoryContext.ts`(分层记忆纯函数)
+- `server/src/prompting/prompts/novel/context/chapterContextBlocks.ts`(分层记忆块)
 - `server/src/prompting/`
 - `client/src/pages/knowledge/`
 - `client/src/pages/worlds/`
@@ -91,3 +96,4 @@
 ## 来源文档
 
 - [README 当前能力说明](../../../README.md)
+- LOOP-8 分层递归记忆计划:`../../../docs/plans/layered-memory.md`(2026-10-20)
