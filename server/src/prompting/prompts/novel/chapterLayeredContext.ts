@@ -381,6 +381,9 @@ export function buildChapterWriteContext(input: {
     timelineContext: input.contextPackage.timelineContext ?? null,
     characterResourceContext: input.contextPackage.characterResourceContext ?? null,
     recentChapterSummaries: takeUnique(input.contextPackage.previousChaptersSummary.slice(0, 3), 3),
+    // INN-A3:卷内回顾与全书状态快照由装配期填充(旧数据缺省为空,不渲染块)。
+    volumeRecap: takeUnique(input.contextPackage.volumeRecap ?? [], 8),
+    bookStateSnapshot: takeUnique(input.contextPackage.bookStateSnapshot ?? [], 8),
     previousChapterTail: compactText(input.contextPackage.previousChapterTail) || null,
     openingAntiRepeatHint: compactText(input.contextPackage.openingHint, "No recent opening guidance."),
     styleContract: input.contextPackage.styleContext?.compiledBlocks?.contract ?? null,

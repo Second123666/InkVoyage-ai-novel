@@ -52,6 +52,11 @@ import {
   resolveActiveMilestonePayoffs,
 } from "./context/bookAndVolumeRewardContext";
 import {
+  buildBookStateSnapshotLines,
+  buildVolumeRecapLines,
+  resolveCurrentVolumeChapterOrders,
+} from "./context/layeredMemoryContext";
+import {
   extractChapterOpening,
   extractChapterTail,
   runtimeChapterSelect,
@@ -290,6 +295,24 @@ export class GenerationContextAssembler {
       })),
       chapter.order,
     ));
+    // INN-A3 分层递归记忆:卷内回顾 + 全书状态快照(纯函数装配,写入 contextPackage 供 writer 块消费)。
+    const volumeRecapOrders = resolveCurrentVolumeChapterOrders(
+      novel.volumePlans.map((volume) => ({ chapters: volume.chapters })),
+      chapter.order,
+    );
+    const volumeRecapRows = volumeRecapOrders
+      ? await prisma.chapterSummary.findMany({
+        where: {
+          novelId,
+          chapter: { order: { in: volumeRecapOrders, lt: chapter.order } },
+        },
+        include: { chapter: { select: { order: true } } },
+        orderBy: { chapter: { order: "asc" } },
+        take: 8,
+      }).catch(() => [])
+      : [];
+    const volumeRecap = buildVolumeRecapLines(volumeRecapRows, chapter.order);
+    const bookStateSnapshot = buildBookStateSnapshotLines(canonicalState.timeline, chapter.order);
     const activeStyleProfileId = styleContext.matchedBindings[0]?.styleProfileId?.trim()
       || styleContext.matchedBindings[0]?.styleProfile?.id?.trim()
       || request.taskStyleProfileId?.trim()
@@ -516,6 +539,8 @@ export class GenerationContextAssembler {
       creativeDecisions: mappedCreativeDecisions,
       openAuditIssues: mappedOpenAuditIssues,
       previousChaptersSummary,
+      volumeRecap,
+      bookStateSnapshot,
       previousChapterTail,
       openingHint,
       continuation: runtimeContinuation,

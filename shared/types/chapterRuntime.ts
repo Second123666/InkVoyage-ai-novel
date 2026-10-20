@@ -505,6 +505,8 @@ export const chapterWriteContextSchema = z.object({
   timelineContext: timelineContextForChapterSchema.nullable().optional(),
   characterResourceContext: characterResourceContextSchema.nullable().optional(),
   recentChapterSummaries: z.array(z.string()).default([]),
+  volumeRecap: z.array(z.string()).default([]),
+  bookStateSnapshot: z.array(z.string()).default([]),
   previousChapterTail: z.string().nullable().optional(),
   openingAntiRepeatHint: z.string(),
   styleContract: runtimeStyleContractSchema.nullable().optional(),
@@ -553,6 +555,9 @@ export const generationContextPackageSchema = z.object({
   creativeDecisions: z.array(runtimeCreativeDecisionSchema),
   openAuditIssues: z.array(runtimeAuditIssueSchema),
   previousChaptersSummary: z.array(z.string()),
+  // INN-A3 分层递归记忆:卷内回顾与全书状态快照(装配期填充,旧数据缺省为空)。
+  volumeRecap: z.array(z.string()).default([]).optional(),
+  bookStateSnapshot: z.array(z.string()).default([]).optional(),
   previousChapterTail: z.string().nullable().optional(),
   openingHint: z.string(),
   continuation: runtimeContinuationSchema,

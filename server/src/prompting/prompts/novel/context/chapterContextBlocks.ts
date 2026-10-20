@@ -478,6 +478,25 @@ export function buildChapterWriterContextBlocks(
         content: toListBlock("Recent chapter summaries", writeContext.recentChapterSummaries),
       })
       : null,
+    // INN-A3 分层递归记忆:全书时间线快照与卷内回顾,后段生成稳定参与(有数据才渲染)。
+    mode === "full" && (writeContext.bookStateSnapshot ?? []).length > 0
+      ? createContextBlock({
+        id: "book_state_snapshot",
+        group: "book_state_snapshot",
+        priority: 91,
+        required: false,
+        content: toListBlock("全书状态快照 — 关键时间线事件(按发生顺序,勿与既有事实冲突)", writeContext.bookStateSnapshot),
+      })
+      : null,
+    mode === "full" && (writeContext.volumeRecap ?? []).length > 0
+      ? createContextBlock({
+        id: "volume_recap",
+        group: "volume_recap",
+        priority: 89,
+        required: false,
+        content: toListBlock("本卷已完成章节回顾(volume recap)", writeContext.volumeRecap),
+      })
+      : null,
     mode === "full"
       ? createContextBlock({
         id: "opening_constraints",
