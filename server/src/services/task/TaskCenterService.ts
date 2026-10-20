@@ -19,6 +19,7 @@ import { NovelWorkflowTaskAdapter } from "./adapters/NovelWorkflowTaskAdapter";
 import { PipelineTaskAdapter } from "./adapters/PipelineTaskAdapter";
 import { StyleExtractionTaskAdapter } from "./adapters/StyleExtractionTaskAdapter";
 import { collectWorkflowLinkedPipelineIds } from "./taskCenterVisibility";
+import { resolveRecoveryGuidance } from "./recoveryPlaybook";
 import {
   compareTaskSummary,
   isAfterCursor,
@@ -369,25 +370,37 @@ export class TaskCenterService {
   }
 
   async getTaskDetail(kind: TaskKind, id: string): Promise<UnifiedTaskDetail | null> {
-    if (kind === "book_analysis") {
-      return this.bookAdapter.detail(id);
+    const detail = await (async (): Promise<UnifiedTaskDetail | null> => {
+      if (kind === "book_analysis") {
+        return this.bookAdapter.detail(id);
+      }
+      if (kind === "novel_pipeline") {
+        return this.pipelineAdapter.detail(id);
+      }
+      if (kind === "knowledge_document") {
+        return this.knowledgeAdapter.detail(id);
+      }
+      if (kind === "agent_run") {
+        return this.agentAdapter.detail(id);
+      }
+      if (kind === "novel_workflow") {
+        return this.workflowAdapter.detail(id);
+      }
+      if (kind === "style_extraction") {
+        return this.styleExtractionAdapter.detail(id);
+      }
+      return this.imageAdapter.detail(id);
+    })();
+    if (!detail) {
+      return null;
     }
-    if (kind === "novel_pipeline") {
-      return this.pipelineAdapter.detail(id);
-    }
-    if (kind === "knowledge_document") {
-      return this.knowledgeAdapter.detail(id);
-    }
-    if (kind === "agent_run") {
-      return this.agentAdapter.detail(id);
-    }
-    if (kind === "novel_workflow") {
-      return this.workflowAdapter.detail(id);
-    }
-    if (kind === "style_extraction") {
-      return this.styleExtractionAdapter.detail(id);
-    }
-    return this.imageAdapter.detail(id);
+    // INN-B4:统一附加恢复指引(单一装饰点,适配器零改动)。
+    const recoveryGuidance = resolveRecoveryGuidance({
+      failureCode: detail.failureCode,
+      noticeCode: detail.noticeCode,
+      pendingManualRecovery: detail.pendingManualRecovery,
+    });
+    return recoveryGuidance ? { ...detail, recoveryGuidance } : detail;
   }
 
   async retryTask(

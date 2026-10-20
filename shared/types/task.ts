@@ -3,6 +3,7 @@ import type {
   NovelWorkflowCheckpoint,
   NovelWorkflowResumeTarget,
 } from "./novelWorkflow";
+import type { RecoveryPlaybookEntry } from "./recoveryPlaybook";
 
 export type TaskKind =
   | "book_analysis"
@@ -78,6 +79,8 @@ export interface UnifiedTaskDetail extends UnifiedTaskSummary {
   meta: Record<string, unknown>;
   steps: UnifiedTaskStep[];
   failureDetails?: string | null;
+  /** INN-B4:按结构化失败码附加的恢复指引(未命中已知码时为兜底条目或 null)。 */
+  recoveryGuidance?: RecoveryPlaybookEntry | null;
 }
 
 export interface UnifiedTaskListResponse {
