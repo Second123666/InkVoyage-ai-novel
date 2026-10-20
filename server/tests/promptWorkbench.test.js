@@ -203,7 +203,7 @@ test("prompt preview reports missing required context for manager diagnosis", as
 test("prompt preview renders audit prompts with complete workbench sample input", async () => {
   const service = new PromptWorkbenchService();
   const preview = await service.preview({
-    promptKey: "audit.chapter.full@v2",
+    promptKey: "audit.chapter.full@v3",
     promptInput: {
       novelTitle: "示例小说",
       chapterTitle: "示例章节",
@@ -224,7 +224,7 @@ test("prompt preview renders audit prompts with complete workbench sample input"
     maxContextTokens: 2000,
   });
 
-  assert.equal(preview.prompt.key, "audit.chapter.full@v2");
+  assert.equal(preview.prompt.key, "audit.chapter.full@v3");
   assert.ok(preview.messages.some((message) => message.content.includes("审校范围：plot, character, continuity")));
   assert.deepEqual(preview.diagnostics.missingRequiredGroups, []);
   assert.ok(preview.context.selectedBlockIds.includes("chapter_boundary"));
@@ -270,7 +270,7 @@ test("prompt preview prefers selected novel chapter context over audit sample co
   });
 
   const preview = await service.preview({
-    promptKey: "audit.chapter.full@v2",
+    promptKey: "audit.chapter.full@v3",
     promptInput: {
       novelTitle: "当代码开始杀人",
       chapterTitle: "第 3 章 异常提交",

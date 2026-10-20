@@ -58,7 +58,7 @@ export const promptAssetLoaderEntries: PromptAssetLoaderEntry[] = [
     load: () => require("../prompts/agent/runtime.prompts").runtimeSetupIdeationPrompt as UnknownPromptAsset,
   },
   {
-    key: "audit.chapter.full@v2",
+    key: "audit.chapter.full@v3",
     load: () => require("../prompts/audit/audit.prompts").auditChapterPrompt as UnknownPromptAsset,
   },
   {

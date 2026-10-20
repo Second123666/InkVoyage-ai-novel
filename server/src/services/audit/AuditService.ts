@@ -17,6 +17,7 @@ import { runStructuredPrompt } from "../../prompting/core/promptRunner";
 import { auditChapterLightPrompt, auditChapterPrompt } from "../../prompting/prompts/audit/audit.prompts";
 import type { LightAuditOutput } from "./auditSchemas";
 import { resolveAuditChapterContextBlocks } from "./auditPromptContext";
+import { normalizeContinuityGuardIssues } from "./continuityGuard";
 
 interface AuditOptions {
   provider?: LLMProvider;
@@ -193,13 +194,14 @@ export class AuditService {
         auditType: type,
         overallScore: typeof matched?.overallScore === "number" ? matched.overallScore : score.overall,
         summary: matched?.summary?.trim() || `${type} 审计已生成。`,
-        issues: (matched?.issues ?? []).map((issue, index) => ({
+        // INN-A2:一致性守卫问题在进入治理链前做确定性规范化(去重/排序/限量/丢空证据)。
+        issues: normalizeContinuityGuardIssues((matched?.issues ?? []).map((issue, index) => ({
           severity: normalizeSeverity(issue.severity),
           code: issue.code?.trim() || `${type}_${index + 1}`,
           description: issue.description?.trim() || `${type} 审计问题`,
           evidence: issue.evidence?.trim() || "未提供证据",
           fixSuggestion: issue.fixSuggestion?.trim() || "请根据上下文修复该问题。",
-        })),
+        }))),
       };
     });
     const persistedReports = await this.persistAuditReports(novelId, chapterId, score, auditReportsInput);

@@ -168,7 +168,7 @@ test("prompt registry exposes versioned planning assets", () => {
     "novel.volume.strategy.critique@v1",
     "novel.volume.skeleton@v3",
     "title.generation@v2",
-    "audit.chapter.full@v2",
+    "audit.chapter.full@v3",
     "bookAnalysis.source.note@v1",
     "character.base.skeleton@v1",
     "novel.continuation.rewrite_similarity@v1",
@@ -686,7 +686,7 @@ test("novel main-chain prompt assets declare explicit non-zero context budgets",
     [promptKey(chapterWriterPrompt), NOVEL_PROMPT_BUDGETS.chapterWriter],
     ["novel.review.chapter@v2", NOVEL_PROMPT_BUDGETS.chapterReview],
     ["novel.review.repair@v2", NOVEL_PROMPT_BUDGETS.chapterRepair],
-    ["audit.chapter.full@v2", NOVEL_PROMPT_BUDGETS.chapterReview],
+    ["audit.chapter.full@v3", NOVEL_PROMPT_BUDGETS.chapterReview],
   ]);
 
   for (const [key, budget] of expectedBudgets.entries()) {
