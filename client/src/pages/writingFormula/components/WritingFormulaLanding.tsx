@@ -87,7 +87,7 @@ export default function WritingFormulaLanding(props: WritingFormulaLandingProps)
     const selectedStyle = "border-primary/60 bg-primary/[0.045] shadow-sm";
     const idleStyle = "border-border bg-card hover:border-primary/35 hover:bg-muted/25";
     const badgeClassName = profile.isStarter
-      ? "h-6 border-sky-200 bg-white text-sky-700"
+      ? "h-6 border-info/40 bg-background text-info"
       : "h-6";
 
     return (
@@ -188,21 +188,21 @@ export default function WritingFormulaLanding(props: WritingFormulaLandingProps)
                 title="读感与定位"
                 description="这一列帮助你快速判断这套写法想写成什么感觉，适合先拿来做哪类项目。"
               >
-                <div className="rounded-2xl border border-slate-200 bg-white/85 p-4 text-sm leading-7 text-slate-700">
+                <div className="rounded-2xl border border-border/70 bg-background/85 p-4 text-sm leading-7 text-muted-foreground">
                   {profile.description}
                 </div>
                 {profile.detailLines.length > 0 ? (
                   <div className="grid gap-2">
                     {profile.detailLines.map((line) => (
-                      <div key={`${profile.id}-${line}`} className="rounded-xl border border-slate-200/80 bg-white/75 px-3 py-3 text-sm leading-6 text-slate-700">
+                      <div key={`${profile.id}-${line}`} className="rounded-xl border border-border/60 bg-background/75 px-3 py-3 text-sm leading-6 text-muted-foreground">
                         {line}
                       </div>
                     ))}
                   </div>
                 ) : null}
                 {profile.sourceContentPreview ? (
-                  <div className="rounded-2xl border border-slate-200 bg-[linear-gradient(135deg,rgba(241,245,249,0.9),rgba(255,255,255,0.98))] px-4 py-4 text-sm leading-7 text-slate-700">
-                    <div className="mb-2 text-xs font-semibold tracking-[0.12em] text-slate-500">原文样本片段</div>
+                  <div className="rounded-2xl border border-border/70 bg-muted/40 px-4 py-4 text-sm leading-7 text-muted-foreground">
+                    <div className="mb-2 text-xs font-semibold tracking-[0.12em] text-muted-foreground">原文样本片段</div>
                     <div>{profile.sourceContentPreview}</div>
                   </div>
                 ) : null}
@@ -230,7 +230,7 @@ export default function WritingFormulaLanding(props: WritingFormulaLandingProps)
                       {profile.antiAiFocus.length > 0 ? (
                         <div className="grid gap-2">
                           {profile.antiAiFocus.map((line) => (
-                            <div key={`${profile.id}-${line}`} className="rounded-xl border border-amber-100 bg-amber-50/70 px-3 py-3 text-sm leading-6 text-amber-900">
+                            <div key={`${profile.id}-${line}`} className="rounded-xl border border-warning/30 bg-warning/10 px-3 py-3 text-sm leading-6 text-warning">
                               {line}
                             </div>
                           ))}
@@ -239,20 +239,20 @@ export default function WritingFormulaLanding(props: WritingFormulaLandingProps)
                       {profile.antiAiRuleNames.length > 0 ? (
                         <div className="flex flex-wrap gap-2">
                           {profile.antiAiRuleNames.map((ruleName) => (
-                            <Badge key={`${profile.id}-${ruleName}`} variant="secondary" className="bg-slate-100 text-slate-700">
+                            <Badge key={`${profile.id}-${ruleName}`} variant="secondary" className="bg-muted text-muted-foreground">
                               {ruleName}
                             </Badge>
                           ))}
                         </div>
                       ) : null}
                       {profile.extractionAntiAiRecommendationCount > 0 ? (
-                        <div className="rounded-xl border bg-slate-50/80 px-3 py-3 text-sm leading-6 text-slate-600">
+                        <div className="rounded-xl border bg-muted/40 px-3 py-3 text-sm leading-6 text-muted-foreground">
                           这套写法在提取阶段额外建议了 {profile.extractionAntiAiRecommendationCount} 条反 AI 规则，适合后续继续精配。
                         </div>
                       ) : null}
                     </div>
                   ) : (
-                    <div className="rounded-xl border border-dashed px-3 py-3 text-sm leading-6 text-slate-500">
+                    <div className="rounded-xl border border-dashed px-3 py-3 text-sm leading-6 text-muted-foreground">
                       这套写法还没有绑定明确的反 AI 约束，所以“去 AI 味”时可读性会偏弱。
                     </div>
                   )}
@@ -293,7 +293,7 @@ export default function WritingFormulaLanding(props: WritingFormulaLandingProps)
                   title="下一步"
                   description="三个按钮现在各自只负责一件事，不会再跳到同一块内容里。"
                 >
-                  <div className="space-y-2 text-sm leading-6 text-slate-700">
+                  <div className="space-y-2 text-sm leading-6 text-muted-foreground">
                     <div>编辑设定：维护这套写法本身的说明、规则和反 AI 约束。</div>
                     <div>应用与测试：绑定到小说或章节，并做试写验证。</div>
                     <div>去 AI 味：只处理正文检测和修正，不改写法字段。</div>
@@ -358,12 +358,12 @@ export default function WritingFormulaLanding(props: WritingFormulaLandingProps)
                 <section className="space-y-3">
                   <div className="flex items-center justify-between gap-3">
                     <div>
-                      <div className="text-sm font-semibold text-slate-950">你自己创建的写法</div>
-                      <div className="text-xs leading-6 text-slate-500">
+                      <div className="text-sm font-semibold text-foreground">你自己创建的写法</div>
+                      <div className="text-xs leading-6 text-muted-foreground">
                         这些是你沉淀下来的可复用资产，应该优先在这里挑。
                       </div>
                     </div>
-                    <Badge variant="secondary" className="bg-slate-100 text-slate-700">
+                    <Badge variant="secondary" className="bg-muted text-muted-foreground">
                       {customProfiles.length} 套
                     </Badge>
                   </div>
@@ -377,12 +377,12 @@ export default function WritingFormulaLanding(props: WritingFormulaLandingProps)
                 <section className="space-y-3">
                   <div className="flex items-center justify-between gap-3">
                     <div>
-                      <div className="text-sm font-semibold text-slate-950">可直接改的起步写法</div>
-                      <div className="text-xs leading-6 text-slate-500">
+                      <div className="text-sm font-semibold text-foreground">可直接改的起步写法</div>
+                      <div className="text-xs leading-6 text-muted-foreground">
                         这些预置资产适合先借一套骨架，再按当前项目改成自己的写法。
                       </div>
                     </div>
-                    <Badge variant="secondary" className="bg-slate-100 text-slate-700">
+                    <Badge variant="secondary" className="bg-muted text-muted-foreground">
                       {starterProfiles.length} 套
                     </Badge>
                   </div>
