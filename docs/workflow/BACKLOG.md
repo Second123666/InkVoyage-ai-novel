@@ -17,7 +17,8 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 6. ~~**UI 线并行入口**(UI-1 第一批)~~ ✅ LOOP-6 完成(2026-10-20):复核发现第一/二批上游已完成,本轮执行真实剩余的第三批 A(写法引擎视觉收敛);UI-1 余项挂账。
 7. ~~**LOOP-7 一致性守卫**(INN-A2)~~ ✅ 完成(2026-10-20):审校 v3 三类矛盾协议 + 确定性规范化 + 治理链守卫。
 8. ~~**LOOP-8 分层递归记忆**(INN-A3)~~ ✅ 完成(2026-10-20):卷内回顾 + 全书时间线快照注入后段生成,含遥测与 5 条守卫。
-9. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **INN-A4 角色弧线追踪(M/P3)**,随后 B1 → B3 → B4 → C 线 → D 线 → RF/BUG/UI/OPS 按 P 排。
+9. ~~**LOOP-9 角色弧线追踪**(INN-A4)~~ ✅ 完成(2026-10-20):CharacterTimeline 演变轨迹注入 writer(character_arc 块 + 遥测)。
+10. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **INN-B1 全链路 Trace 与决策回放(M/P2)**,随后 B3 → B4 → C 线 → D 线 → RF/BUG/UI/OPS 按 P 排。
 
 ---
 
@@ -59,8 +60,9 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
   结果:contextPackage/writeContext 新增 `volumeRecap`(卷内已写章节回顾,当前章前 ≤8 条)与 `bookStateSnapshot`(canonical 时间线已发生事件按章序 ≤8 条);纯函数模块 `layeredMemoryContext.ts` + 装配器单点装配 + writer 两块(priority 91/89)+ 资产 requirements/preferredGroups 登记 + provider contract 遥测(>3 章评估、degrade);5 条守卫测试。契约见 `docs/wiki/rag/knowledge-and-context-assembly.md`;计划 `docs/plans/layered-memory.md`。
   遗留:review/repair 模式未注入(按 MVP 先保 writer);"抽样对比漂移减少"待所有者实测。
 
-- [ ] **INN-A4 角色弧线追踪** · M · P3
-  拆书已有"角色形象演变";扩展到性格/目标/关系演变,生成时注入角色当前阶段状态。
+- [x] **INN-A4 角色弧线追踪** · M · P3(= LOOP-9,2026-10-20 完成)
+  结果:CharacterTimeline 演变流水接入生成上下文 —— `character_arc` 块(每名参与者近 3 条演变轨迹)+ 装配注入 + writer 登记 + 遥测,与 local_state/dynamics 互补构成"角色当前阶段状态"。计划 `docs/plans/character-arc-tracking.md`;契约见 rag wiki 分层记忆段。
+  遗留:evolveCharacter 自动触发(新 LLM 调用与配额决策)与漂移实测留后续。
 
 ### B · Agent 架构工程
 

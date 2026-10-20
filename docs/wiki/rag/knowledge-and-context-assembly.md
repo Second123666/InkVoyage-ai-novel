@@ -40,6 +40,7 @@
 - Prompt 模板只声明需要哪些上下文；Context Broker / Resolver 负责读取、预算、过滤、摘要和组装。
 - RAG 与上下文组装的失败要在 preview 或 trace 中可解释，不能静默丢 required context。
 - **分层递归记忆(INN-A3,章→卷→全书)**:正文 writer 除最近 3 章摘要外,注入两层长程上下文 —— `volume_recap`(当前卷内、当前章之前的章节摘要,≤8 条)与 `book_state_snapshot`(canonical 时间线已发生事件按章序取最近 8 条)。数据在 `GenerationContextAssembler` 单点装配写入 `GenerationContextPackage` 的 `volumeRecap/bookStateSnapshot` 字段(纯函数在 `runtime/context/layeredMemoryContext.ts`),经 `buildChapterWriteContext` 映射为 writeContext 同名字段,块在 `chapterContextBlocks.ts` 以 `mode==="full"` 且非空才渲染;writer 资产的 `contextRequirements` + `preferredGroups` 均登记两组(防预算静默丢弃),provider contract(stages=write、章序>3 才评估、failureSemantics=degrade)提供注入遥测。旧数据字段缺省为空数组,向后兼容。
+- **角色弧线(INN-A4)**:同一管道增加 `character_arc` 块 —— `CharacterTimeline`(含手动 evolveCharacter 与自动事件)按角色分组,每名当前参与者注入最近 3 条演变轨迹行(`第X章 标题: 内容截断`),让性格/目标的演变过程参与后段生成,与 local_state(当前状态)、character_dynamics(关系阶段)互补。数据同样由装配器单点填充(`characterArcEvents` 字段,纯函数 `buildCharacterArcEvents`),块按 full 模式且有数据才渲染;provider contract 同款遥测(章序>3 才评估)。evolveCharacter 仍为手动触发,自动演进留后续。
 
 ## 知识库入口的产品表达
 

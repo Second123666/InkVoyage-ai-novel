@@ -17,6 +17,16 @@
 
 ---
 
+## 2026-10-20 · LOOP-9 · 角色弧线追踪(INN-A4)
+
+- **类别**: 创新(A 线长篇记忆;主对话执行)
+- **目标**: BACKLOG「拆书已有角色形象演变;扩展到性格/目标/关系演变,生成时注入角色当前阶段状态」。
+- **现状审计**: 拆书形象演变(`BookAnalysisCharacterAppearanceService`)、手动演进(`evolveCharacter`:bible+时间线+RAG → 更新性格/状态/目标并写 `CharacterTimeline`)、关系阶段(dynamics)、当前状态(local_state)均已在;**真实缺口 = CharacterTimeline 演变流水完全不参与正文生成**。
+- **改动**: `character_arc` 层接入分层记忆管道 —— 纯函数 `buildCharacterArcEvents`(每角色最近 3 条、截断、缺章序兜底);装配器取 `characterTimeline`(≤30 行)分组写入 `characterArcEvents`(package/writeContext 双 schema,旧数据兼容);writer 新块(priority 90,full 模式且参与者有数据才渲染,提示"延续此轨迹,不要凭空重置人设");requirements+preferredGroups 登记;provider contract 遥测(>3 章评估、degrade)。MVP 边界:evolveCharacter 仍手动触发(自动演进涉及新 LLM 调用与配额决策,留后续);关系演变沿用 dynamics 阶段不另建块。
+- **验证**: server **1414 测试 / 1402 过 / 0 失败 / 12 跳过**(新增 4 条:分组/限量/兜底、writer 登记、块与装配静态契约、gating 行为);client 未动沿用 LOOP-6 结论。途中修 2 个自写缺陷:zod record 需显式键类型、测试内 readSource 路径拼接。
+- **验收对照**: 「生成时注入角色当前阶段状态」= character_arc(轨迹)+ local_state(当前状态)+ dynamics(关系)三层共同构成,测试锁定;演进自动化与漂移实测留后续轮次。
+- **下一步**: 按 BACKLOG 顺序 → **LOOP-10 = INN-B1 全链路 Trace 与决策回放(M/P2)**;其后 B3 → B4 → C 线 → D 线。
+
 ## 2026-10-20 · LOOP-8 · 分层递归记忆(INN-A3 章→卷→全书)
 
 - **类别**: 创新(A 线长篇记忆;主对话执行)
