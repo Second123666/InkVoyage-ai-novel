@@ -38,6 +38,7 @@ import {
 } from "../services/settings/ProviderImageSettingsService";
 import { getRagEmbeddingModelOptions } from "../services/settings/RagEmbeddingModelService";
 import { getLLMSelectionSettings } from "../services/settings/LLMSelectionSettingsService";
+import { modelPricingSettingsService } from "../services/settings/ModelPricingSettingsService";
 import {
   getRagEmbeddingProviders,
   getRagEmbeddingSettings,
@@ -349,6 +350,49 @@ router.put(
         data,
         message: "写法引擎运行设置保存成功。",
       } satisfies ApiResponse<typeof data>);
+    } catch (error) {
+      next(error);
+    }
+  },
+);
+
+// INN-B3 成本感知路由:模型价格配置(provider::model → 每百万 token 单价)。
+const modelPriceEntrySchema = z.object({
+  provider: z.string().trim().min(1),
+  model: z.string().trim().min(1),
+  inputPer1M: z.number().min(0),
+  outputPer1M: z.number().min(0),
+});
+const modelPricesSchema = z.object({
+  prices: z.array(modelPriceEntrySchema).max(200),
+});
+
+router.get("/model-prices", async (_req, res, next) => {
+  try {
+    const prices = await modelPricingSettingsService.getPrices();
+    res.status(200).json({
+      success: true,
+      data: { prices },
+      message: "模型价格读取成功。",
+    } satisfies ApiResponse<{ prices: typeof prices }>);
+  } catch (error) {
+    next(error);
+  }
+});
+
+router.put(
+  "/model-prices",
+  validate({ body: modelPricesSchema }),
+  async (req, res, next) => {
+    try {
+      const prices = await modelPricingSettingsService.savePrices(
+        req.body as z.infer<typeof modelPricesSchema>,
+      );
+      res.status(200).json({
+        success: true,
+        data: { prices },
+        message: "模型价格保存成功。",
+      } satisfies ApiResponse<{ prices: typeof prices }>);
     } catch (error) {
       next(error);
     }

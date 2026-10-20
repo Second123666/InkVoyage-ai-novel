@@ -1816,6 +1816,23 @@ model AppSetting {
   updatedAt DateTime @updatedAt
 }
 
+// INN-B3 成本感知路由:按书的 LLM 调用流水(仅聚合计量,不含正文内容)。
+model LlmUsageEvent {
+  id               String   @id @default(cuid())
+  novelId          String?
+  taskType         String?
+  provider         String?
+  model            String?
+  promptTokens     Int      @default(0)
+  completionTokens Int      @default(0)
+  totalTokens      Int      @default(0)
+  durationMs       Int?
+  createdAt        DateTime @default(now())
+
+  @@index([novelId, createdAt])
+  @@index([taskType, createdAt])
+}
+
 model ModelRouteConfig {
   id                       String  @id @default(cuid())
   taskType                 String  @unique

@@ -315,6 +315,28 @@ export async function recordTrackedLlmUsage(
         recordedAt: now,
       })
       : Promise.resolve(null),
+    // INN-B3:按书计量流水(无书上下文不写,避免设置/预览调用污染成本报表)。
+    (() => {
+      const novelId = context?.novelId ?? record?.meta?.promptMeta?.novelId ?? null;
+      if (!novelId) {
+        return Promise.resolve(null);
+      }
+      return prisma.llmUsageEvent.create({
+        data: {
+          novelId,
+          taskType: record?.meta?.taskType ?? null,
+          provider: record?.meta?.provider ? String(record.meta.provider) : null,
+          model: record?.meta?.model ?? null,
+          promptTokens: usage.promptTokens,
+          completionTokens: usage.completionTokens,
+          totalTokens: usage.totalTokens,
+          durationMs: typeof record?.durationMs === "number"
+            ? Math.max(0, Math.round(record.durationMs))
+            : null,
+          createdAt: now,
+        },
+      }).catch(() => null);
+    })(),
     context.workflowTaskId
       ? prisma.novelWorkflowTask.updateMany({
         where: { id: context.workflowTaskId },
