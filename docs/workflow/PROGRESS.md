@@ -17,6 +17,22 @@
 
 ---
 
+## 2026-10-20 · LOOP-12 · 失败模式 → 恢复动作知识库(INN-B4)
+
+- **类别**: 创新(B 线 Agent 架构;主对话执行)
+- **目标**: BACKLOG「把常见暂停/失败原因沉淀为结构化 原因→恢复动作,自动导演恢复更聪明」。
+- **现状审计**: 跟进层已有 11 个 reason→动作解析;结构化失败信号散落在 failureCode(14 码)、noticeCode(3 码)、章节 failureClassification(5 码);**无统一的知识注册表**,运行时/UI 无法据此给出统一恢复指引。
+- **改动**:
+  1. 共享契约 `shared/types/recoveryPlaybook.ts`(条目含 码/短名/原因解释/用户视角动作/模式/可重试)+ `UnifiedTaskDetail.recoveryGuidance` 可选字段;
+  2. **注册表** `services/task/recoveryPlaybook.ts`:**20 条目**覆盖全部既有结构化码 + 人工恢复合成条目(`manual_recovery_required`)+ `unknown_failure` 兜底;解析优先级 = 人工恢复(最高,不被具体码覆盖)> failureCode > noticeCode > classification > 兜底 > null;纯确定性映射,零 LLM、零自由文本关键词判断;
+  3. **接线**:`TaskCenterService.getTaskDetail` 唯一装饰点附加 `recoveryGuidance`(加法字段,适配器零改动);
+  4. **只读目录端点** `GET /api/recovery-playbook`;
+  5. 语义约束:质量提醒类 inspect+不可重试(质量债≠失败)、重规划类 replan、租约丢失 auto_retry、人工恢复不可重试。
+- **验证**: server **1429 测试 / 1417 过 / 0 失败 / 12 跳过**(新增 4 条:词表覆盖+形状、优先级含反例、语义抽样、静态契约);client 未动沿用既往结论。本轮无 schema 变更。
+- **验收对照**: 「结构化 原因→恢复动作」= 注册表+解析器;「恢复更聪明」= 任务详情统一携带指引(前端展示后置);人工恢复语义优先受测试保护。
+- **发布说明**: 内部字段(UI 未消费),按规则跳过并注明。
+- **下一步**: 按 BACKLOG 顺序 → **LOOP-13 = INN-C1 故事世界图谱可视化(M–L/P2)**(可视化栈已定盘,需拆分多轮;首轮建议先做数据契约与只读图谱端点);其后 C2 → C3 → D 线。
+
 ## 2026-10-20 · LOOP-11 · 成本感知模型路由(INN-B3)
 
 - **类别**: 创新(D 线成本与效率,与 B 线交叉;主对话执行)
