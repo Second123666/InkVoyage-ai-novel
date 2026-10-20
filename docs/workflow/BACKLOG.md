@@ -18,17 +18,19 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 7. ~~**LOOP-7 一致性守卫**(INN-A2)~~ ✅ 完成(2026-10-20):审校 v3 三类矛盾协议 + 确定性规范化 + 治理链守卫。
 8. ~~**LOOP-8 分层递归记忆**(INN-A3)~~ ✅ 完成(2026-10-20):卷内回顾 + 全书时间线快照注入后段生成,含遥测与 5 条守卫。
 9. ~~**LOOP-9 角色弧线追踪**(INN-A4)~~ ✅ 完成(2026-10-20):CharacterTimeline 演变轨迹注入 writer(character_arc 块 + 遥测)。
-10. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **INN-B1 全链路 Trace 与决策回放(M/P2)**,随后 B3 → B4 → C 线 → D 线 → RF/BUG/UI/OPS 按 P 排。
+10. ~~**LOOP-10 全链路 Trace 与决策回放**(INN-B1)~~ ✅ 完成(2026-10-20):章级四段轨迹持久化 + 只读 API。
+11. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **INN-B3 成本感知模型路由(M/P2)**,随后 B4 → C 线 → D 线 → RF/BUG/UI/OPS 按 P 排。
+    **完成项打勾规则(2026-10-20 所有者要求)**:每轮收尾同步更新 BACKLOG —— 完成项 `[x]` + ✅,进行中 `[/]`,入口建议划线。
 
 ---
 
 ## 1. 残缺功能收束(FEAT)
 
-- [x] **FEAT-1 漫画工作台降级为实验特性** · S · P1(= LOOP-3,2026-10-17 完成)
+- [x] **FEAT-1 漫画工作台降级为实验特性** · S · P1(= LOOP-3,2026-10-17 完成) ✅
   结果:桌面侧边栏"实验"徽标 + 注册表过滤;设置→外观与主题总开关可隐藏入口(路由始终可直达);public 文档与 wiki 标注实验状态;`client/src/config/experimentalFeatures.ts` 注册表 + 测试。
   验收:主链 UI 不受干扰(三套验证绿);开关可关闭;既有功能未回退。
 
-- [x] **FEAT-2 短剧工作台降级为实验特性** · S · P1(= LOOP-3)
+- [x] **FEAT-2 短剧工作台降级为实验特性** · S · P1(= LOOP-3) ✅
   结果:同 FEAT-1;桌面入口从 disabled 改为可用并与移动端一致;两页顶部模拟成片提示条(「默认使用模拟演示通道,未接入真实视频生成服务时不会产出真实视频」,配置真实通道的部署下仍准确)。
   验收:同 FEAT-1 + 用户不会误以为能直接出片。
 
@@ -44,7 +46,7 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 
 ### A · 写作质量与长篇记忆
 
-- [x] **INN-A1 伏笔/承诺账本(Foreshadowing Ledger)** · M · P1(= LOOP-5,2026-10-18 完成)
+- [x] **INN-A1 伏笔/承诺账本(Foreshadowing Ledger)** · M · P1(= LOOP-5,2026-10-18 完成) ✅
   结果:先审计(上游已有双 AI 写路径 + 注入 + 只读卡片,验收②已达成),再收敛 11 项:手动登记/标记 + manualLocked 锁定语义、入口门控修复、过窗读时升格、停滞扫描(30 章)、回收计数、逾期降质量债、导演/大纲提醒面。契约见 `docs/wiki/architecture/payoff-ledger-lifecycle.md`;计划 `docs/plans/payoff-ledger-mvp.md`;守卫 `server/tests/payoffLedgerMvp.test.js`。
   残留调优 → INN-A1b。
 
@@ -52,27 +54,27 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
   清单(A1-G2/G3/G5/G6/G7 注入保底与排序:payoff_ledger 块进 preferredGroups、riskSignals/confidence 透传、overdue 注入升级 payoff 语义、pending 按窗口排序、注入条数上限与截断顺序;G8/G9 上下文遥测与预算档案对齐;G11-UI 窗口行内编辑;G15 卡片筛选与章节跳转;G18 同步状态标记与手动重建入口;G19 验收 requiresFullPayoffReconcile 死字段接线;G23 sync_stale 进合成问题;G24 快照双轨说明强化;G25 Markdown 导出伏笔清单;planner 空账本回退摘要 paidOff/failed 仍为 0)。
   验收:逐项小步推进,每批保持三套测试绿;完成项从清单划除。
 
-- [x] **INN-A2 全书一致性守卫(Continuity Guard)** · M · P2(= LOOP-7,2026-10-20 完成)
+- [x] **INN-A2 全书一致性守卫(Continuity Guard)** · M · P2(= LOOP-7,2026-10-20 完成) ✅
   结果:审校 prompt v3 内置三类矛盾检查协议 + 专用问题码(时间线/动机/世界规则)与取证要求;`services/audit/continuityGuard.ts` 确定性规范化(去重保最严、排序、限量、丢空证据)接入既有治理链,零新增 LLM 调用与执行器分支;链路守卫测试覆盖 high→blocking、medium→质量债。契约见 wiki `novel-generation-quality-guards.md` 第八节;计划 `docs/plans/continuity-guard.md`。
   残留:真实检出质量依赖模型按协议输出(失效模式已记 wiki);跨章批量回溯重扫未做。
 
-- [x] **INN-A3 分层递归记忆(章 → 卷 → 全书摘要树)** · M · P2(= LOOP-8,2026-10-20 完成)
+- [x] **INN-A3 分层递归记忆(章 → 卷 → 全书摘要树)** · M · P2(= LOOP-8,2026-10-20 完成) ✅
   结果:contextPackage/writeContext 新增 `volumeRecap`(卷内已写章节回顾,当前章前 ≤8 条)与 `bookStateSnapshot`(canonical 时间线已发生事件按章序 ≤8 条);纯函数模块 `layeredMemoryContext.ts` + 装配器单点装配 + writer 两块(priority 91/89)+ 资产 requirements/preferredGroups 登记 + provider contract 遥测(>3 章评估、degrade);5 条守卫测试。契约见 `docs/wiki/rag/knowledge-and-context-assembly.md`;计划 `docs/plans/layered-memory.md`。
   遗留:review/repair 模式未注入(按 MVP 先保 writer);"抽样对比漂移减少"待所有者实测。
 
-- [x] **INN-A4 角色弧线追踪** · M · P3(= LOOP-9,2026-10-20 完成)
+- [x] **INN-A4 角色弧线追踪** · M · P3(= LOOP-9,2026-10-20 完成) ✅
   结果:CharacterTimeline 演变流水接入生成上下文 —— `character_arc` 块(每名参与者近 3 条演变轨迹)+ 装配注入 + writer 登记 + 遥测,与 local_state/dynamics 互补构成"角色当前阶段状态"。计划 `docs/plans/character-arc-tracking.md`;契约见 rag wiki 分层记忆段。
   遗留:evolveCharacter 自动触发(新 LLM 调用与配额决策)与漂移实测留后续。
 
 ### B · Agent 架构工程
 
-- [x] **INN-B2 统一任务投影契约** · M · P0(= LOOP-4,2026-10-17 完成)
+- [x] **INN-B2 统一任务投影契约** · M · P0(= LOOP-4,2026-10-17 完成) ✅
   结果:契约审计(17 项发现,对抗核实 7 confirmed / 2 refuted)→ 收敛落地 8 项(pmr 全 kind 投影、读路径去 heal、步骤区 pmr 中性、displayStatus 中文化、sourceRoute 单一构造器、attentionCount 权威计数、cancelled 全链中性、小说页映射守卫)+ 六条三层守卫测试。持久契约见 `docs/wiki/architecture/task-projection-contract.md`;计划与处置表见 `docs/plans/task-projection-contract.md`。
   残留:阶段词表/拆书步骤/入队清 pmr/混合视图计数 → BUG-5..8。
 
-- [ ] **INN-B1 全链路 Trace 与决策回放** · M · P2
-  把 retrieval trace 扩展为生成链 trace:每章的上下文装配、模型选择、审核决策可回放。既是排障工具,也是作品集展示点(可解释 Agent)。
-  验收:任一已生成章节能查到"为什么这么写"的结构化轨迹。
+- [x] **INN-B1 全链路 Trace 与决策回放** · M · P2(= LOOP-10,2026-10-20 完成) ✅
+  结果:新增 `ChapterGenerationTrace`(双迁移)定稿即快照四段轨迹(上下文 gating+压缩日志 / 模型参数 / 审核码 / 验收与重规划决策),只读入口 `GET /api/chapter-traces/:novelId/:chapterId`;压缩日志从 console.debug 升级为随包持久化;写入失败不影响主链。计划 `docs/plans/chapter-generation-trace.md`;契约见 rag wiki。发布说明:内部能力,显式跳过。
+  遗留:检索 trace 关联(需 RagRetrievalTrace 加 chapterId)与前端回放 UI 后置。
 
 - [ ] **INN-B3 成本感知模型路由** · M · P2
   便宜模型跑规划/摘要/审核,强模型跑正文;配额感知;按任务类型可配策略。
@@ -125,16 +127,16 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 
 ## 4. 缺陷与稳定性(BUG)
 
-- [x] **BUG-0 项目体检与缺陷清单**(= LOOP-1) · S · P0
+- [x] **BUG-0 项目体检与缺陷清单**(= LOOP-1) · S · P0 ✅
   已产出:测试基线见 BUG-1/BUG-2/BUG-3;冒烟结论与全部证据见 PROGRESS LOOP-1 条目(2026-10-16)。
 
-- [x] **BUG-1 server fast 套件 33 个失败** · M–L · P0(= LOOP-2,2026-10-16 完成)
+- [x] **BUG-1 server fast 套件 33 个失败** · M–L · P0(= LOOP-2,2026-10-16 完成) ✅
   结果:**1383 测试 / 1371 过 / 0 失败 / 12 跳过**,fast 模式改为进程隔离(根治跨文件污染)。
   分诊结论:3 个**真 bug** —— ①token 预算并发丢更新(bookAnalysis.budget 用 read-modify-write 替代原子 increment,批量拆书低估消耗);②章节资源提取上限在 artifact delta schema 缺失(仅靠 prompt 约束);③agent 工具 zod 类型声明未下沉 schema 模块。
   另修 3 处架构脆弱点 —— ④`NovelDirectorIdeaInspirationService` 归位 `idea/`(满足导演根目录边界守卫);⑤提示词上下文解析器 → 服务层顶层 import 形成循环依赖(冷加载"is not a constructor"),改调用时惰性加载;⑥fast 测试单进程 require 全部文件造成跨文件污染(drama 假 prisma 进 require.cache 不还原等),改为 `node --test` 进程隔离。
   其余 ~22 个文件为**测试陈旧**(代码有意演进未同步测试),断言/mock 对齐现行契约,细节见 PROGRESS LOOP-2。
 
-- [x] **BUG-2 client 套件 5 个失败** · S · P1(= LOOP-2)
+- [x] **BUG-2 client 套件 5 个失败** · S · P1(= LOOP-2) ✅
   结果:client **92/92 全绿** + typecheck 绿。(口径修正:全量实为 215,92 为 `tests/*.test.js` 部分口径;`.mjs` 子集未计入导致一个陈旧断言漏网,已于 LOOP-3 修复并写进 PROGRESS。) 
   ①移动端合同簇 ×4:新页面(market-radar、settings-model-routes)的 CSS 落点缺失 ×5 个选择器已补;导航测试列表对齐 31 条现行元数据;任务筛选面板恢复"两行三列"移动合同(kind,status,异常 / keyword 跨列,排序)—— 显式栅格定位 + md 释放 + xl order-last 保桌面模板,激活态改 data 属性驱动(静态类名守卫可继续生效)。
   ②设置路由契约:`/settings/model-routes` 已是独立页(非重定向),旧链接兼容性保持,测试更新。

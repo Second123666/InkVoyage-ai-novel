@@ -41,6 +41,7 @@
 - RAG 与上下文组装的失败要在 preview 或 trace 中可解释，不能静默丢 required context。
 - **分层递归记忆(INN-A3,章→卷→全书)**:正文 writer 除最近 3 章摘要外,注入两层长程上下文 —— `volume_recap`(当前卷内、当前章之前的章节摘要,≤8 条)与 `book_state_snapshot`(canonical 时间线已发生事件按章序取最近 8 条)。数据在 `GenerationContextAssembler` 单点装配写入 `GenerationContextPackage` 的 `volumeRecap/bookStateSnapshot` 字段(纯函数在 `runtime/context/layeredMemoryContext.ts`),经 `buildChapterWriteContext` 映射为 writeContext 同名字段,块在 `chapterContextBlocks.ts` 以 `mode==="full"` 且非空才渲染;writer 资产的 `contextRequirements` + `preferredGroups` 均登记两组(防预算静默丢弃),provider contract(stages=write、章序>3 才评估、failureSemantics=degrade)提供注入遥测。旧数据字段缺省为空数组,向后兼容。
 - **角色弧线(INN-A4)**:同一管道增加 `character_arc` 块 —— `CharacterTimeline`(含手动 evolveCharacter 与自动事件)按角色分组,每名当前参与者注入最近 3 条演变轨迹行(`第X章 标题: 内容截断`),让性格/目标的演变过程参与后段生成,与 local_state(当前状态)、character_dynamics(关系阶段)互补。数据同样由装配器单点填充(`characterArcEvents` 字段,纯函数 `buildCharacterArcEvents`),块按 full 模式且有数据才渲染;provider contract 同款遥测(章序>3 才评估)。evolveCharacter 仍为手动触发,自动演进留后续。
+- **生成轨迹回放(INN-B1)**:每章定稿时由 `ChapterContentFinalizationService` fire-and-forget 写入 `ChapterGenerationTrace`(失败吞掉,诊断数据不得影响主链),四段快照:`contextJson`(上下文 gating 决策 + 压缩日志,压缩日志现同时写入 `GenerationContextPackage.contextCompressionLog`)、`generationJson`(provider/model/temperature/runId)、`auditJson`(总分/各报告 issue codes/开放问题码/blocking)、`decisionJson`(验收状态/repairability/decisionReason/failureCode/重规划建议)。只读入口 `GET /api/chapter-traces/:novelId/:chapterId`(最近 5 条)。检索 trace 关联(需给 RagRetrievalTrace 加 chapterId)与前端回放 UI 后置。
 
 ## 知识库入口的产品表达
 
@@ -80,6 +81,7 @@
 - 历史 trace 数据无限增长：检查服务启动时是否调用了 `ragRetrievalTraceRetention.start()`，以及 `RAG_RETRIEVAL_TRACE_RETENTION_DAYS` 是否设置合理。
 - 后段章节看不到卷内回顾或全书快照：检查当前章是否被卷计划覆盖(`resolveCurrentVolumeChapterOrders` 返回 null 则不查询)、canonical 时间线是否为空,以及 gating decisions 中 `book_state_snapshot/volume_recap` 的 included/reason;早期章节(≤3 章)不评估属预期。
 - 两层记忆块被预算丢弃:检查 writer `preferredGroups` 是否仍包含两组;不要把它们改成 required 来"保证出现"——先看 `ctx-budget` 压缩日志再调预算或条数上限。
+- 章节生成轨迹缺失或查不到:先确认该章是否走过定稿链路(轨迹只在 finalize 时写入,流式中途失败的尝试没有轨迹);查询用 novelId+chapterId,多行按时间倒序代表多次生成/修复历史;轨迹 JSON 解析失败按空段回退,属预期降级。
 
 ## 相关模块
 
@@ -89,6 +91,8 @@
 - `server/src/services/novel/runtime/GenerationContextAssembler.ts`
 - `server/src/services/novel/runtime/context/layeredMemoryContext.ts`(分层记忆纯函数)
 - `server/src/prompting/prompts/novel/context/chapterContextBlocks.ts`(分层记忆块)
+- `server/src/services/novel/runtime/chapterGenerationTraceService.ts`(生成轨迹)
+- `server/src/routes/chapterTrace.ts`(只读轨迹查询)
 - `server/src/prompting/`
 - `client/src/pages/knowledge/`
 - `client/src/pages/worlds/`
@@ -98,3 +102,4 @@
 
 - [README 当前能力说明](../../../README.md)
 - LOOP-8 分层递归记忆计划:`../../../docs/plans/layered-memory.md`(2026-10-20)
+- LOOP-10 生成轨迹计划:`../../../docs/plans/chapter-generation-trace.md`(2026-10-20)

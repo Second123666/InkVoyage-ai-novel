@@ -17,6 +17,22 @@
 
 ---
 
+## 2026-10-20 · LOOP-10 · 全链路 Trace 与决策回放(INN-B1)
+
+- **类别**: 创新(B 线 Agent 架构;主对话执行)
+- **目标**: 把分散的生成信号持久化为"每章为什么这么写"的结构化轨迹并支持只读回放(排障 + 可解释 Agent 展示点)。
+- **现状审计**: 检索 trace(采样、无 chapterId)、提示词遥测(内存态)、gating decisions(仅进 package)、compressionLog(仅 console.debug)、审核/验收(已落库但分散)—— 无任何一处聚合持久化。
+- **改动**:
+  1. **模型** `ChapterGenerationTrace`(双 schema + 双迁移,纯新表;索引 novelId+chapterId+createdAt / novelId+chapterOrder;无级联关系);
+  2. **压缩日志入场**:`GenerationContextPackage.contextCompressionLog`(dropped/summarized/usedTokens/budgetTokens),装配器把既有 `buildCompressionLog` 结果同时写入 package(此前仅 console.debug);
+  3. **轨迹服务** `chapterGenerationTraceService`:纯函数 `buildChapterGenerationTraceSections` 组装四段快照(context: gating 决策+压缩日志;generation: provider/model/temperature/runId;audit: 总分/各报告 issue codes/开放问题码/blocking;decision: 验收状态/repairability/decisionReason/failureCode/重规划建议)+ `record`/`list`;
+  4. **定稿钩子**:`ChapterContentFinalizationService` fire-and-forget 写入,失败吞掉(诊断数据不得影响主链);
+  5. **只读 API**:`GET /api/chapter-traces/:novelId/:chapterId`(最近 5 条,多行即多次生成/修复历史)。
+- **验证**: server **1418 测试 / 1406 过 / 0 失败 / 12 跳过**(新增 4 条:四段组装、record/list prisma-stub 往返、钩子与路由只读静态契约、压缩日志字段);client 未动沿用既往结论;双迁移对齐测试通过。
+- **验收对照**: 「任一已生成章节能查到为什么这么写的结构化轨迹」= 定稿即落轨迹 + 按章节只读查询,测试锁定;检索 trace 关联(需给 RagRetrievalTrace 加 chapterId)与前端回放 UI 后置。
+- **发布说明**: 本轮为**内部能力**(轨迹目前仅接口可查,无用户可见入口),按发布说明规则显式跳过。
+- **下一步**: 按 BACKLOG 顺序 → **LOOP-11 = INN-B3 成本感知模型路由(M/P2)**;其后 B4 → C 线 → D 线。
+
 ## 2026-10-20 · LOOP-9 · 角色弧线追踪(INN-A4)
 
 - **类别**: 创新(A 线长篇记忆;主对话执行)
