@@ -31,6 +31,7 @@
 - 厂商级思考深度是普通请求的默认值。DeepSeek V4 使用低、高、最大三档，空值按高处理；关闭时不得继续发送深度参数。
 - 结构化任务的输出稳定性高于厂商级思考偏好。能力档案要求关闭思考时，运行时必须覆盖用户默认值，避免推理内容破坏结构化结果。
 - 顶部保存的 temperature 是用户偏好，不是绕过厂商参数约束的最终请求值。正式调用必须先经过模型能力兼容层；例如 Kimi K3 的 temperature 固定为 `1.0`，即使当前选择仍保存其他值，请求也必须收敛到厂商允许值。
+- **成本感知路由(INN-B3)**：每次有书上下文的 LLM 调用在 `recordTrackedLlmUsage` 中 fire-and-forget 写入 `LlmUsageEvent`(novelId/taskType/provider/model/tokens/duration;无书上下文不写,设置页与预览调用不污染报表);模型价格配置存 `AppSetting.llm.model_prices`(`provider::model` → 每百万 token 输入/输出单价,经 `GET/PUT /api/settings/model-prices` 维护);`GET /api/cost-report/:novelId?days=30` 按 taskType 输出「实际成本 / 当前路由成本 / 最便宜可用模型成本 / 最贵可用模型成本 / 节省额」,未定价模型进入 `unpricedModels` 且相关合计保守返回 null。价格只影响报表,不会自动切换实际路由(自动路由策略属后续轮次)。
 
 ## 示例
 
@@ -56,10 +57,14 @@
 - 自定义厂商返回 401/403：先核对鉴权方式是否与接口文档一致，再分别检查模型目录、连接测试和正式生成是否使用同一 `authMode`；不要只在刷新模型接口临时改请求头。
 - 模型目录地址出现 `/models/models`：检查地址归一函数是否把用户填写的完整目录地址再次拼接，不要为单个厂商增加硬编码例外。
 - Kimi K3 返回 temperature 参数错误：先确认模型名进入 Kimi 能力兼容层，再检查最终客户端配置是否在构造请求前把 temperature 收敛为 `1.0`；不要要求用户反复调整顶部偏好来规避固定参数约束。
+- 成本报表为空或成本为 null：先确认该书近期是否产生过带 novelId 的 LLM 调用(无书上下文的调用不写流水)、模型价格是否已配置(未定价模型会让对应行与合计返回 null)，再检查 `days` 窗口。
 
 ## 相关模块
 
 - `server/src/services/settings/LLMSelectionSettingsService.ts`
+- `server/src/services/settings/ModelPricingSettingsService.ts`(成本感知路由价格配置)
+- `server/src/services/llm/ModelCostReportService.ts`(成本对比报告)
+- `server/src/routes/costReport.ts`(只读成本报告入口)
 - `server/src/routes/settings/llmSelectionRoutes.ts`
 - `server/src/routes/settings.ts`
 - `server/src/llm/modelCatalog.ts`
@@ -72,3 +77,4 @@
 
 - [模块边界与文档治理](./module-boundaries.md)
 - [项目协作规则](../../../AGENTS.md)
+- LOOP-11 成本感知路由计划:`../../../docs/plans/cost-aware-model-routing.md`(2026-10-20)

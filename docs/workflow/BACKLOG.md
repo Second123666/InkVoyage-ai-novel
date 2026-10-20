@@ -19,7 +19,8 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 8. ~~**LOOP-8 分层递归记忆**(INN-A3)~~ ✅ 完成(2026-10-20):卷内回顾 + 全书时间线快照注入后段生成,含遥测与 5 条守卫。
 9. ~~**LOOP-9 角色弧线追踪**(INN-A4)~~ ✅ 完成(2026-10-20):CharacterTimeline 演变轨迹注入 writer(character_arc 块 + 遥测)。
 10. ~~**LOOP-10 全链路 Trace 与决策回放**(INN-B1)~~ ✅ 完成(2026-10-20):章级四段轨迹持久化 + 只读 API。
-11. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **INN-B3 成本感知模型路由(M/P2)**,随后 B4 → C 线 → D 线 → RF/BUG/UI/OPS 按 P 排。
+11. ~~**LOOP-11 成本感知模型路由**(INN-B3)~~ ✅ 完成(2026-10-20):按书计量流水 + 价格配置 + 当前/经济/强模型成本对比报告。
+12. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **INN-B4 失败模式 → 恢复动作知识库(S–M/P3)**,随后 C 线 → D 线 → RF/BUG/UI/OPS 按 P 排。
     **完成项打勾规则(2026-10-20 所有者要求)**:每轮收尾同步更新 BACKLOG —— 完成项 `[x]` + ✅,进行中 `[/]`,入口建议划线。
 
 ---
@@ -76,9 +77,9 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
   结果:新增 `ChapterGenerationTrace`(双迁移)定稿即快照四段轨迹(上下文 gating+压缩日志 / 模型参数 / 审核码 / 验收与重规划决策),只读入口 `GET /api/chapter-traces/:novelId/:chapterId`;压缩日志从 console.debug 升级为随包持久化;写入失败不影响主链。计划 `docs/plans/chapter-generation-trace.md`;契约见 rag wiki。发布说明:内部能力,显式跳过。
   遗留:检索 trace 关联(需 RagRetrievalTrace 加 chapterId)与前端回放 UI 后置。
 
-- [ ] **INN-B3 成本感知模型路由** · M · P2
-  便宜模型跑规划/摘要/审核,强模型跑正文;配额感知;按任务类型可配策略。
-  验收:同一本书两种路由的成本对比可见(配合 INN-D1)。
+- [x] **INN-B3 成本感知模型路由** · M · P2(= LOOP-11,2026-10-20 完成) ✅
+  结果:按任务类型路由(既有 ModelRouteConfig)+ 按书计量流水(`LlmUsageEvent` 双迁移)+ 价格配置(`llm.model_prices` 与设置端点)+ 成本对比报告(当前路由 vs 最便宜/最贵模型 + 节省额 + 未定价清单,`GET /api/cost-report/:novelId`)。计划 `docs/plans/cost-aware-model-routing.md`;契约见 model-selection wiki。发布说明:内部能力,显式跳过。
+  遗留:自动按成本切换路由(策略化)与前端成本展示留后续;与 INN-D1 报表联动后置。
 
 - [ ] **INN-B4 失败模式 → 恢复动作知识库** · S–M · P3
   把常见暂停/失败原因沉淀为结构化"原因 → 恢复动作",自动导演恢复更聪明。

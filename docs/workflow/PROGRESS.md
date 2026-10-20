@@ -17,6 +17,22 @@
 
 ---
 
+## 2026-10-20 · LOOP-11 · 成本感知模型路由(INN-B3)
+
+- **类别**: 创新(D 线成本与效率,与 B 线交叉;主对话执行)
+- **目标**: BACKLOG「便宜模型跑规划/摘要/审核,强模型跑正文;配额感知;按任务类型可配策略」;验收 = 同一本书两种路由的成本对比可见(配合 INN-D1)。
+- **现状审计**: `ModelRouteConfig` 已实现按任务类型路由;usageTracking 已按调用记录 taskType/novelId/token 但只聚合到任务行;**无按书流水表、无价格数据** —— 缺口 = 按书记账 + 价格 + 对比。
+- **改动**:
+  1. **`LlmUsageEvent` 表**(双 schema + 双迁移):按书 LLM 调用流水(novelId/taskType/provider/model/tokens/duration;无书上下文不写,设置页与预览不污染);
+  2. **计量钩子**:`recordTrackedLlmUsage` fire-and-forget 写流水(失败吞掉);
+  3. **价格配置** `ModelPricingSettingsService`(AppSetting `llm.model_prices`,`provider::model` → 每百万 token 输入/输出单价;非法条目跳过)+ 设置端点 `GET/PUT /api/settings/model-prices`;
+  4. **成本报告** `ModelCostReportService`:纯函数 `buildCostReport` 按 taskType 聚合出「实际成本 / 当前路由成本 / 最便宜模型 / 最贵模型 / 节省额 + 未定价模型清单」;窗口默认 30 天(1-365 夹取);只读入口 `GET /api/cost-report/:novelId?days=30`;
+  5. 明确不做:价格只影响报表,不自动切换真实路由(自动路由策略属后续);前端展示与 D1 报表后置联动。
+- **验证**: server **1425 测试 / 1413 过 / 0 失败 / 12 跳过**(新增 7 条:价格解析/成本数学/对比报告/空窗口/取数窗口与 prisma-stub/保存校验/静态契约);client 未动沿用既往结论;双迁移对齐通过。途中修 2 个自写缺陷:Express5 params 类型(string[] 联合)需 String() 收敛、静态契约正则未允许换行;另自纠一处算错的测试期望(经济路由总量 0.247)。
+- **验收对照**: 「同一本书两种路由成本对比可见」= 报告三列成本 + 节省额,API 可查;前端展示留后续。
+- **发布说明**: 内部能力(API 无 UI),按规则跳过并注明。
+- **下一步**: 按 BACKLOG 顺序 → **LOOP-12 = INN-B4 失败模式 → 恢复动作知识库(S–M/P3)**;其后 C 线 → D 线。
+
 ## 2026-10-20 · LOOP-10 · 全链路 Trace 与决策回放(INN-B1)
 
 - **类别**: 创新(B 线 Agent 架构;主对话执行)
