@@ -16,6 +16,7 @@
 4. **势力归属边**:同一角色×势力只取最新一条轨迹(`updatedAt` 倒序);`stanceLabel` 进 meta。
 5. **上限**:节点 ≤200、边 ≤400(稳定排序截断);`stats` 同时保留截断前 `totalEdgeCount` 与 `truncated` 标记——不静默截断。
 6. **端点**:`GET /api/story-graph/:novelId`(只读);渲染层接入前,前端不得自行拼接同类图谱数据。
+7. **前端渲染(LOOP-14)**:独立页面 `/novels/:id/story-graph`(`StoryGraphPage`,`React.lazy` 路由级懒加载);画布 `StoryGraphCanvas` 为二次懒加载 chunk,React Flow + `@xyflow/react/dist/style.css` 只在画布 chunk 内引入(首屏零增量);布局由纯函数 `storyGraphLayout.ts` 提供确定性同心环坐标(势力 150 → 角色 320 → 地点 480 → 要素 620),节点可拖动、点击显示摘要;入口位于小说角色工作区的「关系」页签(与仅角色的关系图互补)。节点配色只使用语义 token(角色 primary / 势力 warning / 地点 info / 要素 muted)。
 
 ## 失败模式
 
@@ -29,6 +30,8 @@
 - `server/src/services/novel/state/storyWorldGraph.ts`(投影与服务)
 - `server/src/routes/storyGraph.ts`(只读端点)
 - `shared/types/storyWorldGraph.ts`(payload 契约)
+- `client/src/pages/novels/storyGraph/`(页面/画布/布局:StoryGraphPage、StoryGraphCanvas、storyGraphLayout)
+- `client/src/api/storyGraph.ts`(客户端只读查询)
 - 相关:`server/src/services/world/worldVisualization.ts`(世界维度可视化,与本图谱互补)、`docs/design/visualization-stack.md`(次轮渲染栈纪律)
 
 ## 来源文档
