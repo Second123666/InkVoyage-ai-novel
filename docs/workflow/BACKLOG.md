@@ -1,6 +1,6 @@
 # 改进待办池 · Backlog
 
-更新:2026-10-18
+更新:2026-10-21
 配套流程:[improvement-workflow.md](improvement-workflow.md) · 进度:[PROGRESS.md](PROGRESS.md)
 
 状态标记:`[ ]` 待做 · `[/]` 进行中 · `[x]` 完成 · `[~]` 冻结/搁置 · `[!]` 降级为实验
@@ -23,7 +23,8 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 12. ~~**LOOP-12 恢复动作知识库**(INN-B4)~~ ✅ 完成(2026-10-20):20 条目注册表 + 任务详情统一恢复指引 + 只读目录端点。
 13. ~~**LOOP-13 故事世界图谱 · 首轮**(INN-C1)~~ ✅ 完成(2026-10-21):小说级图谱投影 + 只读端点。
 14. ~~**LOOP-14 故事世界图谱 · 前端渲染**(INN-C1)~~ ✅ 完成(2026-10-21):图谱页 + React Flow 画布(懒加载)+ 移动端合同,INN-C1 整项打勾。
-15. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **INN-C2 生产看板(M/P3)**,随后 C3 → D 线 → RF/BUG/UI/OPS 按 P 排。
+15. ~~**LOOP-15 生产看板**(INN-C2)~~ ✅ 完成(2026-10-21):生产看板页(复用 simple-shelf + volumes 投影)+ 工作区入口 + 移动端合同,章节状态/债务热点/卷进度一屏总览。
+16. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **INN-C3 变更 diff 预览(S–M/P3)**,随后 D 线 → RF/BUG/UI/OPS 按 P 排。
     **完成项打勾规则(2026-10-20 所有者要求)**:每轮收尾同步更新 BACKLOG —— 完成项 `[x]` + ✅,进行中 `[/]`,入口建议划线。
 
 ---
@@ -94,8 +95,9 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
   结果:两轮交付 —— ①小说级图谱投影(角色×势力×地点,切片/关系阶段/势力轨迹确定性合成,截断统计与回退)+ 只读端点 `GET /api/story-graph/:novelId`;②前端页面 `/novels/:id/story-graph`(路由级 + 画布二次懒加载,React Flow 同心环布局、拖动与节点摘要,入口在角色「关系」页签,移动端合同齐全)。契约见 wiki `workflows/story-world-graph.md`;计划 `docs/plans/story-world-graph.md`。
   残留:图谱内编辑动作与时间线/地理子视图属后续可视化轮次(UI-3 队列)。
 
-- [ ] **INN-C2 生产看板** · M · P3
-  章节状态、质量债务热点、卷进度一屏总览。
+- [x] **INN-C2 生产看板** · M · P3(= LOOP-15,2026-10-21 完成) ✅
+  结果:纯聚合模型 + 看板页 `/novels/:id/production-board` —— 状态分布(8 态含零项)、待处理章节(error → replan_required → quality_debt)、质量债务热点(前 5)、卷进度(章序映射 + 未挂卷计数);数据源复用 `simple-shelf` + `volumes` 既有投影,零新增后端契约;入口在小说工作区「项目工具」,移动端合同齐全。计划 `docs/plans/production-board.md`;守卫 `client/tests/productionBoard.test.js`。
+  验收:章节状态、债务热点、卷进度一屏总览,条目直达章节页。
 
 - [ ] **INN-C3 变更 diff 预览** · S–M · P3
   规划/章节修改先预览 diff 再落盘。

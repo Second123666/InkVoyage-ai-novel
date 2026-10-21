@@ -17,6 +17,22 @@
 
 ---
 
+## 2026-10-21 · LOOP-15 · 生产看板(INN-C2)
+
+- **类别**: 创新 + UI(C 线交互与可视化;主对话执行)
+- **目标**: BACKLOG INN-C2 —— 章节状态、质量债务热点、卷进度一屏总览。
+- **现状审计**: 小说详情接口的 Chapter 不含聚合状态/字数/债务;既有 `GET /novels/:id/simple-shelf` 已派生 8 态 status、wordCount 与 qualityDebt,`GET /novels/:id/volumes` 返回章序映射 —— 看板直接复用两个既有投影,零新增后端契约。
+- **改动**:
+  1. 纯聚合模型 `productionBoardModel.ts`(可单测):状态分布(8 态固定顺序含零项)、总字数/完成率、待处理章节(error → replan_required → quality_debt,同组按章序)、质量债务热点(按 issueCodes 数降序取前 5)、卷进度(章序映射,含未挂卷计数);
+  2. 页面 `/novels/:id/production-board`(路由级懒加载):统计徽标 + 状态条形分布 + 待处理/债务热点双栏 + 卷进度,条目直达章节页;两数据源独立请求,卷进度失败不影响其余区块;
+  3. 入口:小说工作区「项目工具」弹窗「打开生产看板」;
+  4. 移动端合同(路由元数据/CSS 落点/导航测试);
+  5. 发布说明与 README 用户可见条目;计划 `docs/plans/production-board.md`。
+- **验证**: client typecheck **0 错误**;client **229/229**(新增 3 条守卫:聚合模型、路由/入口/装配含"不得回退详情接口"、移动端合同);server 未动沿用 LOOP-13 全绿(1434/0)。类型修正:初版误用详情接口的 Chapter(缺 status/wordCount/qualityDebt),typecheck 拦截后改为 simple-shelf + volumes。
+- **验收对照**: 「章节状态、质量债务热点、卷进度一屏总览」= 看板三区块 + 头部统计,条目可直达处理位置。
+- **残留**: 看板内编辑动作、跨书对比不做;UI 实测留所有者。
+- **下一步**: 按 BACKLOG 顺序 → **LOOP-16 = INN-C3 变更 diff 预览(S–M/P3)**。
+
 ## 2026-10-21 · LOOP-14 · 故事世界图谱前端渲染(INN-C1 次轮,整项完成)
 
 - **类别**: 创新 + UI(C 线交互与可视化;主对话执行)
