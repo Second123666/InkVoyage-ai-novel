@@ -20,6 +20,8 @@ import type {
 } from "@ai-novel/shared/types/novel";
 import NovelEditView from "./components/NovelEditView";
 import NovelProductionExperienceHandoff from "./components/NovelProductionExperienceHandoff";
+import VolumeWorkspaceSaveDiffDialog from "./components/structuredOutline/VolumeWorkspaceSaveDiffDialog";
+import { usePlanningSavePreview } from "./hooks/usePlanningSavePreview";
 import type { LLMSelectorValue } from "@/components/common/LLMSelector";
 import { getBaseCharacterList } from "@/api/character";
 import { flattenGenreTreeOptions, getGenreTree } from "@/api/genre";
@@ -2345,6 +2347,23 @@ export default function NovelEdit() {
   });
 
   const {
+    pendingPlanSave,
+    requestPlanSave,
+    confirmPendingPlanSave,
+    closePlanSavePreview,
+  } = usePlanningSavePreview({
+    savedVolumes: savedVolumeWorkspace?.volumes ?? [],
+    draftVolumes: normalizedVolumeDraft,
+    onSave: (target) => {
+      if (target === "volume_strategy") {
+        saveOutlineMutation.mutate();
+      } else {
+        saveStructuredMutation.mutate();
+      }
+    },
+  });
+
+  const {
     characterTimelineQuery,
     syncTimelineMutation,
     syncAllTimelineMutation,
@@ -2532,7 +2551,7 @@ export default function NovelEdit() {
     onAddVolume: handleAddVolume,
     onRemoveVolume: handleRemoveVolume,
     onMoveVolume: handleMoveVolume,
-    onSaveOutline: () => saveOutlineMutation.mutate(),
+    onSaveOutline: () => requestPlanSave("volume_strategy"),
     isSavingOutline: saveOutlineMutation.isPending,
     volumeMessage: volumeGenerationMessage || volumeMessage,
     volumeVersions,
@@ -2586,7 +2605,7 @@ export default function NovelEdit() {
     onApplyBatch: (patch) => {
       setVolumeDraft((prev) => applyVolumeChapterBatch(prev, patch));
     },
-    onSaveStructured: () => saveStructuredMutation.mutate(),
+    onSaveStructured: () => requestPlanSave("structured_outline"),
     isSavingStructured: saveStructuredMutation.isPending,
   });
   const chapterTab = {
@@ -2790,108 +2809,122 @@ export default function NovelEdit() {
   }
 
   return (
-    <NovelEditView
-      id={id}
-      activeTab={activeTab}
-      workflowCurrentTab={workflowCurrentTab}
-      onActiveTabChange={setActiveTab}
-      exportControls={{
-        canExportCurrentStep: Boolean(currentExportScope),
-        isExportingCurrentMarkdown,
-        isExportingCurrentJson,
-        isExportingFullMarkdown,
-        isExportingFullJson,
-        isExportingFullTxt,
-        onExportCurrent: (format) => {
-          if (!currentExportScope) {
-            return;
+    <>
+      <NovelEditView
+        id={id}
+        activeTab={activeTab}
+        workflowCurrentTab={workflowCurrentTab}
+        onActiveTabChange={setActiveTab}
+        exportControls={{
+          canExportCurrentStep: Boolean(currentExportScope),
+          isExportingCurrentMarkdown,
+          isExportingCurrentJson,
+          isExportingFullMarkdown,
+          isExportingFullJson,
+          isExportingFullTxt,
+          onExportCurrent: (format) => {
+            if (!currentExportScope) {
+              return;
+            }
+            exportNovelMutation.mutate({
+              format,
+              scope: currentExportScope,
+              novelTitle: exportNovelTitle,
+            });
+          },
+          onExportFull: (format) => {
+            exportNovelMutation.mutate({
+              format,
+              scope: "full",
+              novelTitle: exportNovelTitle,
+            });
+          },
+        }}
+        basicTab={basicTab}
+        worldTab={basicTab}
+        storyMacroTab={storyMacroTab}
+        outlineTab={outlineTab}
+        structuredTab={structuredTab}
+        chapterTab={chapterTab}
+        pipelineTab={pipelineTab}
+        characterTab={characterTab}
+        takeover={isTakeoverDismissed ? null : takeover}
+        activeStepTakeoverEntry={activeStepTakeoverEntry}
+        onSwitchToSimpleMode={() => switchToSimpleMutation.mutate()}
+        isSwitchingToSimpleMode={switchToSimpleMutation.isPending}
+        taskDrawer={{
+          open: isTaskDrawerOpen,
+          onOpenChange: (open) => {
+            setIsTaskDrawerOpen(open);
+            if (!open && taskPanelOpen) {
+              clearTaskPanelOpen();
+            }
+          },
+          task: displayAutoDirectorTask,
+          snapshot: activeDirectorSnapshot,
+          runtimeSnapshot: activeDirectorRuntimeSnapshot,
+          projection: displayAutoDirectorTask?.status === "cancelled" ? null : bookAutomationProjection,
+          currentUiModel: {
+            provider: llm.provider,
+            model: llm.model,
+            temperature: llm.temperature,
+          },
+          actions: taskDrawerActions,
+          onProjectionAction: handleTaskDrawerProjectionAction,
+          followUp: activeAutoDirectorFollowUp,
+          onFollowUpAction: handleDrawerFollowUpAction,
+          executingFollowUpAction: executeFollowUpActionMutation.isPending,
+          runtimeHardBlocked: activeDirectorRuntimeHardBlocked,
+          runtimeBlockedReason: activeDirectorRuntimeBlockedReason,
+          overrideModel: retryOverride,
+          onOverrideModelChange: setRetryOverride,
+          onRetryWithOverrideModel: () => retryAutoDirectorWithCurrentModelMutation.mutate(),
+          retryWithOverrideModelPending: retryAutoDirectorWithCurrentModelMutation.isPending,
+          canRetryWithOverrideModel: Boolean(retryOverride.provider && retryOverride.model.trim()),
+          onRetryWithTaskModel: () => retryAutoDirectorWithTaskModelMutation.mutate(),
+          retryWithTaskModelPending: retryAutoDirectorWithTaskModelMutation.isPending,
+          capabilities: {
+            availableActions: taskDrawerActions.length > 0,
+            availableFollowUps: Boolean(activeAutoDirectorFollowUp),
+            canAdjustRuntimePolicy: Boolean(activeDirectorRuntimeSnapshot && displayAutoDirectorTask),
+            canInspectManualEditImpact: Boolean(displayAutoDirectorTask),
+            canRetryWithOverrideModel: Boolean(displayAutoDirectorTask && (displayAutoDirectorTask.status === "failed" || displayAutoDirectorTask.status === "cancelled")),
+            canCancel: Boolean(displayAutoDirectorTask && canCancelDirectorTask(displayAutoDirectorTask)),
+            canArchive: Boolean(displayAutoDirectorTask && (displayAutoDirectorTask.status === "succeeded" || displayAutoDirectorTask.status === "failed" || displayAutoDirectorTask.status === "cancelled")),
+          },
+          resourceProposals: pendingCharacterResourceProposals,
+          onOpenResourceProposalSource: (proposal) => {
+            if (proposal.chapterId) {
+              setSelectedChapterId(proposal.chapterId);
+              setActiveTab("chapter");
+            } else {
+              setActiveTab("character");
+            }
+            setIsTaskDrawerOpen(false);
+          },
+          onConfirmResourceProposal: (proposalId) => confirmCharacterResourceProposalMutation.mutate(proposalId),
+          onRejectResourceProposal: (proposalId) => rejectCharacterResourceProposalMutation.mutate(proposalId),
+          confirmingResourceProposalId: confirmCharacterResourceProposalMutation.isPending
+            ? confirmCharacterResourceProposalMutation.variables ?? ""
+            : "",
+          rejectingResourceProposalId: rejectCharacterResourceProposalMutation.isPending
+            ? rejectCharacterResourceProposalMutation.variables ?? ""
+            : "",
+          onOpenFullTaskCenter: openAutoDirectorTaskCenter,
+        }}
+      />
+      <VolumeWorkspaceSaveDiffDialog
+        open={Boolean(pendingPlanSave)}
+        onOpenChange={(open) => {
+          if (!open) {
+            closePlanSavePreview();
           }
-          exportNovelMutation.mutate({
-            format,
-            scope: currentExportScope,
-            novelTitle: exportNovelTitle,
-          });
-        },
-        onExportFull: (format) => {
-          exportNovelMutation.mutate({
-            format,
-            scope: "full",
-            novelTitle: exportNovelTitle,
-          });
-        },
-      }}
-      basicTab={basicTab}
-      worldTab={basicTab}
-      storyMacroTab={storyMacroTab}
-      outlineTab={outlineTab}
-      structuredTab={structuredTab}
-      chapterTab={chapterTab}
-      pipelineTab={pipelineTab}
-      characterTab={characterTab}
-      takeover={isTakeoverDismissed ? null : takeover}
-      activeStepTakeoverEntry={activeStepTakeoverEntry}
-      onSwitchToSimpleMode={() => switchToSimpleMutation.mutate()}
-      isSwitchingToSimpleMode={switchToSimpleMutation.isPending}
-      taskDrawer={{
-        open: isTaskDrawerOpen,
-        onOpenChange: (open) => {
-          setIsTaskDrawerOpen(open);
-          if (!open && taskPanelOpen) {
-            clearTaskPanelOpen();
-          }
-        },
-        task: displayAutoDirectorTask,
-        snapshot: activeDirectorSnapshot,
-        runtimeSnapshot: activeDirectorRuntimeSnapshot,
-        projection: displayAutoDirectorTask?.status === "cancelled" ? null : bookAutomationProjection,
-        currentUiModel: {
-          provider: llm.provider,
-          model: llm.model,
-          temperature: llm.temperature,
-        },
-        actions: taskDrawerActions,
-        onProjectionAction: handleTaskDrawerProjectionAction,
-        followUp: activeAutoDirectorFollowUp,
-        onFollowUpAction: handleDrawerFollowUpAction,
-        executingFollowUpAction: executeFollowUpActionMutation.isPending,
-        runtimeHardBlocked: activeDirectorRuntimeHardBlocked,
-        runtimeBlockedReason: activeDirectorRuntimeBlockedReason,
-        overrideModel: retryOverride,
-        onOverrideModelChange: setRetryOverride,
-        onRetryWithOverrideModel: () => retryAutoDirectorWithCurrentModelMutation.mutate(),
-        retryWithOverrideModelPending: retryAutoDirectorWithCurrentModelMutation.isPending,
-        canRetryWithOverrideModel: Boolean(retryOverride.provider && retryOverride.model.trim()),
-        onRetryWithTaskModel: () => retryAutoDirectorWithTaskModelMutation.mutate(),
-        retryWithTaskModelPending: retryAutoDirectorWithTaskModelMutation.isPending,
-        capabilities: {
-          availableActions: taskDrawerActions.length > 0,
-          availableFollowUps: Boolean(activeAutoDirectorFollowUp),
-          canAdjustRuntimePolicy: Boolean(activeDirectorRuntimeSnapshot && displayAutoDirectorTask),
-          canInspectManualEditImpact: Boolean(displayAutoDirectorTask),
-          canRetryWithOverrideModel: Boolean(displayAutoDirectorTask && (displayAutoDirectorTask.status === "failed" || displayAutoDirectorTask.status === "cancelled")),
-          canCancel: Boolean(displayAutoDirectorTask && canCancelDirectorTask(displayAutoDirectorTask)),
-          canArchive: Boolean(displayAutoDirectorTask && (displayAutoDirectorTask.status === "succeeded" || displayAutoDirectorTask.status === "failed" || displayAutoDirectorTask.status === "cancelled")),
-        },
-        resourceProposals: pendingCharacterResourceProposals,
-        onOpenResourceProposalSource: (proposal) => {
-          if (proposal.chapterId) {
-            setSelectedChapterId(proposal.chapterId);
-            setActiveTab("chapter");
-          } else {
-            setActiveTab("character");
-          }
-          setIsTaskDrawerOpen(false);
-        },
-        onConfirmResourceProposal: (proposalId) => confirmCharacterResourceProposalMutation.mutate(proposalId),
-        onRejectResourceProposal: (proposalId) => rejectCharacterResourceProposalMutation.mutate(proposalId),
-        confirmingResourceProposalId: confirmCharacterResourceProposalMutation.isPending
-          ? confirmCharacterResourceProposalMutation.variables ?? ""
-          : "",
-        rejectingResourceProposalId: rejectCharacterResourceProposalMutation.isPending
-          ? rejectCharacterResourceProposalMutation.variables ?? ""
-          : "",
-        onOpenFullTaskCenter: openAutoDirectorTaskCenter,
-      }}
-    />
+        }}
+        diff={pendingPlanSave?.diff ?? null}
+        syncToChapterExecution={pendingPlanSave?.target === "structured_outline"}
+        isSaving={saveOutlineMutation.isPending || saveStructuredMutation.isPending}
+        onConfirm={confirmPendingPlanSave}
+      />
+    </>
   );
 }
