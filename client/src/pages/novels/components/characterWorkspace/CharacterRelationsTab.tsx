@@ -1,10 +1,13 @@
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
+import { Network } from "lucide-react";
 import type { Character } from "@ai-novel/shared/types/novel";
 import type { LLMProvider } from "@ai-novel/shared/types/llm";
 import { getCharacterRelations } from "@/api/novel";
 import { getCharacterDynamicsOverview } from "@/api/novelCharacterDynamics";
 import { queryKeys } from "@/api/queryKeys";
+import { Button } from "@/components/ui/button";
 import CharacterDiagnosticsSection from "../CharacterDiagnosticsSection";
 import CharacterRelationshipGraphPanel from "./CharacterRelationshipGraphPanel";
 import {
@@ -59,6 +62,17 @@ export default function CharacterRelationsTab(props: CharacterRelationsTabProps)
 
   return (
     <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="text-xs leading-5 text-muted-foreground">
+          这里只梳理角色之间的关系;想看 角色×势力×地点 的全貌时,打开故事世界图谱。
+        </div>
+        <Button asChild type="button" variant="outline" size="sm" className="shrink-0">
+          <Link to={`/novels/${novelId}/story-graph`}>
+            <Network className="mr-1.5 h-4 w-4" />
+            故事世界图谱
+          </Link>
+        </Button>
+      </div>
       <CharacterRelationshipGraphPanel
         model={graphModel}
         mode={graphMode}
