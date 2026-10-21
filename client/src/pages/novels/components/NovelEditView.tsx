@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { Loader2, RotateCcw, Sparkles } from "lucide-react";
+import { ArrowRight, Loader2, RotateCcw, Sparkles } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useIsMobileViewport } from "@/components/layout/mobile/useIsMobileViewport";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -298,6 +299,14 @@ function DesktopNovelEditView(props: NovelEditViewProps) {
                     这里收纳次级信息。首屏只保留当前步骤和恢复接管入口，避免主工作区被项目辅助信息挤满。
                   </DialogDescription>
                 </DialogHeader>
+                <div className="flex justify-end">
+                  <Button asChild variant="outline" size="sm">
+                    <Link to={`/novels/${id}/production-board`}>
+                      打开生产看板
+                      <ArrowRight className="ml-1 h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
                 <div className="grid gap-3 md:grid-cols-2">
                   <Card>
                     <CardHeader>
