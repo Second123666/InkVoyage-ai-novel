@@ -17,6 +17,21 @@
 
 ---
 
+## 2026-10-21 · LOOP-16 · 规划变更保存前预览(INN-C3)
+
+- **类别**: 创新 + UI(C 线交互与可视化;主对话执行)
+- **目标**: BACKLOG INN-C3 —— 规划/章节修改先预览 diff 再落盘。
+- **现状审计**: 章节 AI 改写(候选 diffChunks)、故事线/卷版本 diff、世界同步 diff 均已有预览;缺口是卷战略与节奏/拆章保存 —— 整份 `VolumePlanDocument` 草稿直接写入并创建新版本,保存前看不到会导致哪些卷/章节变化。
+- **改动**:
+  1. 纯 diff 模型 `components/structuredOutline/volumeWorkspaceDiff.ts`:按卷 id/章节 id 匹配,分类新增/移除/移动(章序或跨卷)/字段修改,中文标签 + 确定性排序,跨卷移动不重复计字段修改;
+  2. 保存门禁 `usePlanningSavePreview` hook:卷战略与节奏拆章两个保存入口统一先算 diff;无基线或无改动直接保存,有改动先确认;页面只注入保存 mutation;
+  3. 确认弹窗 `VolumeWorkspaceSaveDiffDialog`:汇总徽标 + 分组列表;节奏拆章说明"同步到章节执行区、已有正文保留、卷纲外章节不自动删除",卷战略说明会记录新规划版本;
+  4. 新文件归入 `structuredOutline/` 责任目录;wiki `workflows/planning-change-preview.md` + 计划 `docs/plans/planning-change-preview.md`;发布说明与 README 用户可见条目。
+- **验证**: client typecheck **0 错误**;client **232/232**(新增 3 条守卫:分类/跨卷/空基线、无改动、保存入口与弹窗装配);server 未动沿用 LOOP-13 全绿(1434/0)。途中修 1 处自写测试期望(总变更章节数漏算跨卷移除)。
+- **验收对照**: 规划修改 = 保存前确认弹窗(本轮补齐);章节修改 = AI 改写候选 diff 与版本历史 diff(既有)。
+- **残留**: 后端 diff 端点、自动修复、手动正文编辑 diff 不做;UI 实测留所有者。
+- **下一步**: 按 BACKLOG 顺序 → **LOOP-17 = INN-D1 全链路 token 预算与成本报表(M/P2)**。
+
 ## 2026-10-21 · LOOP-15 · 生产看板(INN-C2)
 
 - **类别**: 创新 + UI(C 线交互与可视化;主对话执行)
