@@ -17,6 +17,23 @@
 
 ---
 
+## 2026-10-22 · LOOP-17 · 全链路 token 预算与成本报表(INN-D1)
+
+- **类别**: 创新 + 功能收束(D 线成本与效率;主对话执行)
+- **目标**: BACKLOG INN-D1 —— 把拆书的 token 预算守卫扩展到生产链;每本书出成本报表。
+- **现状审计**: 拆书已有 `BookAnalysisBudgetGuard`;自动导演有固定单步/单章异常阈值;LOOP-11 已有按书成本报表 API 但无前端入口;缺可配置的本书预算与用户可见报表。
+- **改动**:
+  1. 预算配置 `AppSetting.llm.production_token_budget`(`defaultTokens` + 按书覆盖),服务 `ProductionTokenBudgetSettingsService`;解析优先级本书覆盖 > 全局默认,非法值按未设置;
+  2. 用量与判定 `ProductionTokenBudgetService`:累计取 `LlmUsageEvent` 按 novelId 求和;严格大于才算超限;读取失败按未设置处理,不误停主链;
+  3. 章节边界拦截:`resolveUsageCircuitBreaker` 增加本书预算检查;超限以 reason `token_budget_exceeded` 打开熔断(问题码 `runtime.token_budget_exceeded`,恢复动作 `resume_after_review`),只暂停不删除内容;
+  4. 端点 `GET/PUT /api/production-budget/:novelId`;成本报告端点保持只读;
+  5. 前端生产看板 `ProductionCostPanel`:近 30 天费用概览 + 任务前列 + 累计用量/预算输入;未定价模型明确提示;超限提示恢复方式;
+  6. 共享契约 `shared/types/costControl.ts`(成本报告类型迁入 + 预算设置/状态);计划、wiki、发布说明与 README。
+- **验证**: server **1441 测试 / 1429 过 / 0 失败 / 12 跳过**(新增 7 条守卫);client **234/234**(新增 2 条);双端 typecheck 0 错误。途中修 1 处契约冲突:成本报告路由只读守卫拒绝预算 PUT,遂拆分独立 `production-budget` 路由。
+- **验收对照**: 「预算守卫扩展到生产链」= 本书预算 + 章节边界熔断 + 可恢复;「每本书出成本报表」= 看板费用概览 + 既有报表 API。
+- **残留**: 自动按预算切换路由、全局预算设置页、手动单章生成的预算拦截不做;UI 实测留所有者。
+- **下一步**: 按 BACKLOG 顺序 → **LOOP-18 = INN-D2 本地模型(Ollama 兼容)接入(M/P3)**。
+
 ## 2026-10-21 · LOOP-16 · 规划变更保存前预览(INN-C3)
 
 - **类别**: 创新 + UI(C 线交互与可视化;主对话执行)

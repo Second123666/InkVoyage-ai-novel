@@ -1,6 +1,6 @@
 # 改进待办池 · Backlog
 
-更新:2026-10-21
+更新:2026-10-22
 配套流程:[improvement-workflow.md](improvement-workflow.md) · 进度:[PROGRESS.md](PROGRESS.md)
 
 状态标记:`[ ]` 待做 · `[/]` 进行中 · `[x]` 完成 · `[~]` 冻结/搁置 · `[!]` 降级为实验
@@ -25,7 +25,8 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 14. ~~**LOOP-14 故事世界图谱 · 前端渲染**(INN-C1)~~ ✅ 完成(2026-10-21):图谱页 + React Flow 画布(懒加载)+ 移动端合同,INN-C1 整项打勾。
 15. ~~**LOOP-15 生产看板**(INN-C2)~~ ✅ 完成(2026-10-21):生产看板页(复用 simple-shelf + volumes 投影)+ 工作区入口 + 移动端合同,章节状态/债务热点/卷进度一屏总览。
 16. ~~**LOOP-16 变更 diff 预览**(INN-C3)~~ ✅ 完成(2026-10-21):卷战略/节奏拆章保存前统一 diff 确认;既有章节 AI 改写与版本历史 diff 保持。
-17. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **INN-D1 全链路 token 预算与成本报表(M/P2)**,随后 D2/D3 → RF/BUG/UI/OPS 按 P 排。
+17. ~~**LOOP-17 token 预算与成本报表**(INN-D1)~~ ✅ 完成(2026-10-22):本书预算 + 章节边界熔断 + 看板成本面板。
+18. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **INN-D2 本地模型(Ollama 兼容)接入(M/P3)**,随后 D3 → RF/BUG/UI/OPS 按 P 排。
     **完成项打勾规则(2026-10-20 所有者要求)**:每轮收尾同步更新 BACKLOG —— 完成项 `[x]` + ✅,进行中 `[/]`,入口建议划线。
 
 ---
@@ -106,8 +107,9 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 
 ### D · 成本与效率
 
-- [ ] **INN-D1 全链路 token 预算与成本报表** · M · P2
-  拆书已有 token 预算守卫,扩展到生产链;每本书出成本报表。
+- [x] **INN-D1 全链路 token 预算与成本报表** · M · P2(= LOOP-17,2026-10-22 完成) ✅
+  结果:本书 token 预算(`AppSetting.llm.production_token_budget`,本书覆盖 > 全局默认)+ 累计用量(`LlmUsageEvent` 求和)+ 章节边界熔断(reason `token_budget_exceeded` → 问题码 `runtime.token_budget_exceeded`、可恢复暂停)+ 独立预算端点 `GET/PUT /api/production-budget/:novelId`;生产看板新增「AI 成本与预算」面板(近 30 天费用对比 + 任务前列 + 累计用量 + 预算维护);成本报告端点保持只读。计划 `docs/plans/production-token-budget.md`;契约见 wiki `architecture/model-selection.md`;守卫 `server/tests/productionTokenBudget.test.js`、`client/tests/productionCostPanel.test.js`。
+  验收:拆书预算守卫扩展到生产链且可恢复;每本书可在看板查看成本报表并设置预算。
 
 - [ ] **INN-D2 本地模型(Ollama 兼容)接入** · M · P3
   自定义 provider 已有基础;补 Ollama 兼容层,审核/摘要可离线跑。
