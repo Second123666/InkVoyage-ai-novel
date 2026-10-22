@@ -24,6 +24,7 @@ import genreRouter from "./routes/genre";
 import healthRouter from "./routes/health";
 import { chapterTraceRouter } from "./routes/chapterTrace";
 import { costReportRouter } from "./routes/costReport";
+import { productionBudgetRouter } from "./routes/productionBudget";
 import { recoveryPlaybookRouter } from "./routes/recoveryPlaybook";
 import { storyGraphRouter } from "./routes/storyGraph";
 import imagesRouter from "./routes/images";
@@ -132,6 +133,7 @@ export function createApp() {
   app.use("/api/health", healthRouter);
   app.use("/api/chapter-traces", chapterTraceRouter);
   app.use("/api/cost-report", costReportRouter);
+  app.use("/api/production-budget", productionBudgetRouter);
   app.use("/api/recovery-playbook", recoveryPlaybookRouter);
   app.use("/api/story-graph", storyGraphRouter);
   app.use("/api/agent-catalog", agentCatalogRouter);

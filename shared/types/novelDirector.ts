@@ -123,6 +123,7 @@ export const DIRECTOR_CIRCUIT_BREAKER_REASONS = [
   "protected_user_content",
   "unrecoverable_data_risk",
   "usage_anomaly",
+  "token_budget_exceeded",
 ] as const;
 
 export type DirectorCircuitBreakerReason = typeof DIRECTOR_CIRCUIT_BREAKER_REASONS[number];

@@ -1,5 +1,11 @@
 // INN-B3 成本感知路由:按书的调用流水聚合 + 当前路由 vs 经济/强模型路由成本对比。
 // 纯计算与 IO 分离:buildCostReport 可单测,服务方法负责取数。
+import type {
+  CostReport,
+  CostRouteLike,
+  CostUsageEventLike,
+  TaskCostComparisonRow,
+} from "@ai-novel/shared/types/costControl";
 import { prisma } from "../../db/prisma";
 import {
   modelPricingSettingsService,
@@ -7,51 +13,12 @@ import {
   type ModelPriceMap,
 } from "../settings/ModelPricingSettingsService";
 
-export interface CostUsageEventLike {
-  taskType: string | null;
-  provider: string | null;
-  model: string | null;
-  promptTokens: number;
-  completionTokens: number;
-}
-
-export interface CostRouteLike {
-  taskType: string;
-  provider: string;
-  model: string;
-}
-
-export interface TaskCostComparisonRow {
-  taskType: string;
-  promptTokens: number;
-  completionTokens: number;
-  /** 窗口内实际发生模型的成本合计(可含多模型混用)。 */
-  actualCost: number | null;
-  currentRouteModel: string | null;
-  currentRouteCost: number | null;
-  cheapestModel: string | null;
-  cheapestCost: number | null;
-  premiumModel: string | null;
-  premiumCost: number | null;
-  /** currentRouteCost - cheapestCost;任一为 null 时为 null。 */
-  savingsVsCheapest: number | null;
-}
-
-export interface CostReport {
-  periodDays: number;
-  totalPromptTokens: number;
-  totalCompletionTokens: number;
-  rows: TaskCostComparisonRow[];
-  totals: {
-    actualCost: number | null;
-    currentRouteCost: number | null;
-    cheapestCost: number | null;
-    premiumCost: number | null;
-    savingsVsCheapest: number | null;
-  };
-  unpricedModels: string[];
-  pricedModels: string[];
-}
+export type {
+  CostReport,
+  CostRouteLike,
+  CostUsageEventLike,
+  TaskCostComparisonRow,
+} from "@ai-novel/shared/types/costControl";
 
 const UNCLASSIFIED_TASK = "未分类";
 

@@ -7,6 +7,7 @@ import { queryKeys } from "@/api/queryKeys";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import ProductionCostPanel from "./ProductionCostPanel";
 import { buildProductionBoardModel, CHAPTER_STATUS_META } from "./productionBoardModel";
 
 // INN-C2 生产看板:章节状态、质量债务热点与卷进度一屏总览(复用既有投影,不新增后端契约)。
@@ -179,6 +180,8 @@ export default function ProductionBoardPage() {
               </div>
             )}
           </section>
+
+          <ProductionCostPanel novelId={id} />
         </>
       ) : (
         <div className="rounded-xl border border-dashed bg-muted/20 p-6 text-sm leading-7 text-muted-foreground">

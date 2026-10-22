@@ -189,6 +189,20 @@ export function recordChapterUsageBudgetExceededSignal(input: {
   });
 }
 
+export function recordTokenBudgetExceededSignal(input: {
+  previous?: DirectorCircuitBreakerState | null;
+  usedTokens: number;
+  budgetTokens: number;
+  nodeKey?: string | null;
+}): DirectorCircuitBreakerState {
+  return openDirectorCircuitBreaker({
+    reason: "token_budget_exceeded",
+    message: `全书 AI 用量达到 ${Math.max(0, Math.round(input.usedTokens))} Tokens，超过本书预算 ${Math.max(0, Math.round(input.budgetTokens))} Tokens，已暂停自动执行。调整预算后可继续。`,
+    previous: input.previous,
+    nodeKey: input.nodeKey ?? "chapter_execution_node",
+  });
+}
+
 export function withCircuitBreakerState(
   autoExecution: DirectorAutoExecutionState,
   state: DirectorCircuitBreakerState | null | undefined,

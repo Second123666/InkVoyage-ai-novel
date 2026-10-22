@@ -20,11 +20,13 @@ import {
   isDirectorCircuitBreakerOpen,
   recordChapterUsageBudgetExceededSignal,
   recordModelFailureSignal,
+  recordTokenBudgetExceededSignal,
   recordUsageAnomalySignal,
   withCircuitBreakerState,
 } from "../runtime/DirectorCircuitBreakerService";
 import { directorAutomationLedgerEventService } from "../runtime/DirectorAutomationLedgerEventService";
 import { directorUsageTelemetryQueryService } from "../runtime/DirectorUsageTelemetryQueryService";
+import { productionTokenBudgetService } from "../../../llm/ProductionTokenBudgetService";
 import { directorIssueService } from "../issues";
 import { loadDirectorIssueTaskContext } from "../issues/DirectorIssueTaskContext";
 import {
@@ -145,6 +147,7 @@ function issueCodeForCircuitBreaker(
     case "protected_user_content": return "runtime.protected_content";
     case "unrecoverable_data_risk": return "runtime.data_integrity";
     case "usage_anomaly": return "runtime.token_budget_exceeded";
+    case "token_budget_exceeded": return "runtime.token_budget_exceeded";
     default: return "runtime.unclassified";
   }
 }
@@ -237,6 +240,16 @@ export async function resolveUsageCircuitBreaker(input: {
     : null;
   if (chapterBudgetBreaker) {
     return chapterBudgetBreaker;
+  }
+
+  // INN-D1:全书 token 预算在章节边界检查;超出后暂停,调整预算即可恢复。
+  const budgetStatus = await productionTokenBudgetService.getStatus(input.novelId).catch(() => null);
+  if (budgetStatus?.exceeded && budgetStatus.budgetTokens !== null) {
+    return recordTokenBudgetExceededSignal({
+      previous: input.autoExecution.circuitBreaker,
+      usedTokens: budgetStatus.usedTokens,
+      budgetTokens: budgetStatus.budgetTokens,
+    });
   }
 
   const usage = await directorUsageTelemetryQueryService.getBookUsage({
