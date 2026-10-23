@@ -12,6 +12,7 @@ import { characterVisibleProfileCompletionPrompt } from "../../../prompting/prom
 import { normalizeStoryModeOutput, buildStoryModePromptBlock } from "../../storyMode/storyModeProfile";
 import type { LLMGenerateOptions } from "../novelCoreShared";
 import { WorldContextGateway } from "../worldContext/WorldContextGateway";
+import { runCharacterVisibleProfileBatch } from "./characterVisibleProfileBatch";
 
 export interface CharacterVisibleProfileGenerateOptions extends LLMGenerateOptions {
   userGuidance?: string;
@@ -322,29 +323,11 @@ export class CharacterVisibleProfileService {
       where: { novelId },
       orderBy: { createdAt: "asc" },
     });
-    const results: CharacterVisibleProfileSuggestion[] = [];
-    const skippedCharacters: CharacterVisibleProfileBatchResult["skippedCharacters"] = [];
-
-    for (const character of characters) {
-      if (!this.needsVisibleProfile(character)) {
-        skippedCharacters.push({
-          characterId: character.id,
-          characterName: character.name,
-          reason: "外显资料已较完整",
-        });
-        continue;
-      }
-      try {
-        const result = await this.generateCharacterVisibleProfile(novelId, character.id, options);
-        results.push(result);
-      } catch (error) {
-        skippedCharacters.push({
-          characterId: character.id,
-          characterName: character.name,
-          reason: error instanceof Error ? error.message : "外显资料生成失败",
-        });
-      }
-    }
+    const { results, skippedCharacters } = await runCharacterVisibleProfileBatch({
+      characters,
+      needsProfile: (character) => this.needsVisibleProfile(character),
+      generate: (character) => this.generateCharacterVisibleProfile(novelId, character.id, options),
+    });
 
     return { novelId, results, skippedCharacters };
   }
