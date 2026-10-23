@@ -28,7 +28,8 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 17. ~~**LOOP-17 token 预算与成本报表**(INN-D1)~~ ✅ 完成(2026-10-22):本书预算 + 章节边界熔断 + 看板成本面板。
 18. ~~**LOOP-18 本地模型离线跑审校与摘要**(INN-D2)~~ ✅ 完成(2026-10-23):兼容层审计 + 一键本机预设 + 免密钥文案 + Qwen 分类修复。
 19. ~~**LOOP-19 批量生成吞吐优化**(INN-D3)~~ ✅ 完成(2026-10-23):角色外显资料批量生成改有界并发(3),顺序与失败语义不变。
-20. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **RF-1 大文件拆分(首个文件,行为不变)**,随后 BUG/UI/OPS 按 P 排。
+20. ~~**LOOP-20 RF-1 首个文件拆分**(`worldStructure.ts`)~~ ✅ 完成(2026-10-23):按责任拆为 shared/normalize/legacy/projection + 门面,行为不变。
+21. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **RF-1 第二个大文件拆分(行为不变)**,随后 BUG/UI/OPS 按 P 排。
     **完成项打勾规则(2026-10-20 所有者要求)**:每轮收尾同步更新 BACKLOG —— 完成项 `[x]` + ✅,进行中 `[/]`,入口建议划线。
 
 ---
@@ -123,8 +124,9 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 
 ## 3. 重构与解耦(RF)
 
-- [ ] **RF-1 大文件拆分(逐个成轮,行为不变)** · 每个 S–M · P2
-  清单(>1000 行):`world.prompts.ts`(1312)、`worldStructure.ts`(1311)、`ChapterArtifactDeltaService.ts`(1292)、`promptRunner.ts`(1264)、`RagIndexService.ts`(1242)、`novelDirectorTakeover.ts`(1158)、`worldVisualization.ts`(1082)、`comicRoutes.ts`(1071)。
+- [/] **RF-1 大文件拆分(逐个成轮,行为不变)** · 每个 S–M · P2
+  进度:2026-10-23 已完成 `worldStructure.ts`(1311 → 门面 3 行;拆为 `worldStructure/` 下 shared/normalize/legacy/projection + index,定向 18/18、全量通过,见 PROGRESS LOOP-20)。
+  剩余清单(>1000 行):`world.prompts.ts`(1312)、`ChapterArtifactDeltaService.ts`(1302)、`promptRunner.ts`(1264)、`RagIndexService.ts`(1242)、`novelDirectorTakeover.ts`(1158)、`worldVisualization.ts`(1082)、`comicRoutes.ts`(1071)。
   要求:一次拆一个;测试守护行为不变;每拆一个记一条 PROGRESS。
 
 - [ ] **RF-2 comicRoutes HTTP 层拆分** · S · P2(可与 FEAT-1 同轮或紧随其后)。

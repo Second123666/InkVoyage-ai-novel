@@ -17,6 +17,23 @@
 
 ---
 
+## 2026-10-23 · LOOP-20 · RF-1 大文件拆分(首个:`worldStructure.ts`)
+
+- **类别**: 重构(行为不变;主对话执行)
+- **目标**: BACKLOG RF-1 —— 一次拆一个超过 1000 行的文件,测试守护行为不变。本轮拆分 `server/src/services/world/worldStructure.ts`(1311 行)。
+- **拆分方案**:
+  1. `worldStructure/shared.ts`:常量、`WorldStructureSource`、JSON/文本/ID/去重/规则文本工具、空结构构造器;
+  2. `worldStructure/normalize.ts`:全部归一化函数 + `parseWorldStructurePayload`;
+  3. `worldStructure/legacy.ts`:旧字段种子生成、旧字段文本构建、`applyStructuredWorldToLegacyFields`、`buildWorldStructureOverview`(总览消费旧字段文本构建器,放在这里避免循环);
+  4. `worldStructure/projection.ts`:仅 `buildWorldBindingSupport`;
+  5. `worldStructure/index.ts`:显式门面,只导出原公共 API;原 `worldStructure.ts` 保留一行兼容门面,外部导入路径不变。
+- **边界**:依赖方向 `shared ← normalize ← legacy`、`shared ← projection`、`legacy → projection`(仅 apply 默认参数),无循环;不从业务代码深引用内部文件;不新增泛化 `utils` 目录。
+- **验证**: server build 通过;定向 `worldStructure/worldVisualization/storyWorldSlice/bookFraming` **18/18**;server 全量 **1448 测试 / 1436 过 / 0 失败 / 12 跳过**(与 LOOP-19 基线一致)。client 未动,沿用 LOOP-19 typecheck 0 错误 / 238/238。
+- **拆分过程修正**(静态检查发现):跨文件工具需显式导出;`normalizeLocation` 需导出给 legacy;归一化 metadata 需引入 `WORLD_STRUCTURE_SCHEMA_VERSION`;总览若留在 projection 会与 legacy 形成循环,已移入 legacy。
+- **发布说明**: 纯内部重构,无用户可见变化,按规则跳过发布说明与 README。
+- **残留**: RF-1 剩余 7 个文件(`world.prompts.ts`、`ChapterArtifactDeltaService.ts`、`promptRunner.ts`、`RagIndexService.ts`、`novelDirectorTakeover.ts`、`worldVisualization.ts`、`comicRoutes.ts`)。
+- **下一步**: **LOOP-21 = RF-1 第二个文件**,优先选职责边界清晰的 `world.prompts.ts` 或 `worldVisualization.ts`。
+
 ## 2026-10-23 · LOOP-19 · 批量生成吞吐优化(INN-D3)
 
 - **类别**: 创新/性能(D 线成本与效率;主对话执行)
