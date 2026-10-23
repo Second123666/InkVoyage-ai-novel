@@ -27,7 +27,8 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 16. ~~**LOOP-16 变更 diff 预览**(INN-C3)~~ ✅ 完成(2026-10-21):卷战略/节奏拆章保存前统一 diff 确认;既有章节 AI 改写与版本历史 diff 保持。
 17. ~~**LOOP-17 token 预算与成本报表**(INN-D1)~~ ✅ 完成(2026-10-22):本书预算 + 章节边界熔断 + 看板成本面板。
 18. ~~**LOOP-18 本地模型离线跑审校与摘要**(INN-D2)~~ ✅ 完成(2026-10-23):兼容层审计 + 一键本机预设 + 免密钥文案 + Qwen 分类修复。
-19. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **INN-D3 批量生成吞吐优化(M/P3)**,随后 RF/BUG/UI/OPS 按 P 排。
+19. ~~**LOOP-19 批量生成吞吐优化**(INN-D3)~~ ✅ 完成(2026-10-23):角色外显资料批量生成改有界并发(3),顺序与失败语义不变。
+20. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **RF-1 大文件拆分(首个文件,行为不变)**,随后 BUG/UI/OPS 按 P 排。
     **完成项打勾规则(2026-10-20 所有者要求)**:每轮收尾同步更新 BACKLOG —— 完成项 `[x]` + ✅,进行中 `[/]`,入口建议划线。
 
 ---
@@ -116,7 +117,9 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
   结果:审计确认 Ollama 兼容层主体已存在(免密钥内置厂商、`/api/tags` 模型目录、`prompt_json` 结构化输出、RAG 嵌入候选);补齐最后一公里 —— 模型路由页「本机跑审校与摘要」一键预设(仅 review/light_review/critical_review/summary,温度 0.3,填草稿后确认保存)+ 免密钥厂商文案 + 修复本机 Qwen 模型被误判为自定义网关的分类缺陷。计划 `docs/plans/local-model-offline.md`;契约见 wiki `architecture/model-selection.md`;守卫 `server/tests/ollamaOfflinePath.test.js`、`client/tests/localModelOffline.test.js`。
   验收:审核/摘要四类任务可一键切到本机模型并离线运行;正文生成等任务不受预设影响。
 
-- [ ] **INN-D3 批量生成吞吐优化** · M · P3。
+- [x] **INN-D3 批量生成吞吐优化** · M · P3(= LOOP-19,2026-10-23 完成) ✅
+  结果:审计确认章节生产链/节奏段章节列表必须串行(前序依赖),拆书角色与导演候选已并行;唯一安全缺口 = 角色外显资料批量生成逐角色串行。改为 `runCharacterVisibleProfileBatch` 有界并发(默认 3),slot 回填保证结果与跳过项按输入顺序返回,单项失败隔离,provider requestLimiter 仍然生效。契约见 wiki `workflows/batch-generation-throughput.md`;计划 `docs/plans/batch-throughput.md`;守卫 `server/tests/characterVisibleProfileBatch.test.js`。
+  验收:独立批量任务并发吞吐提升,顺序与失败语义不变;章节链保持串行。
 
 ## 3. 重构与解耦(RF)
 
