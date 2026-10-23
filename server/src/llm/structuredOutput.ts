@@ -247,7 +247,9 @@ export function resolveStructuredOutputProfile(input: {
       safeStructuredMaxTokens: 8192,
     });
   }
-  if (qwenFamily) {
+  // 本机 Ollama 的 Qwen 模型不具备 DashScope/ModelScope 的原生 JSON 扩展,
+  // 必须先归入 ollama 家族,避免仅凭模型名误判为自定义网关。
+  if (qwenFamily && input.provider !== "ollama") {
     return buildProfile({
       family: "custom_openai_compatible_qwen",
       preferredStructuredStrategy: "prompt_json",

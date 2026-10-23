@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, CopyCheck, RefreshCw, Save } from "lucide-react";
+import { ArrowLeft, CopyCheck, HardDrive, RefreshCw, Save } from "lucide-react";
 import type { StructuredFallbackSettings } from "@/api/settings";
 import {
   getAPIKeySettings,
@@ -19,11 +19,14 @@ import { Switch } from "@/components/ui/switch";
 import ModelRouteFields from "./ModelRouteFields";
 import { MODEL_ROUTE_LABELS } from "./modelRouteLabels";
 import {
+  buildLocalOfflineRouteDraft,
   buildRouteSavePayload,
+  findLocalModelProvider,
   formatConnectivityStatus,
   getPreferredModel,
   getProviderDisplayName,
   isSameRouteDraft,
+  LOCAL_OFFLINE_TASK_TYPES,
   parseStructuredRetryCount,
   resolveConnectivityState,
   type ConnectivityState,
@@ -139,6 +142,11 @@ export default function ModelRoutesPage() {
   );
   const defaultProvider = preferredProviderConfig?.provider ?? "deepseek";
   const defaultModel = getPreferredModel(preferredProviderConfig);
+  const localModelProvider = useMemo(() => findLocalModelProvider(providerConfigs), [providerConfigs]);
+  const localOfflineDraft = useMemo(
+    () => buildLocalOfflineRouteDraft(localModelProvider),
+    [localModelProvider],
+  );
   const dirtyTaskTypes = useMemo(
     () => taskTypes.filter((taskType) => {
       const draft = routeDrafts[taskType];
@@ -209,12 +217,11 @@ export default function ModelRoutesPage() {
     });
   }
 
-  function applyBulkDraftToRoutes(targetTaskTypes: ModelRouteTaskType[]) {
+  function applyDraftToRoutes(targetTaskTypes: ModelRouteTaskType[], draft: RouteDraft) {
     if (targetTaskTypes.length === 0) {
       setActionResult("没有需要套用的任务。");
       return;
     }
-    const draft = getBulkDraft();
     setRouteDrafts((prev) => {
       const next = { ...prev };
       targetTaskTypes.forEach((taskType) => {
@@ -223,6 +230,22 @@ export default function ModelRoutesPage() {
       return next;
     });
     setActionResult(`模型设置填入 ${targetTaskTypes.length} 个任务，保存后生效。`);
+  }
+
+  function applyBulkDraftToRoutes(targetTaskTypes: ModelRouteTaskType[]) {
+    applyDraftToRoutes(targetTaskTypes, getBulkDraft());
+  }
+
+  function applyLocalOfflinePreset() {
+    const draft = buildLocalOfflineRouteDraft(localModelProvider);
+    if (!draft) {
+      setActionResult("还没有可用的本机模型；先启动 Ollama 并在厂商设置里选择模型。");
+      return;
+    }
+    const targets = LOCAL_OFFLINE_TASK_TYPES.filter((taskType) => taskTypes.includes(taskType));
+    setBulkDraft(draft);
+    applyDraftToRoutes(targets, draft);
+    setActionResult(`已用本机模型填入 ${targets.length} 个审校/摘要任务，确认后保存。`);
   }
 
   function getStructuredFallbackDraft(): StructuredFallbackDraft {
@@ -312,7 +335,7 @@ export default function ModelRoutesPage() {
             快速套用模型
           </CardTitle>
           <CardDescription>
-            先选一套模型，再填入多个任务；统一保存后，后续创作会按新路由执行。
+            先选一套模型，再填入多个任务；统一保存后，后续创作会按新路由执行。也可以一键让本机 Ollama 承担审校与摘要，减少云端调用。
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -333,6 +356,19 @@ export default function ModelRoutesPage() {
               待保存任务 {dirtyTaskTypes.length} 个；检测异常任务 {failedTaskTypes.length} 个；空白路由 {emptyRouteTaskTypes.length} 个。
             </div>
             <div className="flex flex-wrap items-center gap-2">
+              <Button
+                type="button"
+                size="sm"
+                variant="secondary"
+                onClick={applyLocalOfflinePreset}
+                disabled={!localOfflineDraft}
+                title={localOfflineDraft
+                  ? "把本机模型填入审校与摘要任务，保存后生效"
+                  : "先在厂商设置里启动 Ollama 并选择模型"}
+              >
+                <HardDrive className="h-4 w-4" />
+                本机跑审校与摘要
+              </Button>
               <Button
                 type="button"
                 size="sm"

@@ -49,6 +49,37 @@ export function getPreferredModel(config: APIKeyStatus | undefined): string {
   return config?.currentModel || config?.models?.[0] || "";
 }
 
+// INN-D2 离线任务预设:本机 Ollama 承担审校与摘要,降低云端调用。
+export const LOCAL_OFFLINE_TASK_TYPES: ModelRouteTaskType[] = [
+  "review",
+  "light_review",
+  "critical_review",
+  "summary",
+];
+
+export function findLocalModelProvider(providerConfigs: APIKeyStatus[]): APIKeyStatus | null {
+  return providerConfigs.find((item) => (
+    item.provider === "ollama" && item.isConfigured && item.isActive
+  )) ?? null;
+}
+
+export function buildLocalOfflineRouteDraft(
+  provider: APIKeyStatus | null | undefined,
+): RouteDraft | null {
+  const model = getPreferredModel(provider ?? undefined);
+  if (!provider || !model) {
+    return null;
+  }
+  return {
+    provider: provider.provider,
+    model,
+    temperature: "0.3",
+    maxTokens: "",
+    requestProtocol: "auto",
+    structuredResponseFormat: "auto",
+  };
+}
+
 export function getModelOptions(providerConfigs: APIKeyStatus[], provider: string, currentModel: string): string[] {
   const config = getProviderConfig(providerConfigs, provider);
   const models = config?.models ?? [];

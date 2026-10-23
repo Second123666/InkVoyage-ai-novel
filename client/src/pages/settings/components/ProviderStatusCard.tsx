@@ -36,6 +36,9 @@ function getBalanceSummary(input: {
   if (balance?.status === "available") {
     return `余额 ${formatBalanceAmount(balance.availableBalance, balance.currency)}`;
   }
+  if (!provider.isConfigured && provider.requiresApiKey === false) {
+    return "本机模型不需要查询余额。";
+  }
   return balance?.error ?? balance?.message ?? (provider.isConfigured ? "当前暂未获取余额信息。" : "请先配置 API Key。");
 }
 
@@ -71,8 +74,16 @@ export default function ProviderStatusCard(props: {
     : "不支持图像生成";
   const visibleModels = modelsOpen ? provider.models : provider.models.slice(0, 8);
   const canUseProvider = provider.isConfigured && provider.isActive && Boolean(provider.currentModel);
-  const testDisabledReason = provider.isConfigured ? "" : "配置 API Key 后可以测试连接。";
-  const refreshDisabledReason = provider.isConfigured ? "" : "配置 API Key 后可以刷新模型列表。";
+  const testDisabledReason = provider.isConfigured
+    ? ""
+    : provider.requiresApiKey === false
+      ? "先在配置里选择本机模型，再测试连接。"
+      : "配置 API Key 后可以测试连接。";
+  const refreshDisabledReason = provider.isConfigured
+    ? ""
+    : provider.requiresApiKey === false
+      ? "先启动本地服务并选择模型，再刷新模型列表。"
+      : "配置 API Key 后可以刷新模型列表。";
 
   return (
     <div
