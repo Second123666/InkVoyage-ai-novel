@@ -17,6 +17,22 @@
 
 ---
 
+## 2026-10-23 · LOOP-21 · RF-1 第二个文件:`worldVisualization.ts`
+
+- **类别**: 重构(行为不变;主对话执行)
+- **目标**: RF-1 —— 拆分 `server/src/services/world/worldVisualization.ts`(1082 行)。
+- **拆分方案**:
+  1. `worldVisualization/shared.ts`:类型、上限常量、方向坐标、势力类型别名、关系标签、文本/JSON 工具、`makeId`/`normalizeTextField`;
+  2. `worldVisualization/faction.ts`:势力节点/边推断与归一化、自由文本势力抽取、力量层级、时间线;
+  3. `worldVisualization/geography.ts`:方向/坐标/区域/路线归一化、地理节点/边归一化与地图构建;
+  4. `worldVisualization/payload.ts`:结构化优先、自由文本兜底、LLM 草稿清洗、公共入口;
+  5. `worldVisualization/index.ts`:显式门面,仅导出原公共 API;原文件保留兼容门面。
+- **边界**:`shared ← faction`、`shared ← geography`、`faction/geography/shared ← payload`,无循环;结构化优先与兜底顺序不变。
+- **验证**: server build 通过;定向 `worldVisualization/worldStructure/storyWorldSlice/bookFraming` **18/18**;server 全量 **1448 测试 / 1436 过 / 0 失败 / 12 跳过**(与基线一致)。client 未动,沿用 LOOP-19 typecheck 0 错误 / 238/238。
+- **发布说明**: 纯内部重构,无用户可见变化,按规则跳过。
+- **残留**: RF-1 剩余 6 个文件(`world.prompts.ts`、`ChapterArtifactDeltaService.ts`、`promptRunner.ts`、`RagIndexService.ts`、`novelDirectorTakeover.ts`、`comicRoutes.ts`)。
+- **下一步**: **LOOP-22 = RF-1 第三个文件**。
+
 ## 2026-10-23 · LOOP-20 · RF-1 大文件拆分(首个:`worldStructure.ts`)
 
 - **类别**: 重构(行为不变;主对话执行)
