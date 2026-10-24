@@ -42,37 +42,30 @@ import { buildChapterArtifactContentHash } from "./artifactSync/ChapterArtifactC
 const ARTIFACT_DELTA_SOURCE_TYPE = "chapter_artifact_delta";
 const ARTIFACT_DELTA_SOURCE_STAGE = "chapter_execution";
 
-type CharacterLookupItem = {
-  id: string;
-  name: string;
-  role: string;
-  castRole: string | null;
-  currentGoal: string | null;
-  currentState: string | null;
-};
-
-type ChapterReference = {
-  id: string;
-  order: number;
-  title: string;
-};
-
-type ChapterArtifactDeltaResourceUpdate = ChapterArtifactDeltaOutput["characterResourceDeltas"][number];
-type ChapterArtifactPayoffDelta = ChapterArtifactDeltaOutput["payoffDeltas"][number];
-type ChapterArtifactKnowledgeState = ChapterArtifactDeltaOutput["characterKnowledgeStates"][number];
-type ChapterArtifactDialogueInfluenceResolution = ChapterArtifactDeltaOutput["characterDialogueInfluenceResolutions"][number];
-
-type ActiveCharacterDialogueInfluence = {
-  id: string;
-  characterId: string;
-  characterName: string;
-  summary: string;
-  behaviorGuidance: string;
-  emotionalGuidance: string | null;
-  relationTension: string | null;
-  targetStartChapterOrder: number;
-  targetEndChapterOrder: number;
-};
+import {
+  assertExpectedChapterContentInTransaction,
+  buildCharacterRosterText,
+  buildKnowledgeBoundaryLine,
+  clampConfidence,
+  cleanNullableText,
+  cleanOptionalText,
+  joinFactContents,
+  mergeKnowledgeBoundaryState,
+  normalizeName,
+  resolveCharacter,
+  stringifyActiveCharacterDialogueInfluenceText,
+  stringifyChapterResourceText,
+  stringifyPayoffText,
+  stringifyPreviousState,
+  uniqueTextItems,
+  type ActiveCharacterDialogueInfluence,
+  type ChapterArtifactDeltaResourceUpdate,
+  type ChapterArtifactDialogueInfluenceResolution,
+  type ChapterReference,
+  type CharacterLookupItem,
+} from "./artifactSync/chapterArtifactDelta.shared";
+import { applyPayoffDeltas } from "./artifactSync/chapterArtifactPayoffConsumer";
+export { mergeKnowledgeBoundaryState } from "./artifactSync/chapterArtifactDelta.shared";
 
 export interface ChapterArtifactDeltaSyncInput {
   novelId: string;
@@ -136,171 +129,6 @@ export interface ChapterArtifactConsumerResult {
 }
 
 export const buildContentHash = buildChapterArtifactContentHash;
-
-function normalizeName(value: string | null | undefined): string {
-  return compactText(value).replace(/\s+/g, "").toLowerCase();
-}
-
-function cleanOptionalText(value: string | null | undefined): string | undefined {
-  const normalized = compactText(value);
-  return normalized || undefined;
-}
-
-function cleanNullableText(value: string | null | undefined): string | null {
-  return compactText(value) || null;
-}
-
-function clampConfidence(value: number | null | undefined): number | null {
-  return typeof value === "number" && Number.isFinite(value)
-    ? Math.max(0, Math.min(1, value))
-    : null;
-}
-
-function resolveCharacter(
-  characters: Array<{ id: string; name: string }>,
-  name: string | null | undefined,
-): { id: string; name: string } | null {
-  const normalized = normalizeName(name);
-  if (!normalized) {
-    return null;
-  }
-  const exact = characters.find((item) => normalizeName(item.name) === normalized);
-  if (exact) {
-    return exact;
-  }
-  const fuzzy = characters.find((item) => {
-    const itemName = normalizeName(item.name);
-    return itemName && (normalized.includes(itemName) || itemName.includes(normalized));
-  });
-  return fuzzy ?? null;
-}
-
-function uniqueTextItems(items: string[] | null | undefined, maxItems: number): string[] {
-  const result: string[] = [];
-  const seen = new Set<string>();
-  for (const item of items ?? []) {
-    const normalized = compactText(item);
-    if (!normalized || seen.has(normalized)) {
-      continue;
-    }
-    seen.add(normalized);
-    result.push(normalized);
-    if (result.length >= maxItems) {
-      break;
-    }
-  }
-  return result;
-}
-
-function joinFactContents(items: string[], maxItems = 3): string | null {
-  const joined = uniqueTextItems(items, maxItems).join("；");
-  return joined || null;
-}
-
-function buildKnowledgeBoundaryLine(state: ChapterArtifactKnowledgeState): string | null {
-  const knownFacts = uniqueTextItems(state.knownFacts, 5);
-  const hiddenFacts = uniqueTextItems(state.hiddenFacts, 5);
-  if (knownFacts.length === 0 && hiddenFacts.length === 0) {
-    return null;
-  }
-  return [
-    "【信息边界】",
-    knownFacts.length > 0 ? `已知：${knownFacts.join("；")}` : "已知：无新增",
-    hiddenFacts.length > 0 ? `未知/不应超前知情：${hiddenFacts.join("；")}` : "未知/不应超前知情：无",
-  ].join("");
-}
-
-export function mergeKnowledgeBoundaryState(
-  currentState: string | null | undefined,
-  boundaryLine: string,
-): string {
-  const base = String(currentState ?? "")
-    .replace(/\n?【信息边界】[^\n]*/g, "")
-    .trim();
-  const cappedBoundary = boundaryLine.slice(0, 1200);
-  const baseBudget = Math.max(0, 1200 - cappedBoundary.length - (base ? 1 : 0));
-  const cappedBase = base.slice(0, baseBudget).trim();
-  return [cappedBase, cappedBoundary].filter(Boolean).join("\n");
-}
-
-function normalizeLedgerKey(title: string, fallback: string): string {
-  const base = compactText(title)
-    .toLowerCase()
-    .replace(/[^\p{L}\p{N}]+/gu, "_")
-    .replace(/^_+|_+$/g, "")
-    .slice(0, 96);
-  return base || fallback;
-}
-
-function stringifyChapterResourceText(items: Awaited<ReturnType<typeof characterResourceLedgerService.listResources>>): string {
-  return items.slice(0, 20).map((item) => [
-    `- ${item.name}`,
-    `holder=${item.holderCharacterName ?? "未知"}`,
-    `status=${item.status}`,
-    `function=${item.narrativeFunction}`,
-    item.summary,
-  ].filter(Boolean).join(" | ")).join("\n");
-}
-
-function stringifyPayoffText(items: Array<{
-  ledgerKey: string;
-  title: string;
-  currentStatus: string;
-  summary: string;
-  targetStartChapterOrder: number | null;
-  targetEndChapterOrder: number | null;
-  lastTouchedChapterOrder: number | null;
-}>): string {
-  return items.slice(0, 20).map((item) => [
-    `- ${item.ledgerKey} | ${item.title}`,
-    `status=${item.currentStatus}`,
-    item.targetStartChapterOrder || item.targetEndChapterOrder
-      ? `target=${item.targetStartChapterOrder ?? "?"}-${item.targetEndChapterOrder ?? "?"}`
-      : "",
-    item.lastTouchedChapterOrder ? `lastTouched=${item.lastTouchedChapterOrder}` : "",
-    item.summary,
-  ].filter(Boolean).join(" | ")).join("\n");
-}
-
-function stringifyActiveCharacterDialogueInfluenceText(items: ActiveCharacterDialogueInfluence[]): string {
-  return items.slice(0, 8).map((item) => [
-    `- influenceId=${item.id}`,
-    `角色=${item.characterName}`,
-    `对话沉淀=${item.summary}`,
-    `窗口=${item.targetStartChapterOrder}-${item.targetEndChapterOrder}`,
-    `行动倾向=${item.behaviorGuidance}`,
-    item.emotionalGuidance ? `情绪倾向=${item.emotionalGuidance}` : "",
-    item.relationTension ? `关系张力=${item.relationTension}` : "",
-  ].filter(Boolean).join(" | ")).join("\n");
-}
-
-function stringifyPreviousState(snapshot: Awaited<ReturnType<typeof stateService.getLatestSnapshotBeforeChapter>>): string {
-  if (!snapshot) {
-    return "";
-  }
-  const characterLines = snapshot.characterStates
-    .map((item) => item.summary?.trim())
-    .filter((item): item is string => Boolean(item))
-    .slice(0, 6);
-  const relationLines = snapshot.relationStates
-    .map((item) => item.summary?.trim())
-    .filter((item): item is string => Boolean(item))
-    .slice(0, 5);
-  const infoLines = snapshot.informationStates
-    .map((item) => `${item.holderType}:${item.fact}`)
-    .slice(0, 6);
-  const foreshadowLines = snapshot.foreshadowStates
-    .map((item) => `${item.title}(${item.status})`)
-    .slice(0, 6);
-  return [
-    snapshot.summary ? `摘要：${snapshot.summary}` : "",
-    characterLines.length > 0 ? `角色：\n${characterLines.map((item) => `- ${item}`).join("\n")}` : "",
-    relationLines.length > 0 ? `关系：\n${relationLines.map((item) => `- ${item}`).join("\n")}` : "",
-    infoLines.length > 0 ? `信息：\n${infoLines.map((item) => `- ${item}`).join("\n")}` : "",
-    foreshadowLines.length > 0 ? `伏笔：\n${foreshadowLines.map((item) => `- ${item}`).join("\n")}` : "",
-  ].filter(Boolean).join("\n\n");
-}
-
 export class ChapterArtifactDeltaService {
   async syncChapterArtifacts(input: ChapterArtifactDeltaSyncInput): Promise<ChapterArtifactDeltaSyncResult> {
     const extraction = await this.extractChapterArtifacts(input);
@@ -379,7 +207,7 @@ export class ChapterArtifactDeltaService {
         chapterOrder: chapter.order,
         chapterTitle: chapter.title,
         chapterGoal: chapter.taskSheet?.trim() || chapter.expectation?.trim() || "无明确章节目标",
-        characterRosterText: this.buildCharacterRosterText(characters).slice(0, 7000),
+        characterRosterText: buildCharacterRosterText(characters).slice(0, 7000),
         previousStateText: stringifyPreviousState(previousSnapshot).slice(0, 5000),
         existingResourceText: stringifyChapterResourceText(existingResources).slice(0, 5000),
         existingPayoffText: stringifyPayoffText(payoffRows).slice(0, 6000),
@@ -484,7 +312,7 @@ export class ChapterArtifactDeltaService {
         select: { id: true, order: true, title: true },
         orderBy: { order: "asc" },
       });
-      return { payoffDeltaCount: await this.applyPayoffDeltas({
+      return { payoffDeltaCount: await applyPayoffDeltas({
         novelId: input.novelId,
         chapterId: input.chapterId,
         chapterOrder: chapter.order,
@@ -635,7 +463,7 @@ export class ChapterArtifactDeltaService {
   }): Promise<number> {
     return prisma.$transaction(async (tx) => {
       if (input.expectedChapterContent !== undefined) {
-        await this.assertExpectedChapterContentInTransaction(tx, input as {
+        await assertExpectedChapterContentInTransaction(tx, input as {
           novelId: string;
           chapterId: string;
           expectedChapterContent: string;
@@ -712,7 +540,7 @@ export class ChapterArtifactDeltaService {
     const resolvedAt = new Date();
     const results = await prisma.$transaction(async (tx) => {
       if (input.expectedChapterContent !== undefined) {
-        await this.assertExpectedChapterContentInTransaction(tx, input as {
+        await assertExpectedChapterContentInTransaction(tx, input as {
           novelId: string;
           chapterId: string;
           expectedChapterContent: string;
@@ -739,16 +567,6 @@ export class ChapterArtifactDeltaService {
     return results.reduce((count, result) => count + result.count, 0);
   }
 
-  private buildCharacterRosterText(characters: CharacterLookupItem[]): string {
-    return characters.map((character) => [
-      `- ${character.id}`,
-      character.name,
-      character.role,
-      character.castRole ? `cast=${character.castRole}` : "",
-      character.currentGoal ? `goal=${character.currentGoal}` : "",
-      character.currentState ? `state=${character.currentState}` : "",
-    ].filter(Boolean).join(" | ")).join("\n");
-  }
 
   private async persistChapterSummaryAndFacts(input: {
     novelId: string;
@@ -944,153 +762,7 @@ export class ChapterArtifactDeltaService {
     });
   }
 
-  private async applyPayoffDeltas(input: {
-    novelId: string;
-    chapterId: string;
-    chapterOrder: number;
-    chapterTitle: string;
-    chapters: ChapterReference[];
-    output: ChapterArtifactDeltaOutput;
-    stateSnapshotId: string | null;
-    expectedChapterContent: string;
-  }): Promise<number> {
-    if (input.output.payoffDeltas.length === 0) {
-      return 0;
-    }
-    const now = new Date();
-    await prisma.$transaction(async (tx) => {
-      await this.assertExpectedChapterContentInTransaction(tx, input);
-      for (const rawDelta of input.output.payoffDeltas) {
-        const ledgerKey = normalizeLedgerKey(rawDelta.ledgerKey, normalizeLedgerKey(rawDelta.title, `chapter_${input.chapterOrder}_payoff`));
-        // A1-G22:增量路径与全量对账共用同一守卫(无目标窗口的 overdue 降级回待推进),
-        // 杜绝两条写路径语义不一致。
-        const item = sanitizePayoffLedgerSyncItem({ ...rawDelta, ledgerKey });
-        const previous = await tx.payoffLedgerItem.findUnique({
-          where: {
-            novelId_ledgerKey: {
-              novelId: input.novelId,
-              ledgerKey,
-            },
-          },
-        });
-        // A1-G10:手动锁定条目不接受增量路径改写状态/原因/窗口。
-        const lockedByUser = previous?.manualLocked === true;
-        const setupChapterId = this.resolveChapterReference({
-          value: item.setupChapterId ?? item.setupChapterOrder ?? item.firstSeenChapterOrder,
-          chapters: input.chapters,
-          currentChapterId: input.chapterId,
-          fallbackToCurrentChapter: item.currentStatus === "setup" || item.currentStatus === "hinted",
-        }) ?? previous?.setupChapterId ?? null;
-        const payoffChapterId = this.resolveChapterReference({
-          value: item.payoffChapterId ?? item.payoffChapterOrder,
-          chapters: input.chapters,
-          currentChapterId: input.chapterId,
-          fallbackToCurrentChapter: item.currentStatus === "paid_off",
-        }) ?? previous?.payoffChapterId ?? null;
-        const lastTouchedChapterId = this.resolveChapterReference({
-          value: item.lastTouchedChapterOrder,
-          chapters: input.chapters,
-          currentChapterId: input.chapterId,
-          fallbackToCurrentChapter: true,
-        }) ?? input.chapterId;
-        const sourceRefs = item.sourceRefs.length > 0
-          ? item.sourceRefs.map((ref) => ({
-            ...ref,
-            chapterId: ref.chapterId ?? lastTouchedChapterId,
-            chapterOrder: ref.chapterOrder ?? input.chapterOrder,
-          }))
-          : [{
-            kind: "chapter_payoff_ref" as const,
-            refId: null,
-            refLabel: `第${input.chapterOrder}章《${input.chapterTitle}》`,
-            chapterId: input.chapterId,
-            chapterOrder: input.chapterOrder,
-            volumeId: null,
-            volumeSortOrder: null,
-          }];
-        const evidence = item.evidence.length > 0
-          ? item.evidence.map((evidenceItem) => ({
-            ...evidenceItem,
-            chapterId: evidenceItem.chapterId ?? input.chapterId,
-            chapterOrder: evidenceItem.chapterOrder ?? input.chapterOrder,
-          }))
-          : [{
-            summary: item.summary,
-            chapterId: input.chapterId,
-            chapterOrder: input.chapterOrder,
-          }];
-        const riskSignals = clearStaleRiskSignal(dedupeRiskSignals(item.riskSignals.map((signal) => ({
-          code: signal.code,
-          severity: signal.severity,
-          summary: signal.summary,
-        }))));
-        await tx.payoffLedgerItem.upsert({
-          where: {
-            novelId_ledgerKey: {
-              novelId: input.novelId,
-              ledgerKey,
-            },
-          },
-          create: {
-            novelId: input.novelId,
-            ledgerKey,
-            title: item.title,
-            summary: item.summary,
-            scopeType: item.scopeType,
-            currentStatus: item.currentStatus,
-            targetStartChapterOrder: item.targetStartChapterOrder ?? null,
-            targetEndChapterOrder: item.targetEndChapterOrder ?? null,
-            firstSeenChapterOrder: item.firstSeenChapterOrder ?? input.chapterOrder,
-            lastTouchedChapterOrder: item.lastTouchedChapterOrder ?? input.chapterOrder,
-            lastTouchedChapterId,
-            setupChapterId,
-            payoffChapterId,
-            lastSnapshotId: input.stateSnapshotId,
-            sourceRefsJson: serializeLedgerJson(sourceRefs),
-            evidenceJson: serializeLedgerJson(evidence),
-            riskSignalsJson: serializeLedgerJson(riskSignals),
-            statusReason: item.statusReason?.trim() || null,
-            confidence: item.confidence ?? null,
-            updatedAt: now,
-          },
-          update: {
-            title: item.title,
-            summary: item.summary,
-            scopeType: item.scopeType,
-            currentStatus: lockedByUser ? previous.currentStatus : item.currentStatus,
-            targetStartChapterOrder: lockedByUser
-              ? previous.targetStartChapterOrder
-              : item.targetStartChapterOrder ?? null,
-            targetEndChapterOrder: lockedByUser
-              ? previous.targetEndChapterOrder
-              : item.targetEndChapterOrder ?? null,
-            firstSeenChapterOrder: item.firstSeenChapterOrder ?? previous?.firstSeenChapterOrder ?? input.chapterOrder,
-            lastTouchedChapterOrder: item.lastTouchedChapterOrder ?? input.chapterOrder,
-            lastTouchedChapterId,
-            setupChapterId,
-            payoffChapterId,
-            lastSnapshotId: input.stateSnapshotId ?? previous?.lastSnapshotId ?? null,
-            sourceRefsJson: serializeLedgerJson(sourceRefs),
-            evidenceJson: serializeLedgerJson(evidence),
-            riskSignalsJson: serializeLedgerJson(riskSignals),
-            statusReason: lockedByUser ? previous.statusReason : item.statusReason?.trim() || null,
-            confidence: item.confidence ?? null,
-            updatedAt: now,
-          },
-        });
-      }
-    });
-    return input.output.payoffDeltas.length;
-  }
 
-  private resolveChapterReference(input: {
-    value: unknown;
-    chapters: ChapterReference[];
-    currentChapterId: string;
-    fallbackToCurrentChapter: boolean;
-  }): string | null {
-    return resolveSnapshotChapterReference(input);
-  }
 
   private async applyCharacterDynamics(input: {
     novelId: string;
@@ -1127,7 +799,7 @@ export class ChapterArtifactDeltaService {
 
     let writeCount = 0;
     await prisma.$transaction(async (tx) => {
-      await this.assertExpectedChapterContentInTransaction(tx, input);
+      await assertExpectedChapterContentInTransaction(tx, input);
       await tx.characterCandidate.deleteMany({
         where: {
           novelId: input.novelId,
@@ -1264,7 +936,7 @@ export class ChapterArtifactDeltaService {
     }
 
     await prisma.$transaction(async (tx) => {
-      await this.assertExpectedChapterContentInTransaction(tx, input);
+      await assertExpectedChapterContentInTransaction(tx, input);
       for (const update of updates) {
         await tx.character.update({
           where: { id: update.characterId },
@@ -1275,22 +947,6 @@ export class ChapterArtifactDeltaService {
     return updates.length;
   }
 
-  private async assertExpectedChapterContentInTransaction(
-    tx: Parameters<Parameters<typeof prisma.$transaction>[0]>[0],
-    input: { novelId: string; chapterId: string; expectedChapterContent: string },
-  ): Promise<void> {
-    const current = await tx.chapter.findFirst({
-      where: {
-        id: input.chapterId,
-        novelId: input.novelId,
-        content: input.expectedChapterContent,
-      },
-      select: { id: true },
-    });
-    if (!current) {
-      throw new ChapterArtifactContentVersionError("章节正文版本已变化，已拒绝写入过期章节资产。");
-    }
-  }
 
   private queueRagUpsert(ownerType: RagOwnerType, ownerId: string): void {
     void ragServices.ragIndexService.enqueueUpsert(ownerType, ownerId).catch(() => {
@@ -1298,5 +954,3 @@ export class ChapterArtifactDeltaService {
     });
   }
 }
-
-export const chapterArtifactDeltaService = new ChapterArtifactDeltaService();

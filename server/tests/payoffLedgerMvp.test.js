@@ -169,7 +169,7 @@ test("A1-G20/G22 静态守卫:逾期不进 blocking、增量路径复用统一�
   assert.match(buildersSource, /isSyntheticOverdueBlocker/, "blocking 剥离函数必须存在");
   assert.match(buildersSource, /issue\.code !== "payoff_overdue"/, "blockingLedgerKeys 需排除逾期合成问题");
 
-  const deltaSource = readSource("services", "novel", "runtime", "ChapterArtifactDeltaService.ts");
+  const deltaSource = readSource("services", "novel", "runtime", "artifactSync", "chapterArtifactPayoffConsumer.ts");
   assert.match(deltaSource, /sanitizePayoffLedgerSyncItem/, "增量路径必须复用统一守卫");
   assert.match(deltaSource, /lockedByUser \? previous\.currentStatus/, "增量路径必须跳过锁定项状态覆盖");
 
