@@ -17,6 +17,21 @@
 
 ---
 
+## 2026-10-24 · LOOP-26 · RF-1 第七个文件:`RagIndexService.ts`
+
+- **类别**: 重构(行为不变;主对话执行)
+- **目标**: RF-1 —— 拆分 `server/src/services/rag/RagIndexService.ts`(1242 行,RAG 索引核心服务)。
+- **拆分方案**:
+  1. `ragIndexChunking.ts`:纯分块逻辑(`isCjk`、`normalizeRagPreChunks`、`buildRagChunkCandidates`、`buildRagContextualDocumentMap`);
+  2. `ragIndexSourceLoading.ts`:`buildJoinedText`、`loadRagSourceDocuments`(prisma 读取,注入 `normalizeRagPreChunks`);
+  3. `ragIndexEmbedding.ts`:`embedRagTextsInBatches`(接收 `EmbeddingService` 参数);
+  4. 服务文件保留队列管理、进度快照、`upsertOwnerChunks`/`deleteOwnerChunks` 编排、`syncKnowledgeDocumentIndexStatus`。
+- **行为约束**:并发配置、进度上报阈值(3%)、事务边界不变;公共 API(`RagIndexService` 构造签名、`RagJobCancelledError`、`RagJobProgressSnapshot`、`RagJobSummaryRecord`)不变;`prisma.ragIndexJob` 字符串保留在服务文件。
+- **验证**: server build 通过;定向 `ragChunking`/`ragContextualChunk`/`ragJobListing`/`knowledgeServiceStatus`/`ragCompatibilityBootstrap` **18/18**;server 全量 **1448 测试 / 1436 过 / 0 失败 / 12 跳过**(与基线一致)。client 未动,沿用 LOOP-19 结论。
+- **发布说明**: 纯内部重构,无用户可见变化,按规则跳过。
+- **残留**: RF-1 剩余 1 个文件(`promptRunner.ts`)。
+- **下一步**: **LOOP-27 = RF-1 第八个文件(最后一个)**。
+
 ## 2026-10-24 · LOOP-25 · RF-1 第六个文件:`novelDirectorTakeover.ts`
 
 - **类别**: 重构(行为不变;主对话执行)
