@@ -17,6 +17,21 @@
 
 ---
 
+## 2026-10-24 · LOOP-24 · RF-1 第五个文件:`comicRoutes.ts`(同轮达成 RF-2)
+
+- **类别**: 重构(行为不变;主对话执行)
+- **目标**: RF-1 —— 拆分 `server/src/modules/comic/http/comicRoutes.ts`(1071 行,64 条路由);同轮覆盖 RF-2(comicRoutes HTTP 层拆分)。
+- **拆分方案**:
+  1. `comicRouteSchemas.ts`:跨领域共享的参数与请求体 Schema;
+  2. `comicRouteContext.ts`:模块级服务单例(`ComicProjectService` / `ComicEpisodePlanService` / `ComicPanelScriptService`);
+  3. 8 个领域注册器(每文件一个 `registerXxx(router)`):项目/剧集/事实、分镜脚本、角色与立绘、分镜图片与气泡、成片导出、批量任务、角色资产、场景;
+  4. `comicRoutes.ts` 降为 23 行入口,按**原注册顺序**调用注册器,保持 `export default router`。
+- **行为约束**:路由路径/方法/校验/处理函数体逐行搬运,不改业务逻辑;服务实例仍为模块级单例;领域内专用 Schema 留在注册器文件。
+- **验证**: server build 通过;路由数量守卫 **HEAD 64 条 vs 拆分后 8 文件合计 64 条**;`comicDecoupling` **2/2**;server 全量 **1448 测试 / 1436 过 / 0 失败 / 12 跳过**(与基线一致)。client 未动,沿用 LOOP-19 结论。
+- **发布说明**: 漫画为实验特性的内部重构,无用户可见变化,按规则跳过。
+- **残留**: RF-1 剩余 3 个文件(`promptRunner.ts`、`RagIndexService.ts`、`novelDirectorTakeover.ts`)。
+- **下一步**: **LOOP-25 = RF-1 第六个文件**。
+
 ## 2026-10-24 · LOOP-23 · RF-1 第四个文件:`ChapterArtifactDeltaService.ts`
 
 - **类别**: 重构(行为不变;主对话执行)
