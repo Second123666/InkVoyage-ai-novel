@@ -17,6 +17,23 @@
 
 ---
 
+## 2026-10-24 · LOOP-22 · RF-1 第三个文件:`world.prompts.ts`
+
+- **类别**: 重构(行为不变;主对话执行)
+- **目标**: RF-1 —— 拆分 `server/src/prompting/prompts/world/world.prompts.ts`(1312 行,含 14 个 PromptAsset)。
+- **拆分方案**:
+  1. `world.prompts/worldReference.prompts.ts`:参考灵感、概念卡、概念卡本地化;
+  2. `world.prompts/worldOptions.prompts.ts`:属性选项、深挖问题;
+  3. `world.prompts/worldGeneration.prompts.ts`:分层生成/本地化、结构回填、主题世界、结构分区、公理建议;
+  4. `world.prompts/worldQuality.prompts.ts`:可视化、一致性、导入抽取;
+  5. `world.prompts/worldPromptHelpers.ts`:参考方式标签、宽松对象清洗;
+  6. `world.prompts/index.ts`:显式门面;原文件保留兼容门面,注册表与业务导入路径不变。
+- **行为约束**:14 个资产的 `id/version/taskType/mode/contextPolicy/outputSchema/render` 均未改动;注册表仍按原路径加载。
+- **验证**: server build 通过;全量套件首跑发现 `powerSystemPreference.test.js` 静态守卫仍读取旧文件,已将守卫指向承载提示词的 `worldGeneration.prompts.ts`;修正后 server 全量 **1448 测试 / 1436 过 / 0 失败 / 12 跳过**(与基线一致)。client 未动,沿用 LOOP-19 结论。
+- **发布说明**: 纯内部重构,无用户可见变化,按规则跳过。
+- **残留**: RF-1 剩余 5 个文件(`ChapterArtifactDeltaService.ts`、`promptRunner.ts`、`RagIndexService.ts`、`novelDirectorTakeover.ts`、`comicRoutes.ts`)。
+- **下一步**: **LOOP-23 = RF-1 第四个文件**。
+
 ## 2026-10-23 · LOOP-21 · RF-1 第二个文件:`worldVisualization.ts`
 
 - **类别**: 重构(行为不变;主对话执行)
