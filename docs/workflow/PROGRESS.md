@@ -17,6 +17,23 @@
 
 ---
 
+## 2026-10-24 · LOOP-27 · RF-1 第八个文件(最后一个):`promptRunner.ts`
+
+- **类别**: 重构(行为不变;主对话执行;RF-1 收官)
+- **目标**: RF-1 —— 拆分 `server/src/prompting/core/promptRunner.ts`(1264 行,提示词执行核心)。
+- **拆分方案**:
+  1. `promptRunnerState.ts`:可覆盖 LLM 工厂/结构化调用器状态、访问器与测试注入函数;
+  2. `promptRunnerHelpers.ts`:纯工具(渲染上下文、调用元信息、错误分类、语义重试消息);
+  3. `promptRunnerTelemetry.ts`:完成/失败记录、流式捕获、结果组装;
+  4. `promptRunnerStructured.ts`:结构化解析、后校验、语义重试循环;
+  5. `promptRunnerExecutors.ts`:执行准备与四个执行器;
+  6. `index.ts` 显式门面;原文件保留兼容门面。
+- **关键陷阱与修复**:既有测试用就地赋值注入桩(`promptRunner.runStructuredPrompt = stub`),`export *` 的 CJS getter 绑定不可写,赋值静默失效 → 桩失效、真实 LLM 调用触发、多文件测试以不同错误信息失败(chapterPatchRepair/bookAnalysis/repairStream/pipelineRuntime 等)。stash 对照证实 HEAD 通过、未修复拆分失败;**根因归属本轮**。修复:门面改用显式 `export const`(可写属性),就地替换恢复生效。教训已记 wiki。
+- **验证**: server build 通过;`chapterPatchRepair` 桩注入回归 **11/11**;server 全量 **1448 测试 / 1436 过 / 0 失败 / 12 跳过**;client 未动沿用 LOOP-19 结论。另发现 integration 模式既有失败(`novel.character.castOptions@v2` 注册键与资产 v3 不一致,上游遗留),登记为 BUG-9,与本轮无关。
+- **发布说明**: 纯内部重构,无用户可见变化,按规则跳过。
+- **RF-1 整项完成(8/8)**:`worldStructure.ts`、`worldVisualization.ts`、`world.prompts.ts`、`ChapterArtifactDeltaService.ts`、`comicRoutes.ts`(同轮达成 RF-2)、`novelDirectorTakeover.ts`、`RagIndexService.ts`、`promptRunner.ts`,全部行为不变、全量通过。
+- **下一步**: 按 BACKLOG 顺序 → **LOOP-28 = BUG-9 / RF 后按 P 排的 BUG 项**(见入口建议)。
+
 ## 2026-10-24 · LOOP-26 · RF-1 第七个文件:`RagIndexService.ts`
 
 - **类别**: 重构(行为不变;主对话执行)

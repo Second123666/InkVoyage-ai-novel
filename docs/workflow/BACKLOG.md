@@ -1,6 +1,6 @@
 # 改进待办池 · Backlog
 
-更新:2026-10-23
+更新:2026-10-24
 配套流程:[improvement-workflow.md](improvement-workflow.md) · 进度:[PROGRESS.md](PROGRESS.md)
 
 状态标记:`[ ]` 待做 · `[/]` 进行中 · `[x]` 完成 · `[~]` 冻结/搁置 · `[!]` 降级为实验
@@ -35,7 +35,8 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 24. ~~**LOOP-24 RF-1 第五个文件拆分**(`comicRoutes.ts`)~~ ✅ 完成(2026-10-24):拆为 8 个领域注册器 + schemas/context + 23 行入口,64 条路由与注册顺序不变;同轮达成 RF-2。
 25. ~~**LOOP-25 RF-1 第六个文件拆分**(`novelDirectorTakeover.ts`)~~ ✅ 完成(2026-10-24):拆为 7 个子模块 + index 门面,纯函数无 IO,行为不变。
 26. ~~**LOOP-26 RF-1 第七个文件拆分**(`RagIndexService.ts`)~~ ✅ 完成(2026-10-24):拆出纯分块、源加载、嵌入批处理,服务保留队列与编排,行为不变。
-27. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **RF-1 第八个文件拆分(最后一个,行为不变)**,随后 BUG/UI/OPS 按 P 排。
+27. ~~**LOOP-27 RF-1 第八个文件拆分**(`promptRunner.ts`,最后一个)~~ ✅ 完成(2026-10-24):拆为 state/helpers/telemetry/structured/executors + 可写导出门面;**RF-1 整项完成(8/8)**。核心教训:门面不得用 `export *`(getter 不可写,测试就地桩失效),记 wiki。
+28. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **BUG-9 修复**(integration 陈旧注册键,小),随后 UI/OPS 按 P 排。
     **完成项打勾规则(2026-10-20 所有者要求)**:每轮收尾同步更新 BACKLOG —— 完成项 `[x]` + ✅,进行中 `[/]`,入口建议划线。
 
 ---
@@ -130,10 +131,9 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 
 ## 3. 重构与解耦(RF)
 
-- [/] **RF-1 大文件拆分(逐个成轮,行为不变)** · 每个 S–M · P2
-  进度:已完成 `worldStructure.ts`(1311 → 门面)、`worldVisualization.ts`(1082 → 门面)、`world.prompts.ts`(1312 → 门面,14 个 PromptAsset 按族拆分)、`ChapterArtifactDeltaService.ts`(1302 → 957,拆出 shared 工具与伏笔消费者)、`comicRoutes.ts`(1071 → 23 行入口,8 个领域注册器)、`novelDirectorTakeover.ts`(1158 → 3 行门面,7 个子模块)、`RagIndexService.ts`(1242 → 768,拆出纯分块/源加载/嵌入批处理),均全量通过;见 PROGRESS LOOP-20/21/22/23/24/25/26。
-  剩余清单(>1000 行):`promptRunner.ts`(1264)。
-  要求:一次拆一个;测试守护行为不变;每拆一个记一条 PROGRESS。
+- [x] **RF-1 大文件拆分(逐个成轮,行为不变)** · 每个 S–M · P2(= LOOP-20~27,2026-10-24 整项完成) ✅
+  结果:8 个 >1000 行文件全部拆为职责子模块并保留兼容门面,行为不变、全量通过:`worldStructure.ts`(1311 → 门面)、`worldVisualization.ts`(1082 → 门面)、`world.prompts.ts`(1312 → 门面,14 个 PromptAsset 按族拆分)、`ChapterArtifactDeltaService.ts`(1302 → 957,拆出 shared 工具与伏笔消费者)、`comicRoutes.ts`(1071 → 23 行入口,8 个领域注册器,同轮达成 RF-2)、`novelDirectorTakeover.ts`(1158 → 3 行门面,7 个子模块)、`RagIndexService.ts`(1242 → 768,拆出纯分块/源加载/嵌入批处理)、`promptRunner.ts`(1264 → 可写导出门面 + 5 个子模块)。
+  核心教训:promptRunner 门面必须用显式 `export const` 而非 `export *`(getter 不可写会让测试就地桩静默失效),已记 wiki `prompts/prompt-runner-module.md`。各轮计划见 `docs/plans/rf1-*.md`,模块边界 wiki 见 architecture/rag/prompts 对应页。
 
 - [x] **RF-2 comicRoutes HTTP 层拆分** · S · P2(= LOOP-24,2026-10-24 完成) ✅
   结果:与 RF-1 第五轮合并执行 —— 拆为 8 个领域注册器 + `comicRouteSchemas`/`comicRouteContext` + 23 行入口;64 条路由与注册顺序不变,全量测试通过。计划 `docs/plans/rf1-comic-routes-split.md`;契约见 wiki `architecture/comic-http-module.md`。
@@ -191,6 +191,11 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 - [ ] **BUG-8 混合视图隐藏行与 overview 计数不对齐** · S · P3(LOOP-4 审计 INC-17,low 未核)
   被关联 workflow 隐藏的 pipeline 行在"全部"视图不可见、按 kind 筛选却可见;overview 原始计数含这些行,列表条数对不上。
   验收:计数与可见性规则同源(同查询或同过滤),切换筛选不出现"任务凭空出现/消失"。
+
+- [ ] **BUG-9 prompt 注册表 castOptions 注册键与资产版本不一致** · S · P3(LOOP-27 审计发现,上游遗留)
+  `promptAssetLoaderEntries.ts` 声明 `novel.character.castOptions@v2`,但 `characterPreparation.prompts.ts` 的资产实际版本是 v3。注册表水合时把 v2 键重映射为 v3 并删除 v2 键,导致 `getRegisteredPromptAsset("novel.character.castOptions","v2")` 返回 null;`prompting.test.js`(integration 模式)两条用例因此失败。
+  修法方向:注册键与测试断言升级到 v3(或按项目 prompt 版本治理流程迁移),不回退资产版本。
+  验收:`node --test tests/prompting.test.js` 全绿(含 registry keys 列表与 castOptions 断言)。
 
 ## 5. 前端 UI 改进(UI)
 
