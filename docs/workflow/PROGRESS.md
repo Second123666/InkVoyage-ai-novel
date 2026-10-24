@@ -17,6 +17,21 @@
 
 ---
 
+## 2026-10-24 · LOOP-23 · RF-1 第四个文件:`ChapterArtifactDeltaService.ts`
+
+- **类别**: 重构(行为不变;主对话执行)
+- **目标**: RF-1 —— 拆分 `server/src/services/novel/runtime/ChapterArtifactDeltaService.ts`(1302 行,章节生产核心链路)。
+- **拆分方案**:
+  1. `artifactSync/chapterArtifactDelta.shared.ts`:共享类型、角色解析/知识边界/账本键/上下文文本工具、角色名册、章节引用解析、`assertExpectedChapterContentInTransaction` 版本守卫;
+  2. `artifactSync/chapterArtifactPayoffConsumer.ts`:`applyPayoffDeltas` 伏笔账本增量消费者(显式函数);
+  3. 服务文件保留公共类型/消费者枚举、提取与分发编排、摘要/快照/角色资源/动态/知识/心智/对话影响与 RAG 队列;
+  4. `mergeKnowledgeBoundaryState` 继续由服务文件 re-export,外部公共 API 不变。
+- **行为约束**:`CHAPTER_ARTIFACT_CONSUMERS` 顺序、事务边界、`expectedChapterContent` 栅栏、伏笔 `manualLocked` 语义与错误信息均未改动。
+- **验证**: server build 通过;定向 `chapterRuntimeCoordinator` **14/14**;全量首跑发现 `payoffLedgerMvp` 静态守卫仍读旧文件,已改指伏笔消费者模块;修正后 server 全量 **1448 测试 / 1436 过 / 0 失败 / 12 跳过**(与基线一致)。client 未动,沿用 LOOP-19 结论。
+- **发布说明**: 纯内部重构,无用户可见变化,按规则跳过。
+- **残留**: RF-1 剩余 4 个文件(`promptRunner.ts`、`RagIndexService.ts`、`novelDirectorTakeover.ts`、`comicRoutes.ts`)。
+- **下一步**: **LOOP-24 = RF-1 第五个文件**。
+
 ## 2026-10-24 · LOOP-22 · RF-1 第三个文件:`world.prompts.ts`
 
 - **类别**: 重构(行为不变;主对话执行)

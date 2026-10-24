@@ -31,7 +31,8 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 20. ~~**LOOP-20 RF-1 首个文件拆分**(`worldStructure.ts`)~~ ✅ 完成(2026-10-23):按责任拆为 shared/normalize/legacy/projection + 门面,行为不变。
 21. ~~**LOOP-21 RF-1 第二个文件拆分**(`worldVisualization.ts`)~~ ✅ 完成(2026-10-23):按 shared/faction/geography/payload 拆分,行为不变。
 22. ~~**LOOP-22 RF-1 第三个文件拆分**(`world.prompts.ts`)~~ ✅ 完成(2026-10-24):按提示词族拆分,14 个资产与注册路径不变;全量通过。
-23. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **RF-1 第四个大文件拆分(行为不变)**,随后 BUG/UI/OPS 按 P 排。
+23. ~~**LOOP-23 RF-1 第四个文件拆分**(`ChapterArtifactDeltaService.ts`)~~ ✅ 完成(2026-10-24):拆出 shared 工具与伏笔消费者,公共 API 与行为不变;全量通过。
+24. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **RF-1 第五个大文件拆分(行为不变)**,随后 BUG/UI/OPS 按 P 排。
     **完成项打勾规则(2026-10-20 所有者要求)**:每轮收尾同步更新 BACKLOG —— 完成项 `[x]` + ✅,进行中 `[/]`,入口建议划线。
 
 ---
@@ -127,8 +128,8 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 ## 3. 重构与解耦(RF)
 
 - [/] **RF-1 大文件拆分(逐个成轮,行为不变)** · 每个 S–M · P2
-  进度:已完成 `worldStructure.ts`(1311 → 门面)、`worldVisualization.ts`(1082 → 门面)、`world.prompts.ts`(1312 → 门面,14 个 PromptAsset 按族拆分,全量通过);见 PROGRESS LOOP-20/21/22。
-  剩余清单(>1000 行):`ChapterArtifactDeltaService.ts`(1302)、`promptRunner.ts`(1264)、`RagIndexService.ts`(1242)、`novelDirectorTakeover.ts`(1158)、`comicRoutes.ts`(1071)。
+  进度:已完成 `worldStructure.ts`(1311 → 门面)、`worldVisualization.ts`(1082 → 门面)、`world.prompts.ts`(1312 → 门面,14 个 PromptAsset 按族拆分)、`ChapterArtifactDeltaService.ts`(1302 → 957,拆出 shared 工具与伏笔消费者),均全量通过;见 PROGRESS LOOP-20/21/22/23。
+  剩余清单(>1000 行):`promptRunner.ts`(1264)、`RagIndexService.ts`(1242)、`novelDirectorTakeover.ts`(1158)、`comicRoutes.ts`(1071)。
   要求:一次拆一个;测试守护行为不变;每拆一个记一条 PROGRESS。
 
 - [ ] **RF-2 comicRoutes HTTP 层拆分** · S · P2(可与 FEAT-1 同轮或紧随其后)。
