@@ -17,6 +17,25 @@
 
 ---
 
+## 2026-10-24 · LOOP-25 · RF-1 第六个文件:`novelDirectorTakeover.ts`
+
+- **类别**: 重构(行为不变;主对话执行)
+- **目标**: RF-1 —— 拆分 `server/src/services/novel/director/runtime/novelDirectorTakeover.ts`(1158 行,导演接管决策/就绪模块,纯函数无 IO)。
+- **拆分方案**:
+  1. `takeoverTypes.ts`:共享类型 + 阶段/入口元信息;
+  2. `takeoverInput.ts`:种子素材判定、构思/候选、`buildDirectorTakeoverInput`;
+  3. `takeoverSnapshot.ts`:资产快照就绪谓词;
+  4. `takeoverMapping.ts`:阶段/入口/工作流映射与 `buildSkipSteps`;
+  5. `takeoverPlan.ts`:执行延续、阶段计划、自动执行计划、`resolveDirectorTakeoverPlan`;
+  6. `takeoverReadiness.ts`:各步骤就绪度、预览、`buildDirectorTakeoverReadiness`、`assertDirectorTakeoverPhaseAvailable`;
+  7. `takeoverBookSpec.ts`:`buildTakeoverBookSpec`;
+  8. `index.ts` 显式门面只导出原公共 API;原文件保留兼容门面。
+- **行为约束**:判断阈值、文案、跳步语义、计划解析逻辑逐行搬运;门面只导出原公共 API,内部谓词与元信息不外泄;保持纯函数(无 IO、无状态)。
+- **验证**: server build 通过;定向 `novelDirectorTakeover` + `directorTakeoverExecutionContract` **17/17**;server 全量 **1448 测试 / 1436 过 / 0 失败 / 12 跳过**(与基线一致)。client 未动,沿用 LOOP-19 结论。
+- **发布说明**: 纯内部重构,无用户可见变化,按规则跳过。
+- **残留**: RF-1 剩余 2 个文件(`promptRunner.ts`、`RagIndexService.ts`)。
+- **下一步**: **LOOP-26 = RF-1 第七个文件**。
+
 ## 2026-10-24 · LOOP-24 · RF-1 第五个文件:`comicRoutes.ts`(同轮达成 RF-2)
 
 - **类别**: 重构(行为不变;主对话执行)
