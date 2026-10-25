@@ -27,7 +27,7 @@
 - **测试桩静默失效**:症状是测试中出现真实 LLM 调用日志(`[structured.invoke] invoke_start ... baseURL=https://api...`)或错误信息与桩预期不符;检查门面是否被改回 `export *`。
 - **语义重试不生效**:检查 `promptRunnerStructured.ts` 的重试循环是否仍通过 `getPromptRunnerStructuredInvoker()` 取调用器(而不是捕获初值)。
 - **循环依赖**:helpers/telemetry 不得 import executors;新增引用时先确认方向。
-- **integration 模式陈旧用例**:`novel.character.castOptions@v2` 注册键与资产实际版本 v3 不一致(上游遗留,见 BUG-9),导致 `prompting.test.js` 在 integration 模式下失败;与本模块拆分无关。
+- **注册键与资产版本不一致**:历史上多个注册键落后于资产实际版本(水合时键被重映射,旧键失效)。BUG-9 已把 8 个键对齐到资产版本并让 `prompting.test.js` 恢复全绿;新增提示词时注册键必须与资产 `id@version` 完全一致,可用全量扫描脚本(遍历 `promptAssetLoaderEntries` 校验 `id@version === key`)在 CI 前自查。
 
 ## 相关模块
 

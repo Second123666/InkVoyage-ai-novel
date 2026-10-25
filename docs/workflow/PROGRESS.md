@@ -17,6 +17,20 @@
 
 ---
 
+## 2026-10-25 · LOOP-28 · BUG-9 注册键与资产版本对齐
+
+- **类别**: 缺陷修复(主对话执行)
+- **目标**: BUG-9 —— `promptAssetLoaderEntries` 的注册键落后于资产实际版本,导致 `getRegisteredPromptAsset` 对旧键返回 null、`prompting.test.js`(integration 模式)失败。
+- **现状审计**: LOOP-27 修复 `prompting.test.js` 后暴露第二处失败,进而全量扫描 161 个注册键,发现 **8 处** 不一致(上游资产升版后注册键未同步):`novel.character.castOptions`(v2→v3)、`novel.chapterHook.generate`(v1→v2)、`novel.character.castAuto`(v1→v2)、`novel.character.castAuto.members`(v1→v2)、`novel.character.supplemental`(v1→v2)、`novel.create.resource_recommendation`(v1→v2)、`style.detection`(v1→v2)、`style.rewrite`(v1→v2)、`novel.world.generate_from_theme`(v2→v3)。
+- **改动**:
+  1. 注册键全部对齐到资产实际 `id@version`;
+  2. `prompting.test.js` 断言同步更新(castOptions v3、supplemental v2);
+  3. 无任何程序化调用引用旧键(已核),旧键在水合时本就被重映射删除,更新为纯修复。
+- **验证**: server build 0 错误;全量扫描 **161 键 0 不一致**;`prompting.test.js` **49/49**;`prompting-governance` + `promptWorkbench` 中 governance 有 1 条**既有**违规(`ComicFactService.ts:39` 内联 SystemMessage,上游 comic 提交引入,登记 BUG-10,与本轮无关);server 全量 **1448 / 1436 过 / 0 失败 / 12 跳过**。client 未动。
+- **发布说明**: 内部注册表修复,无用户可见变化,按规则跳过。
+- **残留**: BUG-10(comic 内联提示词违规)待处理。
+- **下一步**: **LOOP-29 = BUG-10**(把 comic 事实提取提示词迁入 prompting 注册表或纳入允许集)。
+
 ## 2026-10-24 · LOOP-27 · RF-1 第八个文件(最后一个):`promptRunner.ts`
 
 - **类别**: 重构(行为不变;主对话执行;RF-1 收官)
