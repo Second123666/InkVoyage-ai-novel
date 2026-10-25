@@ -17,6 +17,21 @@
 
 ---
 
+## 2026-10-25 · LOOP-33 · UI-1 第三批 B:设置页语义 token 收敛
+
+- **类别**: UI(设计系统落地;主对话执行)
+- **目标**: UI-1 第三批剩余 —— 设置模块硬编码色值迁移到语义 token,深浅两套主题一致。
+- **改动**:
+  1. `ProviderStatusCard`:可用徽标 `bg-emerald-600 text-white` → `bg-success text-success-foreground`;
+  2. `SettingsReadinessCard`:就绪/检查/进行中/警告图标与文案 → `text-success`/`text-warning`/`text-info`;
+  3. `ModelRoutesPage` `RouteStatusDot`:健康/失败/检查/空闲 → `bg-success`/`bg-destructive`/`bg-warning`/`bg-muted-foreground/40`;
+  4. `AutoDirectorIssuePolicyCard`、`AutoDirectorPendingReviewAutoPromotionCard`、`ProviderConfigDialog`、`StyleEngineRuntimeSettingsCard`:8 处 amber 警示面 → `border-warning/40 bg-warning/10(/15) text-warning`;
+  5. 复扫设置模块:**0 处**调色板残留。
+- **验证**: client typecheck 0 错误;新增守卫 `settingsVisualContracts.test.js`(扫描设置模块全部 tsx,禁止调色板硬编码色/装饰渐变/纯黑白类名)1/1;client **239/239**。server 未动。
+- **发布说明**: 视觉 token 迁移无交互变化,深色主题对比度提升属细微改进,按规则跳过(可与 UI-2 主题层一起验收)。
+- **残留**: UI-1 第三批剩余:世界三页结构对齐、`/settings/model-routes` 组织、`/style-engine` 结构终态、`/anti-ai-rules` 结构对齐;之后第四~六批。
+- **下一步**: **LOOP-34 = UI-1 第三批剩余的结构对齐**(或按入口建议进入 UI-5 开源 Showcase,S–M/P2)。
+
 ## 2026-10-25 · LOOP-32 · BUG-5 任务阶段词表中英混写收敛
 
 - **类别**: 缺陷修复(主对话执行)
