@@ -31,6 +31,7 @@ const routedPaths = [
   "/story-modes",
   "/titles",
   "/prompt-workbench",
+  "/settings/appearance",
   "/settings/models",
   "/settings/model-routes",
   "/settings/director",
