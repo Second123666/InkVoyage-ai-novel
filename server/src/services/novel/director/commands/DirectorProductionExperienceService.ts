@@ -6,7 +6,7 @@ import { buildFullBookAutopilotExecutionPlan } from "@ai-novel/shared/types/nove
 import { buildFullDirectorAutoApprovalConfig } from "@ai-novel/shared/types/autoDirectorApproval";
 import { prisma } from "../../../../db/prisma";
 import { AppError } from "../../../../middleware/errorHandler";
-import { parseSeedPayload } from "../../workflow/novelWorkflow.shared";
+import { NOVEL_WORKFLOW_STAGE_LABELS, parseSeedPayload } from "../../workflow/novelWorkflow.shared";
 import {
   applyDirectorRunModeContract,
   type DirectorWorkflowSeedPayload,
@@ -96,7 +96,9 @@ export class DirectorProductionExperienceService {
           data: {
             seedPayloadJson: JSON.stringify(nextSeed),
             status: "waiting_approval",
-            currentStage: "chapter_execution",
+            // BUG-5:持久化值统一为中文展示标签(与 NOVEL_WORKFLOW_STAGE_LABELS 写入点一致),
+            // 步骤解析侧(resolveStageIndex)同时兼容 key/label,存量中英混写均可命中。
+            currentStage: NOVEL_WORKFLOW_STAGE_LABELS.chapter_execution,
             currentItemKey: "chapter_batch_ready",
             currentItemLabel: "已选择创作界面，准备开始全书生产",
             checkpointType: "chapter_batch_ready",

@@ -154,8 +154,14 @@ function resolveStageIndex(
   if (!currentStage) {
     return 0;
   }
-  const index = definitions.findIndex((item) => item.key === currentStage);
-  return index >= 0 ? index : 0;
+  const indexByKey = definitions.findIndex((item) => item.key === currentStage);
+  if (indexByKey >= 0) {
+    return indexByKey;
+  }
+  // BUG-5:历史持久化值混有中文展示标签,按 label 再解析一次,
+  // 保证中英混写都能命中正确步骤索引。
+  const indexByLabel = definitions.findIndex((item) => item.label === currentStage);
+  return indexByLabel >= 0 ? indexByLabel : 0;
 }
 
 export function buildSteps(
