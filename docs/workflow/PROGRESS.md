@@ -17,6 +17,19 @@
 
 ---
 
+## 2026-10-25 · LOOP-31 · BUG-6 + BUG-8 任务中心两处一致性修复
+
+- **类别**: 缺陷修复(主对话执行)
+- **目标**: BUG-6(拆书步骤词表缺口)与 BUG-8(混合视图隐藏行与 overview 计数不对齐)。
+- **改动**:
+  1. **BUG-6**:`BOOK_ANALYSIS_STEPS` 补齐 `loading_cache`(读取缓存)与 `generating_overview`(生成总览),步骤流改为 排队→读取缓存→提取笔记→生成总览→生成章节→收尾,与 `BookAnalysisStage` 全集一致;拆书中段 currentStage 不再回落到第 0 步;
+  2. **BUG-6 产品语义核实**:draft 状态在拆书专属页面可见(`listAnalyses` 仅过滤 archived),archived 为用户显式归档动作、全站隐藏 —— 语义已明确,无需改;
+  3. **BUG-8**:`parseLinkedPipelineJobId` 移入 `taskCenterVisibility`(单一来源);新增 `collectLinkedPipelineJobIdsFromRows` 供 overview 复用同一代理状态规则;`listTasks` 移除 kind=novel_pipeline 的隐藏旁路(两种视图同一条规则);overview 的 `generationJob.groupBy` 排除被代理行。
+- **验证**: server build 0 错误;`bookAnalysisSteps` 守卫 2/2(词表覆盖全阶段 + buildSteps 索引正确)、`taskCenterVisibility` 守卫 4/4(含静态断言 overview 排除与无旁路);server 全量 **1453 / 1441 过 / 0 失败 / 12 跳过**。client 未动。
+- **发布说明**: 运行记录的拆书中段进度与计数一致性属用户可见修复,已记 release-notes/README(2026-10-25)。
+- **残留**: BUG-5(任务阶段词表中英分裂,M/P2,需独立一轮)、BUG-7(需所有者产品语义决策)。
+- **下一步**: **LOOP-32 = BUG-5**(任务阶段词表统一)或按入口建议进入 UI/OPS 线。
+
 ## 2026-10-25 · LOOP-30 · BUG-3 + BUG-4 小项清理
 
 - **类别**: 缺陷修复(主对话执行)

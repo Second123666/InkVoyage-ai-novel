@@ -39,7 +39,8 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 28. ~~**LOOP-28 BUG-9 注册键对齐**~~ ✅ 完成(2026-10-25):全量扫描发现并修复 8 处注册键与资产版本不一致,`prompting.test.js` 恢复 49/49 全绿;新发现 BUG-10。
 29. ~~**LOOP-29 BUG-10 comic 内联提示词迁移**~~ ✅ 完成(2026-10-25):`factExtractionPrompt` 迁入 prompting 并注册,governance integration 恢复全绿。
 30. ~~**LOOP-30 BUG-3 + BUG-4 小项清理**~~ ✅ 完成(2026-10-25):pnpm WARN 消失;移动端外观页专属落点齐全,238/238 + 1448/0 全绿。
-31. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **BUG-6**(拆书步骤词表,S/P2),随后 BUG-8、BUG-5(需更大改动);BUG-7 需所有者产品语义决策后再动。
+31. ~~**LOOP-31 BUG-6 + BUG-8**~~ ✅ 完成(2026-10-25):拆书步骤词表补齐全阶段;任务中心隐藏行与 overview 计数同源;守卫 6 条,全量 1453/0。
+32. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **BUG-5**(任务阶段词表中英分裂,M/P2),或转入 UI/OPS 线;BUG-7 需所有者产品语义决策后再动。
     **完成项打勾规则(2026-10-20 所有者要求)**:每轮收尾同步更新 BACKLOG —— 完成项 `[x]` + ✅,进行中 `[/]`,入口建议划线。
 
 ---
@@ -180,18 +181,16 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
   `NovelWorkflowTask.currentStage` 持久化中文标签,通用步骤表用英文键,且存在英文写入混入(如 `chapter_execution`);list 路径步骤索引可能回落 0。需独立一轮统一阶段词表(持久化值 ↔ 步骤键 ↔ 展示标签的映射收敛),涉及写入点迁移。
   验收:任一 currentStage 值在步骤解析中命中正确索引;守卫测试覆盖中英混写。
 
-- [ ] **BUG-6 拆书任务步骤词表缺口** · S · P2(LOOP-4 审计 INC-9,partly)
-  `BOOK_ANALYSIS_STEPS` 缺 `loading_cache`/`generating_overview` 阶段键,拆书中段进度停在第一步;draft/archived 静默丢弃无归档可见性说明。
-  验收:拆书全阶段进度正确推进;draft/archived 处置有明确产品语义(过滤并说明,或单独呈现)。
+- [x] **BUG-6 拆书任务步骤词表缺口** · S · P2(= LOOP-31,2026-10-25 完成) ✅
+  结果:`BOOK_ANALYSIS_STEPS` 补齐 `loading_cache`/`generating_overview`,步骤流与 `BookAnalysisStage` 全集一致,中段进度不再回落第 0 步;产品语义核实:draft 在拆书专属页面可见,archived 为显式归档全站隐藏 —— 均有明确语义,无需改。守卫 `bookAnalysisSteps.test.js`(2 条:词表覆盖 + 索引正确)。
 
 - [ ] **BUG-7 命令入队无条件清除待手动恢复标记** · S · P1(LOOP-4 审计 INC-3,partly;**需所有者产品语义决策**)
   `DirectorCommandService.markCommandAcceptedOnTask` 在任何导演命令入队时把 `pendingManualRecovery` 清回 false 并置 queued;agent 工具 enqueueContinueCommand 属可达路径。与"仅显式用户恢复可清除 pmr"的 AGENTS 契约存在张力。
   待决策:哪些入队路径可视作"显式恢复"(用户 UI 动作 / 用户批准的 agent 运行 / 后台自动)?决策后加守卫并在非豁免路径保留 pmr。
   验收:决策落地 + 守卫测试锁定允许清除的路径清单。
 
-- [ ] **BUG-8 混合视图隐藏行与 overview 计数不对齐** · S · P3(LOOP-4 审计 INC-17,low 未核)
-  被关联 workflow 隐藏的 pipeline 行在"全部"视图不可见、按 kind 筛选却可见;overview 原始计数含这些行,列表条数对不上。
-  验收:计数与可见性规则同源(同查询或同过滤),切换筛选不出现"任务凭空出现/消失"。
+- [x] **BUG-8 混合视图隐藏行与 overview 计数不对齐** · S · P3(= LOOP-31,2026-10-25 完成) ✅
+  结果:`parseLinkedPipelineJobId` 移入 `taskCenterVisibility` 单一来源;新增 `collectLinkedPipelineJobIdsFromRows` 供 overview 复用同一代理状态规则;`listTasks` 移除 kind=novel_pipeline 隐藏旁路;overview 的 pipeline 计数排除被代理行。切换筛选不再"凭空出现/消失"。守卫 4 条(含静态断言)。
 
 - [x] **BUG-9 prompt 注册表注册键与资产版本不一致** · S · P3(= LOOP-28,2026-10-25 完成) ✅
   结果:全量扫描 161 个注册键发现 8 处落后于资产实际版本(castOptions/chapterHook.generate/castAuto/castAuto.members/supplemental/resource_recommendation/style.detection/style.rewrite/world.generate_from_theme),全部对齐;`prompting.test.js` 恢复 **49/49**;扫描脚本零不一致。教训记 wiki `prompts/prompt-runner-module.md`。
