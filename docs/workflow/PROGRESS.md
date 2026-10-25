@@ -17,6 +17,20 @@
 
 ---
 
+## 2026-10-25 · LOOP-39 · UI-1 第五批:帮助页主题化(新手任务导航)
+
+- **类别**: UI(设计系统落地;主对话执行)
+- **目标**: UI-1 第五批 —— `/help` 从硬编码深色 Hero 转为随主题适配的新手任务导航头。
+- **审计结论**:`/help` 结构**上游已达标**(创作向导 Hero 由真实 journey 驱动 + 第一本书路线里程碑 + 可选增强 + 主行动推荐,已是任务导航而非营销 Hero)。真实缺口是 **Hero 硬编码**:`bg-[#122033]` 深色底 + 白字 + `sky` 装饰光斑,不随明暗主题;里程碑/完成态用 emerald/amber 调色板。
+- **改动**:
+  1. Hero 改为 `border-primary/15 bg-primary/[0.05]` 主题自适应表面,移除硬编码 hex 与装饰光斑(无渐变规范);徽标/文案/当前作品卡改语义 token;
+  2. 里程碑状态 `border-success bg-success` / `border-warning bg-warning`,需处理行 `bg-warning/10`;完成态区块 `border-success/30 bg-success/10`;错误图标 `text-warning`;
+  3. 守卫 `helpPageVisualContracts.test.js`(3 条:无硬编码色/任务导航结构/语义状态 token)。
+- **验证**: client typecheck 0 错误;守卫 3/3;client **259/259**。server 未动。
+- **发布说明**: 帮助页头部随明暗主题适配,深色模式不再出现突兀的固定深色横幅,用户可见,已记 release-notes/README(2026-10-25)。
+- **残留**: UI-1 第五批其余(preview 阅读进度、story-modes 资产库、章节编辑器收敛)待后续;chat-legacy 仅兼容维护(不擅自删路由)。
+- **下一步**: **LOOP-40 = UI-1 第五批其余**(或 UI-5 开源 Showcase);BUG-7 / UI-6 仍等所有者决策。
+
 ## 2026-10-25 · LOOP-38 · UI-1 第四批:短剧/漫画状态色语义化
 
 - **类别**: UI(设计系统落地;主对话执行)
