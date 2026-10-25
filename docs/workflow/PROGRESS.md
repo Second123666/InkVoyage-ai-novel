@@ -17,6 +17,19 @@
 
 ---
 
+## 2026-10-25 · LOOP-35 · UI-1 第三批 D:模型路由按任务分组
+
+- **类别**: UI(设计系统落地;主对话执行)
+- **目标**: UI-1 第三批 —— 模型路由页按「开书、规划、正文、审核、资料处理」组织,提升可读性与修复动作定位。
+- **改动**:
+  1. `modelRouteLabels.ts` 新增 `MODEL_ROUTE_GROUP_ORDER`(开书设定/规划推进/正文生产/审校把关/资料加工/灵感对话)+ `resolveModelRouteGroup` 纯函数;11 个任务类型全部归位,未知类型回退规划推进;灵感陪写单列以免语义错位;
+  2. `ModelRoutesPage` 抽出 `renderRouteCard`,路由卡按分组顺序渲染,每组带标题与项数;
+  3. 守卫 `modelRouteGroups.test.js`(5 条:全类型覆盖/语义归位/未知回退/具名分组存在/页面接入)。
+- **验证**: client typecheck 0 错误;守卫 5/5;client **249/249**。server 未动。
+- **发布说明**: 模型路由管理页按创作流程分组展示,用户可见,已记 release-notes/README(2026-10-25)。
+- **残留**: UI-1 第三批剩余:`/worlds/generator` 分步工作区、`/style-engine` 结构终态、`/anti-ai-rules` 结构对齐。
+- **下一步**: **LOOP-36 = UI-1 第三批剩余**,或按入口建议进入 UI-5 开源 Showcase。
+
 ## 2026-10-25 · LOOP-34 · UI-1 第三批 C:世界样本卡状态与下一步引导
 
 - **类别**: UI(设计系统落地;主对话执行)
