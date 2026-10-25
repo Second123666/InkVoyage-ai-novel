@@ -7,7 +7,7 @@ import type {
 } from "@ai-novel/shared/types/styleEngine";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import OpenInCreativeHubButton from "@/components/creativeHub/OpenInCreativeHubButton";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import { getNovelDetail, getNovelList } from "@/api/novel";
 import { queryKeys } from "@/api/queryKeys";
 import {
@@ -46,6 +46,27 @@ import {
 import { normalizeWritingFormulaMode } from "./writingFormulaV2.shared";
 
 type WorkspaceDialog = null | "editor" | "workbench" | "clean";
+
+const WORKSPACE_VIEW_META: Record<
+  Exclude<WorkspaceDialog, null>,
+  { title: string; description: string; tabLabel: string }
+> = {
+  editor: {
+    title: "编辑当前写法",
+    description: "这里专门整理写法本身的设定说明。应用测试和去 AI 味已经拆到独立入口，避免混在一个窗口里。",
+    tabLabel: "编辑写法",
+  },
+  workbench: {
+    title: "当前写法的应用与测试",
+    description: "这里专门处理绑定到小说、章节和试写验证，不修改写法字段本身。",
+    tabLabel: "应用测试",
+  },
+  clean: {
+    title: "去 AI 味",
+    description: "这里专门做正文检测和修正，不进入写法字段编辑，也不混入绑定和试写操作。",
+    tabLabel: "去 AI 味",
+  },
+};
 
 export default function WritingFormulaPage() {
   const llm = useLLMStore();
@@ -567,25 +588,42 @@ export default function WritingFormulaPage() {
         onOpenTaskCenter={(task) => navigate(`/tasks?kind=style_extraction&id=${task.id}`)}
       />
 
-      <Dialog
-        open={activeWorkspaceDialog === "editor"}
-        onOpenChange={(open) => {
-          setActiveWorkspaceDialog(open ? "editor" : null);
-          if (!open) {
-            setEditorFocusIntent(null);
-          }
-        }}
-      >
-        <DialogContent ref={editorDialogRef} className="!flex h-[88vh] w-[min(1180px,96vw)] max-w-none flex-col gap-0 overflow-hidden p-0">
-          <DialogHeader className="border-b px-6 py-5 pr-14">
-            <DialogTitle>编辑当前写法</DialogTitle>
-            <DialogDescription>
-              这里专门整理写法本身的设定说明。应用测试和去 AI 味已经拆到独立入口，避免混在一个窗口里。
-            </DialogDescription>
-          </DialogHeader>
+      {activeWorkspaceDialog ? (
+        <section
+          ref={activeWorkspaceDialog === "editor" ? editorDialogRef : undefined}
+          className="flex flex-col overflow-hidden rounded-3xl border border-border/40 bg-card/70"
+          aria-label="写法工作区"
+        >
+          <div className="flex flex-wrap items-start justify-between gap-3 border-b border-border/40 px-5 py-4">
+            <div className="min-w-0 space-y-1">
+              <div className="text-base font-semibold text-foreground">
+                {WORKSPACE_VIEW_META[activeWorkspaceDialog].title}
+              </div>
+              <div className="text-xs text-muted-foreground">
+                {WORKSPACE_VIEW_META[activeWorkspaceDialog].description}
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {(Object.keys(WORKSPACE_VIEW_META) as Array<Exclude<WorkspaceDialog, null>>).map((view) => (
+                <Button
+                  key={view}
+                  size="sm"
+                  variant={activeWorkspaceDialog === view ? "default" : "outline"}
+                  onClick={() => setActiveWorkspaceDialog(view)}
+                >
+                  {WORKSPACE_VIEW_META[view].tabLabel}
+                </Button>
+              ))}
+              <Button size="sm" variant="ghost" onClick={() => setActiveWorkspaceDialog(null)}>
+                关闭工作区
+              </Button>
+            </div>
+          </div>
 
-          <div className="h-full min-h-0 overflow-hidden p-6 pt-4">
-            <WritingFormulaAdvancedWorkspace
+          <div className="min-h-[70vh] overflow-auto p-5">
+            {activeWorkspaceDialog === "editor" ? (
+              <div>
+<WritingFormulaAdvancedWorkspace
               antiAiRules={antiAiRules}
               selectedProfile={selectedProfile}
               editor={editor}
@@ -617,24 +655,11 @@ export default function WritingFormulaPage() {
               onSave={() => saveProfileMutation.mutate()}
               onDelete={() => selectedProfile && deleteProfileMutation.mutate(selectedProfile.id)}
             />
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog
-        open={activeWorkspaceDialog === "workbench"}
-        onOpenChange={(open) => setActiveWorkspaceDialog(open ? "workbench" : null)}
-      >
-        <DialogContent className="!flex h-[84vh] w-[min(1080px,94vw)] max-w-none flex-col gap-0 overflow-hidden p-0">
-          <DialogHeader className="border-b px-6 py-5 pr-14">
-            <DialogTitle>当前写法的应用与测试</DialogTitle>
-            <DialogDescription>
-              这里专门处理绑定到小说、章节和试写验证，不修改写法字段本身。
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="h-full min-h-0 overflow-auto p-6 pt-4">
-            <WritingFormulaWorkbenchPanel
+              </div>
+            ) : null}
+            {activeWorkspaceDialog === "workbench" ? (
+              <div>
+<WritingFormulaWorkbenchPanel
               selectedProfileId={selectedProfileId}
               bindingForm={bindingForm}
               bindings={bindings}
@@ -650,24 +675,11 @@ export default function WritingFormulaPage() {
               onTestWriteFormChange={(patch) => setTestWriteForm((prev) => ({ ...prev, ...patch }))}
               onRunTestWrite={() => testWriteMutation.mutate()}
             />
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog
-        open={activeWorkspaceDialog === "clean"}
-        onOpenChange={(open) => setActiveWorkspaceDialog(open ? "clean" : null)}
-      >
-        <DialogContent className="!flex h-[84vh] w-[min(980px,92vw)] max-w-none flex-col gap-0 overflow-hidden p-0">
-          <DialogHeader className="border-b px-6 py-5 pr-14">
-            <DialogTitle>去 AI 味</DialogTitle>
-            <DialogDescription>
-              这里专门做正文检测和修正，不进入写法字段编辑，也不混入绑定和试写操作。
-            </DialogDescription>
-          </DialogHeader>
-
-          <div className="h-full min-h-0 overflow-auto p-6 pt-4">
-            <WritingFormulaCleanPanel
+              </div>
+            ) : null}
+            {activeWorkspaceDialog === "clean" ? (
+              <div>
+<WritingFormulaCleanPanel
               selectedProfile={selectedProfile}
               detectInput={detectInput}
               detectionReport={detectionMutation.data?.data ?? null}
@@ -678,9 +690,11 @@ export default function WritingFormulaPage() {
               onDetect={() => detectionMutation.mutate()}
               onRewrite={() => rewriteMutation.mutate()}
             />
+              </div>
+            ) : null}
           </div>
-        </DialogContent>
-      </Dialog>
+        </section>
+      ) : null}
     </div>
   );
 }
