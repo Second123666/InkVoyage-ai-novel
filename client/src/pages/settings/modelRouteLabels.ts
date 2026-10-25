@@ -46,3 +46,36 @@ export const MODEL_ROUTE_LABELS: Record<ModelRouteTaskType, { title: string; des
     description: "处理日常对话，并把结果整理成创作时能直接理解的内容。",
   },
 };
+
+// UI-1 第三批 D · 模型路由分组(LOOP-35)
+// 按 rollout 计划「开书、规划、正文、审核、资料处理」组织,灵感陪写单列以免语义错位。
+export const MODEL_ROUTE_GROUP_ORDER = [
+  "开书设定",
+  "规划推进",
+  "正文生产",
+  "审校把关",
+  "资料加工",
+  "灵感对话",
+] as const;
+
+export type ModelRouteGroup = (typeof MODEL_ROUTE_GROUP_ORDER)[number];
+
+const MODEL_ROUTE_TASK_GROUPS: Record<ModelRouteTaskType, ModelRouteGroup> = {
+  state_resolution: "开书设定",
+  planner: "规划推进",
+  replan: "规划推进",
+  writer: "正文生产",
+  repair: "正文生产",
+  review: "审校把关",
+  light_review: "审校把关",
+  critical_review: "审校把关",
+  summary: "资料加工",
+  fact_extraction: "资料加工",
+  chat: "灵感对话",
+};
+
+const GROUP_FALLBACK: ModelRouteGroup = "规划推进";
+
+export function resolveModelRouteGroup(taskType: string): ModelRouteGroup {
+  return MODEL_ROUTE_TASK_GROUPS[taskType as ModelRouteTaskType] ?? GROUP_FALLBACK;
+}

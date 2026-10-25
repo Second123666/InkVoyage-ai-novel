@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
 import ModelRouteFields from "./ModelRouteFields";
-import { MODEL_ROUTE_LABELS } from "./modelRouteLabels";
+import { MODEL_ROUTE_LABELS, MODEL_ROUTE_GROUP_ORDER, resolveModelRouteGroup } from "./modelRouteLabels";
 import {
   buildLocalOfflineRouteDraft,
   buildRouteSavePayload,
@@ -275,6 +275,113 @@ export default function ModelRoutesPage() {
   const fallbackDraft = getStructuredFallbackDraft();
   const routeBulkDraft = getBulkDraft();
 
+      const renderRouteCard = (taskType: ModelRouteTaskType) => {
+        const draft = getRouteDraft(taskType);
+        const label = MODEL_ROUTE_LABELS[taskType];
+        const providerName = getProviderDisplayName(providerConfigs, draft.provider);
+        const connectivity = connectivityMap.get(taskType);
+        const connectivityState = resolveConnectivityState(
+          connectivity,
+          modelRouteConnectivityQuery.isPending || modelRouteConnectivityQuery.isFetching,
+        );
+        const isDirty = dirtyTaskTypeSet.has(taskType);
+        const hasUnsavedRouteDiff = connectivity != null
+          && (
+            draft.provider !== connectivity.provider
+            || (draft.model.trim().length > 0 && draft.model !== connectivity.model)
+            || (draft.requestProtocol !== "auto" && draft.requestProtocol !== connectivity.requestProtocol)
+            || (
+              draft.structuredResponseFormat !== "auto"
+              && draft.structuredResponseFormat !== connectivity.structured?.strategy
+            )
+          );
+
+        return (
+          <Card key={taskType}>
+            <CardHeader>
+              <CardTitle className="flex flex-wrap items-center gap-2">
+                <span>{label.title}</span>
+                <span className="inline-flex items-center gap-2 rounded-full border px-2 py-0.5 text-xs font-normal text-muted-foreground">
+                  <RouteStatusDot state={connectivityState} />
+                  {connectivityState === "healthy"
+                    ? "兼容性正常"
+                    : connectivityState === "failed"
+                      ? "存在异常"
+                      : connectivityState === "checking"
+                        ? "检测中"
+                        : "未检测"}
+                </span>
+                {isDirty ? <Badge variant="secondary">待保存</Badge> : null}
+              </CardTitle>
+              <CardDescription>
+                {label.description}
+                <span className="ml-2 text-xs">标识：{taskType}</span>
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <ModelRouteFields
+                draft={draft}
+                providerConfigs={providerConfigs}
+                providerOptions={providerOptions}
+                onPatch={(patch) => patchDraft(taskType, patch)}
+                temperaturePlaceholder="0.7"
+                maxTokensPlaceholder="留空则使用系统默认"
+                modelEmptyText="这个服务商没有可选模型"
+                manualModelPlaceholder="也可以手动输入模型名"
+              />
+
+              <div className="flex items-center justify-between gap-3">
+                <div className="space-y-1 text-xs text-muted-foreground">
+                  <div>{isDirty ? "表单改动保存后生效。" : `任务使用：${providerName}。`}</div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <RouteStatusDot state={connectivityState} />
+                    <span>{formatConnectivityStatus(connectivity)}</span>
+                  </div>
+                  {connectivity?.structured ? (
+                    <div>
+                      请求协议：{connectivity.structured.requestProtocol ?? connectivity.requestProtocol ?? "无"}，
+                      结构化策略：{connectivity.structured.strategy ?? "无"}，
+                      {connectivity.structured.reasoningForcedOff ? "会关闭 thinking" : "保留 thinking"}，
+                      {connectivity.structured.fallbackAvailable ? "备用模型可用" : "备用模型未启用"}
+                    </div>
+                  ) : null}
+                  {hasUnsavedRouteDiff ? (
+                    <div>检测结果来自生效路由；保存后会自动重新检测。</div>
+                  ) : null}
+                </div>
+                <Button
+                  size="sm"
+                  onClick={() => saveModelRouteMutation.mutate(buildRouteSavePayload(taskType, draft))}
+                  disabled={isSavingRoutes || !draft.provider.trim() || !draft.model.trim()}
+                >
+                  <Save className="h-4 w-4" />
+                  保存路由
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        );
+      };
+
+      const groupedTaskTypes = MODEL_ROUTE_GROUP_ORDER
+        .map((group) => ({
+          group,
+          items: taskTypes.filter((taskType) => resolveModelRouteGroup(taskType) === group),
+        }))
+        .filter((entry) => entry.items.length > 0);
+
+      const groupedJsx = groupedTaskTypes.map(({ group, items }) => (
+        <section key={group} className="space-y-3">
+          <div className="flex items-baseline gap-2">
+            <h3 className="text-sm font-semibold text-foreground">{group}</h3>
+            <span className="text-xs text-muted-foreground">{items.length} 项任务</span>
+          </div>
+          <div className="space-y-3">
+            {items.map((taskType) => renderRouteCard(taskType))}
+          </div>
+        </section>
+      ));
+
   return (
     <div className="space-y-4">
       <Card>
@@ -488,93 +595,7 @@ export default function ModelRoutesPage() {
         </CardContent>
       </Card>
 
-      {taskTypes.map((taskType) => {
-        const draft = getRouteDraft(taskType);
-        const label = MODEL_ROUTE_LABELS[taskType];
-        const providerName = getProviderDisplayName(providerConfigs, draft.provider);
-        const connectivity = connectivityMap.get(taskType);
-        const connectivityState = resolveConnectivityState(
-          connectivity,
-          modelRouteConnectivityQuery.isPending || modelRouteConnectivityQuery.isFetching,
-        );
-        const isDirty = dirtyTaskTypeSet.has(taskType);
-        const hasUnsavedRouteDiff = connectivity != null
-          && (
-            draft.provider !== connectivity.provider
-            || (draft.model.trim().length > 0 && draft.model !== connectivity.model)
-            || (draft.requestProtocol !== "auto" && draft.requestProtocol !== connectivity.requestProtocol)
-            || (
-              draft.structuredResponseFormat !== "auto"
-              && draft.structuredResponseFormat !== connectivity.structured?.strategy
-            )
-          );
-
-        return (
-          <Card key={taskType}>
-            <CardHeader>
-              <CardTitle className="flex flex-wrap items-center gap-2">
-                <span>{label.title}</span>
-                <span className="inline-flex items-center gap-2 rounded-full border px-2 py-0.5 text-xs font-normal text-muted-foreground">
-                  <RouteStatusDot state={connectivityState} />
-                  {connectivityState === "healthy"
-                    ? "兼容性正常"
-                    : connectivityState === "failed"
-                      ? "存在异常"
-                      : connectivityState === "checking"
-                        ? "检测中"
-                        : "未检测"}
-                </span>
-                {isDirty ? <Badge variant="secondary">待保存</Badge> : null}
-              </CardTitle>
-              <CardDescription>
-                {label.description}
-                <span className="ml-2 text-xs">标识：{taskType}</span>
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <ModelRouteFields
-                draft={draft}
-                providerConfigs={providerConfigs}
-                providerOptions={providerOptions}
-                onPatch={(patch) => patchDraft(taskType, patch)}
-                temperaturePlaceholder="0.7"
-                maxTokensPlaceholder="留空则使用系统默认"
-                modelEmptyText="这个服务商没有可选模型"
-                manualModelPlaceholder="也可以手动输入模型名"
-              />
-
-              <div className="flex items-center justify-between gap-3">
-                <div className="space-y-1 text-xs text-muted-foreground">
-                  <div>{isDirty ? "表单改动保存后生效。" : `任务使用：${providerName}。`}</div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <RouteStatusDot state={connectivityState} />
-                    <span>{formatConnectivityStatus(connectivity)}</span>
-                  </div>
-                  {connectivity?.structured ? (
-                    <div>
-                      请求协议：{connectivity.structured.requestProtocol ?? connectivity.requestProtocol ?? "无"}，
-                      结构化策略：{connectivity.structured.strategy ?? "无"}，
-                      {connectivity.structured.reasoningForcedOff ? "会关闭 thinking" : "保留 thinking"}，
-                      {connectivity.structured.fallbackAvailable ? "备用模型可用" : "备用模型未启用"}
-                    </div>
-                  ) : null}
-                  {hasUnsavedRouteDiff ? (
-                    <div>检测结果来自生效路由；保存后会自动重新检测。</div>
-                  ) : null}
-                </div>
-                <Button
-                  size="sm"
-                  onClick={() => saveModelRouteMutation.mutate(buildRouteSavePayload(taskType, draft))}
-                  disabled={isSavingRoutes || !draft.provider.trim() || !draft.model.trim()}
-                >
-                  <Save className="h-4 w-4" />
-                  保存路由
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        );
-      })}
+      {groupedJsx}
 
       {actionResult ? <div className="text-sm text-muted-foreground">{actionResult}</div> : null}
     </div>
