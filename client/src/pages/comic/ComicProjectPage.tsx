@@ -338,7 +338,7 @@ export default function ComicProjectPage() {
             {formatDef.imageSize}
           </span>
           {project.sourceBundle && (
-            <span className="inline-flex items-center gap-1 rounded-full border bg-green-500/10 px-2.5 py-0.5 text-xs text-green-600 dark:text-green-400">
+            <span className="inline-flex items-center gap-1 rounded-full border bg-success/10 px-2.5 py-0.5 text-xs text-success">
               <BookText className="h-3 w-3" />
               内容源已导入
             </span>

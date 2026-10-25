@@ -199,10 +199,10 @@ function BatchBar({
         )}
 
         {job?.status === "completed" && (
-          <span className="text-xs font-medium text-green-600 dark:text-green-400">全部完成</span>
+          <span className="text-xs font-medium text-success">全部完成</span>
         )}
         {job?.status === "partial" && !hasFailures && (
-          <span className="text-xs font-medium text-amber-600 dark:text-amber-400">部分完成</span>
+          <span className="text-xs font-medium text-warning">部分完成</span>
         )}
       </div>
 
@@ -212,9 +212,9 @@ function BatchBar({
             <div
               className={`h-full rounded-full transition-all duration-500 ${
                 job?.status === "partial"
-                  ? "bg-amber-500"
+                  ? "bg-warning"
                   : job?.status === "completed"
-                  ? "bg-green-500"
+                  ? "bg-success"
                   : "bg-primary"
               }`}
               style={{

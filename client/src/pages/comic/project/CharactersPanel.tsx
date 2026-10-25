@@ -412,8 +412,8 @@ function VisualAnchorEditor({ character }: { character: ComicCharacter }) {
                     </div>
                     {suggestion.faceShapeOverride && (
                       <div>
-                        <p className="text-[10px] text-amber-700 dark:text-amber-300">新的脸型强覆盖</p>
-                        <p className="mt-0.5 whitespace-pre-wrap rounded bg-amber-50/60 p-1.5 leading-relaxed dark:bg-amber-900/20">{suggestion.faceShapeOverride}</p>
+                        <p className="text-[10px] text-warning">新的脸型强覆盖</p>
+                        <p className="mt-0.5 whitespace-pre-wrap rounded bg-warning/10 p-1.5 leading-relaxed">{suggestion.faceShapeOverride}</p>
                       </div>
                     )}
                     <div className="flex gap-2 pt-1">
@@ -435,9 +435,9 @@ function VisualAnchorEditor({ character }: { character: ComicCharacter }) {
             placeholder="描述角色外貌：五官、肤色、发型、年龄、体格、标志特征..."
           />
 
-          <div className="mt-3 rounded-md border border-amber-300/50 bg-amber-50/40 px-2.5 py-2 dark:border-amber-700/50 dark:bg-amber-900/10">
+          <div className="mt-3 rounded-md border border-warning/40 bg-warning/10 px-2.5 py-2">
             <div className="flex items-center justify-between">
-              <p className="text-[10px] font-semibold text-amber-700 dark:text-amber-300">脸型强覆盖（FINAL OVERRIDE）</p>
+              <p className="text-[10px] font-semibold text-warning">脸型强覆盖（FINAL OVERRIDE）</p>
               {override && (
                 <button
                   type="button"
@@ -503,7 +503,7 @@ function VisualAnchorEditor({ character }: { character: ComicCharacter }) {
             {initial || "该角色还没有外貌锚点。"}
           </p>
           {initialOverride && (
-            <div className="mt-1.5 rounded-md border border-amber-300/50 bg-amber-50/40 px-2.5 py-1.5 text-[11px] text-amber-800 dark:border-amber-700/50 dark:bg-amber-900/10 dark:text-amber-300">
+            <div className="mt-1.5 rounded-md border border-warning/40 bg-warning/10 px-2.5 py-1.5 text-[11px] text-warning">
               <span className="font-semibold">脸型强覆盖：</span>{initialOverride}
             </div>
           )}

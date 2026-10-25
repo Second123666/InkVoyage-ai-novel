@@ -260,7 +260,7 @@ function CharacterReadinessWarning({ characters }: { characters: ComicCharacter[
   });
   if (characters.length === 0 || withoutSheet.length === 0) return null;
   return (
-    <div className="flex items-start gap-2.5 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-xs text-amber-800 dark:border-amber-700 dark:bg-amber-900/20 dark:text-amber-300">
+    <div className="flex items-start gap-2.5 rounded-lg border border-warning/40 bg-warning/10 px-3 py-2.5 text-xs text-warning">
       <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" />
       <div>
         <span className="font-semibold">建议先完善角色设计稿</span>
