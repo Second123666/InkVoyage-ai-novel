@@ -653,4 +653,9 @@ export const promptAssetLoaderEntries: PromptAssetLoaderEntry[] = [
     key: "world.axioms.suggest@v1",
     load: () => require("../prompts/world/world.prompts").worldAxiomSuggestionPrompt as UnknownPromptAsset,
   },
+  // ─── comic(实验特性;BUG-10 自 ComicFactService 迁入) ──────────────────────
+  {
+    key: "comic.factExtraction@v1",
+    load: () => require("../prompts/comic/comic.prompts").factExtractionPrompt as UnknownPromptAsset,
+  },
 ];
