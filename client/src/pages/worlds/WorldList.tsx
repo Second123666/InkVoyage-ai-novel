@@ -8,6 +8,7 @@ import { deleteWorld, getWorldList } from "@/api/world";
 import { queryKeys } from "@/api/queryKeys";
 import { featureFlags } from "@/config/featureFlags";
 import { toast } from "@/components/ui/toast";
+import { resolveWorldGuidance } from "./worldGuidance";
 
 interface WorldLibraryCardProjection {
   summary: string;
@@ -304,6 +305,7 @@ export default function WorldList() {
         <div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
           {worlds.map((world) => {
             const preview = buildWorldLibraryProjection(world);
+            const guidance = resolveWorldGuidance(preview);
 
             return (
               <article
@@ -339,6 +341,25 @@ export default function WorldList() {
                   <span><strong className="font-semibold tabular-nums text-foreground">{preview.forceCount}</strong> 个势力</span>
                   <span><strong className="font-semibold tabular-nums text-foreground">{preview.locationCount}</strong> 个地点</span>
                   <span><strong className="font-semibold tabular-nums text-foreground">{preview.relationCount}</strong> 条关系</span>
+                </div>
+
+                <div className="mt-3 rounded-2xl bg-muted/25 px-4 py-3 text-xs leading-5">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge
+                      variant={guidance.statusTone === "success" ? "default" : "secondary"}
+                      className="border-0 bg-muted/60 font-normal"
+                    >
+                      {guidance.status}
+                    </Badge>
+                    <span className="text-muted-foreground">
+                      {guidance.usableSteps.length > 0
+                        ? `可支撑：${guidance.usableSteps.join("、")}`
+                        : "还没有可支撑的创作步骤"}
+                    </span>
+                  </div>
+                  <div className="mt-1.5 text-muted-foreground">
+                    <span className="font-medium text-foreground">下一步：</span>{guidance.nextAction}
+                  </div>
                 </div>
 
                 <details className="group mt-4 border-t border-border/30 pt-3">
