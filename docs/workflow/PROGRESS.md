@@ -17,6 +17,18 @@
 
 ---
 
+## 2026-10-25 · LOOP-30 · BUG-3 + BUG-4 小项清理
+
+- **类别**: 缺陷修复(主对话执行)
+- **目标**: 合并清理两个最小 BUG 项:BUG-3(pnpm 配置迁移卫生)、BUG-4(移动端外观页路由登记缺口)。
+- **改动**:
+  1. **BUG-3**:删除根 `package.json` 的 `pnpm.onlyBuiltDependencies` / `ignoredBuiltDependencies` 块 —— pnpm ≥10 已改读 `pnpm-workspace.yaml` 的 `allowBuilds`(两处配置语义已等同),每次命令打印的 `[WARN] The "pnpm" field...` 消失;
+  2. **BUG-4**:`MOBILE_ROUTE_PATTERNS` 补登记 `settings-appearance`(外观与主题,more 组);`index.css` 两个移动块补 `.mobile-route-settings-appearance` CSS 落点;导航测试 `routedPaths` 补 `/settings/appearance`。
+- **验证**: client typecheck 0 错误;client **238/238**(导航合同含新路径);server 全量 **1448 / 1436 过 / 0 失败 / 12 跳过** 且输出无 pnpm WARN;pnpm 命令输出无 WARN。
+- **发布说明**: BUG-4 用户可见(移动端外观页布局),已记 release-notes 与 README(2026-10-25);BUG-3 纯内部。
+- **残留**: BUG-5/6(词表类,S–M)、BUG-7(需所有者产品语义决策)、BUG-8(任务视图计数,S)。
+- **下一步**: **LOOP-31 = BUG-6**(拆书步骤词表缺口,S/P2)或 BUG-8;BUG-5/7 需要决策或更大改动,建议单独一轮。
+
 ## 2026-10-25 · LOOP-29 · BUG-10 comic 事实提取提示词迁入 prompting
 
 - **类别**: 缺陷修复(主对话执行)

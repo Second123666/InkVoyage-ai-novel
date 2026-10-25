@@ -38,7 +38,8 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 27. ~~**LOOP-27 RF-1 第八个文件拆分**(`promptRunner.ts`,最后一个)~~ ✅ 完成(2026-10-24):拆为 state/helpers/telemetry/structured/executors + 可写导出门面;**RF-1 整项完成(8/8)**。核心教训:门面不得用 `export *`(getter 不可写,测试就地桩失效),记 wiki。
 28. ~~**LOOP-28 BUG-9 注册键对齐**~~ ✅ 完成(2026-10-25):全量扫描发现并修复 8 处注册键与资产版本不一致,`prompting.test.js` 恢复 49/49 全绿;新发现 BUG-10。
 29. ~~**LOOP-29 BUG-10 comic 内联提示词迁移**~~ ✅ 完成(2026-10-25):`factExtractionPrompt` 迁入 prompting 并注册,governance integration 恢复全绿。
-30. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **BUG-3 / BUG-4 等剩余 BUG 项(按 P 排)**,随后 UI/OPS。
+30. ~~**LOOP-30 BUG-3 + BUG-4 小项清理**~~ ✅ 完成(2026-10-25):pnpm WARN 消失;移动端外观页专属落点齐全,238/238 + 1448/0 全绿。
+31. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **BUG-6**(拆书步骤词表,S/P2),随后 BUG-8、BUG-5(需更大改动);BUG-7 需所有者产品语义决策后再动。
     **完成项打勾规则(2026-10-20 所有者要求)**:每轮收尾同步更新 BACKLOG —— 完成项 `[x]` + ✅,进行中 `[/]`,入口建议划线。
 
 ---
@@ -169,13 +170,11 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
   ①移动端合同簇 ×4:新页面(market-radar、settings-model-routes)的 CSS 落点缺失 ×5 个选择器已补;导航测试列表对齐 31 条现行元数据;任务筛选面板恢复"两行三列"移动合同(kind,status,异常 / keyword 跨列,排序)—— 显式栅格定位 + md 释放 + xl order-last 保桌面模板,激活态改 data 属性驱动(静态类名守卫可继续生效)。
   ②设置路由契约:`/settings/model-routes` 已是独立页(非重定向),旧链接兼容性保持,测试更新。
 
-- [ ] **BUG-3 pnpm 配置迁移卫生** · S · P3
-  根 `package.json` 的 `pnpm.onlyBuiltDependencies` 已不被 pnpm 读取(每次运行报 WARN),应迁到 `pnpm-workspace.yaml` 或 `.npmrc` 等新位置。
-  验收:启动/测试输出无该 WARN。
+- [x] **BUG-3 pnpm 配置迁移卫生** · S · P3(= LOOP-30,2026-10-25 完成) ✅
+  结果:`pnpm-workspace.yaml` 的 `allowBuilds` 已覆盖原配置语义(两处清单等同),直接删除根 `package.json` 的 `pnpm` 块;所有 pnpm 命令不再打印 WARN;server/client 全量验证通过。
 
-- [ ] **BUG-4 移动端路由元数据缺 /settings/appearance 登记** · S · P3
-  `MOBILE_ROUTE_PATTERNS` 登记了多个 settings 子页但缺 `settings/appearance`,该页在移动端回退到通用落点与"更多功能"页头标题,没有专属 CSS 落点(LOOP-3 侦察发现,范围外未动)。
-  验收:补登记后导航合同测试与该页 CSS 落点齐全;不改路由本身。
+- [x] **BUG-4 移动端路由元数据缺 /settings/appearance 登记** · S · P3(= LOOP-30,2026-10-25 完成) ✅
+  结果:`MOBILE_ROUTE_PATTERNS` 补登记 `settings-appearance`(外观与主题,more 组),`index.css` 两块补 `.mobile-route-settings-appearance`,导航测试 `routedPaths` 补 `/settings/appearance`;移动端该页使用专属布局与标题。client 238/238。
 
 - [ ] **BUG-5 任务阶段词表中英分裂** · M · P2(LOOP-4 审计 INC-8,partly)
   `NovelWorkflowTask.currentStage` 持久化中文标签,通用步骤表用英文键,且存在英文写入混入(如 `chapter_execution`);list 路径步骤索引可能回落 0。需独立一轮统一阶段词表(持久化值 ↔ 步骤键 ↔ 展示标签的映射收敛),涉及写入点迁移。
