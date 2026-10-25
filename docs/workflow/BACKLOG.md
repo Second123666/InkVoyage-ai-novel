@@ -37,7 +37,8 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 26. ~~**LOOP-26 RF-1 第七个文件拆分**(`RagIndexService.ts`)~~ ✅ 完成(2026-10-24):拆出纯分块、源加载、嵌入批处理,服务保留队列与编排,行为不变。
 27. ~~**LOOP-27 RF-1 第八个文件拆分**(`promptRunner.ts`,最后一个)~~ ✅ 完成(2026-10-24):拆为 state/helpers/telemetry/structured/executors + 可写导出门面;**RF-1 整项完成(8/8)**。核心教训:门面不得用 `export *`(getter 不可写,测试就地桩失效),记 wiki。
 28. ~~**LOOP-28 BUG-9 注册键对齐**~~ ✅ 完成(2026-10-25):全量扫描发现并修复 8 处注册键与资产版本不一致,`prompting.test.js` 恢复 49/49 全绿;新发现 BUG-10。
-29. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **BUG-10**(comic 内联提示词迁移),随后 UI/OPS 按 P 排。
+29. ~~**LOOP-29 BUG-10 comic 内联提示词迁移**~~ ✅ 完成(2026-10-25):`factExtractionPrompt` 迁入 prompting 并注册,governance integration 恢复全绿。
+30. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **BUG-3 / BUG-4 等剩余 BUG 项(按 P 排)**,随后 UI/OPS。
     **完成项打勾规则(2026-10-20 所有者要求)**:每轮收尾同步更新 BACKLOG —— 完成项 `[x]` + ✅,进行中 `[/]`,入口建议划线。
 
 ---
@@ -197,10 +198,9 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
   结果:全量扫描 161 个注册键发现 8 处落后于资产实际版本(castOptions/chapterHook.generate/castAuto/castAuto.members/supplemental/resource_recommendation/style.detection/style.rewrite/world.generate_from_theme),全部对齐;`prompting.test.js` 恢复 **49/49**;扫描脚本零不一致。教训记 wiki `prompts/prompt-runner-module.md`。
   残留发现:governance integration 违规 `ComicFactService.ts:39` 内联 SystemMessage → BUG-10。
 
-- [ ] **BUG-10 comic 事实提取提示词内联在服务文件(违反 prompt 治理)** · S · P3(LOOP-28 审计发现,上游 `6f633268` 引入)
-  `server/src/services/comic/ComicFactService.ts` 内联定义 PromptAsset 且 render 使用 `new SystemMessage`,`prompting-governance.test.js` 的内联提示词守卫报违规(`ComicFactService.ts:39`)。
-  修法方向:迁入 prompting 注册表(`prompting/prompts/comic/` 家族 + registry 注册),或按治理例外流程登记到允许集(优先迁移)。
-  验收:`node --test tests/prompting-governance.test.js` 全绿;comic 事实提取行为不变。
+- [x] **BUG-10 comic 事实提取提示词内联在服务文件(违反 prompt 治理)** · S · P3(= LOOP-29,2026-10-25 完成) ✅
+  结果:`factExtractionPrompt` 迁入 `prompting/prompts/comic/comic.prompts.ts` 并注册 `comic.factExtraction@v1`;`ComicFactService` 改为从 prompting 导入资产,服务逻辑不变;governance integration 模式恢复全绿。事故记录:迁移中曾误覆盖既有 `comic.prompts.ts`(上游已完成 episodeOutline/panelScript 迁移),已 git checkout 恢复并改为追加合并,162 注册键全量校验一致。
+  验收:`prompting-governance` + `comicDecoupling` + `prompting.test` + `promptCatalog` 全绿;全量 0 失败。
 
 ## 5. 前端 UI 改进(UI)
 

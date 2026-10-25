@@ -17,6 +17,20 @@
 
 ---
 
+## 2026-10-25 · LOOP-29 · BUG-10 comic 事实提取提示词迁入 prompting
+
+- **类别**: 缺陷修复(主对话执行)
+- **目标**: BUG-10 —— `ComicFactService.ts` 内联 PromptAsset 且 render 使用 `new SystemMessage`,违反 prompt 治理守卫(`prompting-governance.test.js` integration 失败)。
+- **改动**:
+  1. `factExtractionPrompt`(含 Schema/类型)迁入 `prompting/prompts/comic/comic.prompts.ts`(BUG-10 迁移;资产 `id: comic.factExtraction`、`version: v1`、任务/模式/上下文预算逐字保留);
+  2. 注册表登记 `comic.factExtraction@v1`(与资产 `id@version` 一致,BUG-9 规则);
+  3. `ComicFactService` 移除内联提示词与 Schema,改为从 prompting 导入资产,服务逻辑(取数、摘要构建、fire-and-forget、写库)不变。
+- **事故与纠正**: 迁移时误以为 `prompting/prompts/comic/` 不存在而覆盖了既有的 `comic.prompts.ts`(内含 episodeOutline/panelScript/visualAnchorRewrite 三个资产,上游已完成前两个的迁移)。通过 `git checkout HEAD --` 恢复后改为追加合并,并验证162 个注册键全部一致、无坏链。教训:新建家族目录前先核既有文件,写覆盖前先 grep 导出。
+- **验证**: server build 0 错误;注册键全量扫描 **162 键 0 不一致 0 加载失败**;`prompting-governance` + `comicDecoupling` + `prompting.test` + `promptCatalog` **61/61**;server 全量 **1448 / 1436 过 / 0 失败 / 12 跳过**。client 未动。
+- **发布说明**: 内部治理修复,无用户可见变化,按规则跳过。
+- **残留**: 无。governance integration 模式恢复全绿。
+- **下一步**: 按 BACKLOG 顺序 → **LOOP-30 = BUG-3/BUG-4 等剩余 BUG 项(按 P 排)**,随后 UI/OPS。
+
 ## 2026-10-25 · LOOP-28 · BUG-9 注册键与资产版本对齐
 
 - **类别**: 缺陷修复(主对话执行)
