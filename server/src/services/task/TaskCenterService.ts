@@ -18,7 +18,10 @@ import { ImageTaskAdapter } from "./adapters/ImageTaskAdapter";
 import { NovelWorkflowTaskAdapter } from "./adapters/NovelWorkflowTaskAdapter";
 import { PipelineTaskAdapter } from "./adapters/PipelineTaskAdapter";
 import { StyleExtractionTaskAdapter } from "./adapters/StyleExtractionTaskAdapter";
-import { collectWorkflowLinkedPipelineIds } from "./taskCenterVisibility";
+import {
+  collectLinkedPipelineJobIdsFromRows,
+  collectWorkflowLinkedPipelineIds,
+} from "./taskCenterVisibility";
 import { resolveRecoveryGuidance } from "./recoveryPlaybook";
 import {
   compareTaskSummary,
@@ -72,6 +75,19 @@ export class TaskCenterService {
     const archivedWorkflowIds = archivedIdsByKind.get("novel_workflow") ?? [];
     const archivedStyleExtractionIds = archivedIdsByKind.get("style_extraction") ?? [];
 
+    // BUG-8:overview 与列表可见性同源 —— 被工作流代理(queued/running/waiting_approval/succeeded)
+    // 的 pipeline 行不计入 novel_pipeline 计数,与 listTasks 的过滤规则一致。
+    const linkedPipelineJobIds = collectLinkedPipelineJobIdsFromRows(
+      await prisma.novelWorkflowTask.findMany({
+        where: {
+          status: { in: ["queued", "running", "waiting_approval", "succeeded"] },
+          ...(archivedWorkflowIds.length ? { id: { notIn: archivedWorkflowIds } } : {}),
+        },
+        select: { status: true, seedPayloadJson: true },
+        take: 2000,
+      }),
+    );
+
     const [
       bookRows,
       pipelineRows,
@@ -98,7 +114,13 @@ export class TaskCenterService {
       prisma.generationJob.groupBy({
         by: ["status"],
         where: {
-          ...(archivedPipelineIds.length ? { id: { notIn: archivedPipelineIds } } : {}),
+          ...((archivedPipelineIds.length || linkedPipelineJobIds.size)
+            ? {
+              id: {
+                notIn: [...archivedPipelineIds, ...linkedPipelineJobIds],
+              },
+            }
+            : {}),
         },
         _count: { _all: true },
       }),
@@ -348,12 +370,10 @@ export class TaskCenterService {
         : this.styleExtractionAdapter.list({ status: filters.status, keyword, take: sourceTake }),
     ]);
 
-    const linkedPipelineIds = filters.kind === "novel_pipeline"
-      ? new Set<string>()
-      : collectWorkflowLinkedPipelineIds(workflowTasks);
-    const visibleNovelTasks = filters.kind === "novel_pipeline"
-      ? novelTasks
-      : novelTasks.filter((task) => !linkedPipelineIds.has(task.id));
+    const linkedPipelineIds = collectWorkflowLinkedPipelineIds(workflowTasks);
+    // BUG-8:同一可见性规则贯穿「全部」与按 kind 筛选 —— 被工作流代理的 pipeline 行两种视图都不展示,
+    // 避免切换筛选时任务"凭空出现/消失";overview 计数使用同源规则(见 getOverview)。
+    const visibleNovelTasks = novelTasks.filter((task) => !linkedPipelineIds.has(task.id));
 
     const merged = [...bookTasks, ...visibleNovelTasks, ...knowledgeTasks, ...imageTasks, ...agentTasks, ...workflowTasks, ...styleExtractionTasks]
       .sort(compareTaskSummary);

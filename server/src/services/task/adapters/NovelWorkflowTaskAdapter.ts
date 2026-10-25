@@ -10,6 +10,7 @@ import type { ResourceRef } from "@ai-novel/shared/types/agent";
 import type { TaskStatus, UnifiedTaskDetail, UnifiedTaskSummary } from "@ai-novel/shared/types/task";
 import { prisma } from "../../../db/prisma";
 import { AppError } from "../../../middleware/errorHandler";
+import { parseLinkedPipelineJobId } from "../taskCenterVisibility";
 import { DirectorCommandService } from "../../novel/director/commands/DirectorCommandService";
 import {
   buildSkippableAutoExecutionReviewBlockingReason,
@@ -54,25 +55,6 @@ function buildOwnerLabel(row: {
   title: string;
 }): string {
   return row.novel?.title?.trim() || row.title.trim() || "小说主任务";
-}
-
-function parseLinkedPipelineJobId(seedPayloadJson?: string | null): string | null {
-  if (!seedPayloadJson?.trim()) {
-    return null;
-  }
-  try {
-    const parsed = JSON.parse(seedPayloadJson) as {
-      autoExecution?: {
-        pipelineJobId?: unknown;
-      };
-    };
-    return typeof parsed.autoExecution?.pipelineJobId === "string"
-      && parsed.autoExecution.pipelineJobId.trim()
-      ? parsed.autoExecution.pipelineJobId.trim()
-      : null;
-  } catch {
-    return null;
-  }
 }
 
 function parseTaskNotice(seedPayloadJson?: string | null): DirectorTaskNotice | null {

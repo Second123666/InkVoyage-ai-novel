@@ -29,7 +29,9 @@ export const STATUS_RANK: Record<TaskStatus, number> = {
 
 export const BOOK_ANALYSIS_STEPS = [
   { key: "queued", label: "排队" },
+  { key: "loading_cache", label: "读取缓存" },
   { key: "preparing_notes", label: "提取笔记" },
+  { key: "generating_overview", label: "生成总览" },
   { key: "generating_sections", label: "生成章节" },
   { key: "finalizing", label: "收尾" },
 ] as const;
