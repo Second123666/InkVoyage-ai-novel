@@ -216,7 +216,7 @@
 
 - 第一批：完成（2026-07-14）。
 - 第二批：完成（2026-07-14，2A / 2B / 2C 均已完成）。
-- 第三批：接近完成（2026-10-25 迭代）—— A 写法引擎视觉收敛（LOOP-6）；B 设置页语义 token 收敛（LOOP-33，~15 处，0 残留，守卫 `settingsVisualContracts.test.js`）；C 世界样本卡状态/步骤/下一步引导（LOOP-34，守卫 `worldGuidance.test.js`）；D 模型路由按开书/规划/正文/审校/资料分组（LOOP-35，守卫 `modelRouteGroups.test.js`）。**结构验收（LOOP-36）**：世界生成器已是四步工作区、反 AI 规则已是「资产库 + 工作区」两栏结构 —— 经审计上游已达目标，以守卫 `worldGenAndAntiAiStructure.test.js` 锁定，本项「不再把整条流程包在一个大 Card 中」不再重复施工。**唯一剩余**：`/style-engine` 结构终态（编辑/工作台/净稿仍为 88vh/84vh 超大弹窗，目标为常驻「资产库 + 编辑工作区」），需独立一轮重构。
+- 第三批：**完成**（2026-10-25）—— A 写法引擎视觉收敛（LOOP-6）；B 设置页语义 token 收敛（LOOP-33，~15 处 0 残留，守卫 `settingsVisualContracts.test.js`）；C 世界样本卡状态/步骤/下一步引导（LOOP-34，守卫 `worldGuidance.test.js`）；D 模型路由按开书/规划/正文/审校/资料分组（LOOP-35，守卫 `modelRouteGroups.test.js`）；结构验收（LOOP-36，generator 四步工作区 / anti-ai-rules 两栏已达目标，守卫 `worldGenAndAntiAiStructure.test.js`）；`/style-engine` 结构终态（LOOP-37，三套工作面板从 88vh/84vh 弹窗改为页面内常驻工作区，守卫 `styleEngineWorkspaceStructure.test.js`）。
 - 第四批：待开始。
 - 第五批：待开始。
 - 第六批：待开始。

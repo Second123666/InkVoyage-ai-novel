@@ -17,6 +17,21 @@
 
 ---
 
+## 2026-10-25 · LOOP-37 · UI-1 `/style-engine` 结构终态(第三批收官)
+
+- **类别**: UI(设计系统落地;主对话执行)
+- **目标**: UI-1 第三批唯一剩余 —— 编辑/应用测试/去 AI 味三态从 88vh/84vh 超大弹窗改为页面内常驻工作区。
+- **改动**:
+  1. `WritingFormulaPage` 三处 `<Dialog>` 容器替换为单个常驻 `<section>`:视图标题/描述 + editor/workbench/clean 切换 + 关闭按钮 + 对应面板(面板 props、mutation、状态全部不动);
+  2. 视图元信息抽为 `WORKSPACE_VIEW_META`(文案原样迁移);
+  3. 编辑视图仍挂 `editorDialogRef` 并复用 `useWritingFormulaDialogFocus`(焦点查询 data-* 契约不变);
+  4. 创建流程 `WritingFormulaCreateDialog` 保留模态;
+  5. 移除已无用的 Dialog 导入,改导 Button;守卫 `styleEngineWorkspaceStructure.test.js`(3 条:无超大弹窗/常驻工作区+视图切换/焦点契约+创建弹窗)。
+- **验证**: client typecheck 0 错误;守卫 3/3;client **254/254**。server 未动。
+- **发布说明**: 写法引擎编辑/应用/净稿改为页面内常驻切换,编辑态不再丢失上下文,用户可见,已记 release-notes/README(2026-10-25)。
+- **UI-1 第三批全部完成**:A 写法视觉(LOOP-6)、B 设置 token(33)、C 世界卡引导(34)、D 路由分组(35)、结构验收(36)、style-engine 终态(37)。
+- **下一步**: **LOOP-38 = UI-1 第四批(短剧/漫画衍生页)** 或 **UI-5 开源 Showcase**;BUG-7 仍等所有者决策。
+
 ## 2026-10-25 · LOOP-36 · UI-1 第三批结构验收与计划纠偏
 
 - **类别**: UI / 流程(主对话执行)

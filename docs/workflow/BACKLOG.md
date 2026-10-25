@@ -45,7 +45,8 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 34. ~~**LOOP-34 UI-1 第三批 C:世界样本卡状态与下一步引导**~~ ✅ 完成(2026-10-25):resolveWorldGuidance 纯函数 + 卡片引导区,守卫 5 条,client 244/244。
 35. ~~**LOOP-35 UI-1 第三批 D:模型路由按任务分组**~~ ✅ 完成(2026-10-25):分组纯函数 + renderRouteCard 分组渲染,守卫 5 条,client 249/249。
 36. ~~**LOOP-36 UI-1 第三批结构验收与计划纠偏**~~ ✅ 完成(2026-10-25):验收 generator/anti-ai-rules 已达目标(守卫 2 条),纠偏 rollout 计划;唯一剩余 style-engine 结构终态。
-37. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **UI-1 `/style-engine` 结构终态**(弹窗改常驻资产库+编辑工作区,重构),或 **UI-5 开源 Showcase**;BUG-7 仍需所有者产品语义决策。
+37. ~~**LOOP-37 UI-1 `/style-engine` 结构终态**~~ ✅ 完成(2026-10-25):三套工作面板从 88vh/84vh 弹窗改为页面内常驻工作区,守卫 3 条,client 254/254;**UI-1 第三批全部完成**。
+38. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **UI-1 第四批(短剧/漫画衍生页)** 或 **UI-5 开源 Showcase**;BUG-7 仍需所有者产品语义决策。
     **完成项打勾规则(2026-10-20 所有者要求)**:每轮收尾同步更新 BACKLOG —— 完成项 `[x]` + ✅,进行中 `[/]`,入口建议划线。
 
 ---
@@ -216,7 +217,8 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
   **第三批 B(LOOP-33)**:设置模块 ~15 处硬编码色(emerald/amber/sky/red/slate)全部迁移到语义 token(success/warning/info/destructive/muted),0 残留;守卫 `client/tests/settingsVisualContracts.test.js`。
   **第三批 C(LOOP-34)**:世界样本库卡片接入 `resolveWorldGuidance` 纯函数,显示状态/可支撑步骤/下一步;守卫 `client/tests/worldGuidance.test.js`。
   **第三批 D(LOOP-35)**:模型路由页按 开书设定/规划推进/正文生产/审校把关/资料加工/灵感对话 分组渲染;守卫 `client/tests/modelRouteGroups.test.js`。
-  **结构验收(LOOP-36)**:generator 已是四步工作区、anti-ai-rules 已是两栏结构(上游已达目标),守卫 `worldGenAndAntiAiStructure.test.js` 锁定,计划状态纠偏;**唯一剩余 = `/style-engine` 结构终态**(弹窗改常驻工作区)。
+  **结构验收(LOOP-36)**:generator 已是四步工作区、anti-ai-rules 已是两栏结构(上游已达目标),守卫 `worldGenAndAntiAiStructure.test.js` 锁定,计划状态纠偏。
+  **第三批 E(LOOP-37,第三批收官)**:`/style-engine` 编辑/应用测试/去 AI 味三态从 88vh/84vh 弹窗改为页面内常驻工作区,创建流程保留模态,焦点契约不变;守卫 `styleEngineWorkspaceStructure.test.js`。**第三批全部完成**。
   **第三批剩余**:
   - 世界三页(`/worlds`、`/worlds/generator`、`/worlds/:id/workspace`):状态/推荐深化动作与分步工作区的结构对齐(色值仅 1 处,几乎干净);
   - 设置(`/settings/model-routes` 组织 + 设置内部 17 处色值);
