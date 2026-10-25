@@ -51,11 +51,11 @@ export function AutoDirectorPendingReviewAutoPromotionCard(props: {
 
   return (
     <>
-      <Card className="min-w-0 overflow-hidden border-amber-300 bg-amber-50/35">
+      <Card className="min-w-0 overflow-hidden border-warning/40 bg-warning/10">
         <CardHeader className="flex-row items-start justify-between gap-3 space-y-0">
           <div className="min-w-0 space-y-1.5">
             <CardTitle className="flex flex-wrap items-center gap-2">
-              <ShieldAlert className="h-5 w-5 text-amber-700" aria-hidden="true" />
+              <ShieldAlert className="h-5 w-5 text-warning" aria-hidden="true" />
               待确认状态自动放行
             </CardTitle>
             <CardDescription className={AUTO_DIRECTOR_MOBILE_CLASSES.wrapText}>
@@ -77,7 +77,7 @@ export function AutoDirectorPendingReviewAutoPromotionCard(props: {
         </CardHeader>
         <CardContent className="space-y-4">
           {enabled ? (
-            <div className={`flex min-w-0 items-start gap-2 rounded-md border border-amber-300 bg-amber-100/80 px-3 py-2 text-sm text-amber-950 ${AUTO_DIRECTOR_MOBILE_CLASSES.wrapText}`}>
+            <div className={`flex min-w-0 items-start gap-2 rounded-md border border-warning/40 bg-warning/15 px-3 py-2 text-sm text-warning ${AUTO_DIRECTOR_MOBILE_CLASSES.wrapText}`}>
               <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
               <div>
                 自动放行处于开启状态。符合条件的提案会按正史提交；如需回退，需要依据留痕记录人工核对。
@@ -144,7 +144,7 @@ export function AutoDirectorPendingReviewAutoPromotionCard(props: {
           )}
         >
           <div className="space-y-4">
-            <div className={`rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-950 ${AUTO_DIRECTOR_MOBILE_CLASSES.wrapText}`}>
+            <div className={`rounded-md border border-warning/40 bg-warning/10 px-3 py-2 text-sm text-warning ${AUTO_DIRECTOR_MOBILE_CLASSES.wrapText}`}>
               开启后，系统只处理生效基准时间之后产生的提案；存量待确认提案不进入自动放行范围。符合条件的提案会被提交为正史事实，系统不会自动撤销。
             </div>
 

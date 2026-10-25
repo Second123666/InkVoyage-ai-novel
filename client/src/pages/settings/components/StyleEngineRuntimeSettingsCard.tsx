@@ -129,7 +129,7 @@ export default function StyleEngineRuntimeSettingsCard() {
         </div>
 
         {!isValidTimeout ? (
-          <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+          <div className="rounded-md border border-warning/40 bg-warning/10 px-3 py-2 text-sm text-warning">
             请输入 {limits.minMinutes}-{limits.maxMinutes} 分钟之间的整数。
           </div>
         ) : null}

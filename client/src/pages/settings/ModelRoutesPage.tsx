@@ -38,12 +38,12 @@ import type { ModelRouteTaskType } from "@ai-novel/shared/types/novel";
 
 function RouteStatusDot({ state }: { state: ConnectivityState }) {
   const colorClass = state === "healthy"
-    ? "bg-emerald-500"
+    ? "bg-success"
     : state === "failed"
-      ? "bg-red-500"
+      ? "bg-destructive"
       : state === "checking"
-        ? "bg-amber-400"
-        : "bg-slate-300";
+        ? "bg-warning"
+        : "bg-muted-foreground/40";
 
   return <span className={`inline-block h-2.5 w-2.5 rounded-full ${colorClass}`} aria-hidden="true" />;
 }
