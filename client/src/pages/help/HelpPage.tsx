@@ -63,7 +63,7 @@ export default function HelpPage() {
   if (journeyQuery.isError || !journey) {
     return (
       <div className="mx-auto flex min-h-[60vh] max-w-xl flex-col items-center justify-center gap-4 text-center">
-        <CircleAlert className="h-10 w-10 text-amber-600" />
+        <CircleAlert className="h-10 w-10 text-warning" />
         <div>
           <h1 className="text-xl font-semibold">暂时无法读取创作进度</h1>
           <p className="mt-2 text-sm text-muted-foreground">重新加载后，系统会继续根据模型、项目和章节状态推荐下一步。</p>
@@ -89,30 +89,29 @@ export default function HelpPage() {
 
   return (
     <div className="mx-auto w-full max-w-6xl space-y-5">
-      <section className="relative overflow-hidden rounded-3xl bg-[#122033] px-6 py-7 text-white shadow-[0_24px_70px_rgba(15,23,42,0.20)] sm:px-8 sm:py-9">
-        <div className="absolute -right-24 -top-32 h-80 w-80 rounded-full bg-sky-400/15 blur-3xl" />
+      <section className="relative overflow-hidden rounded-3xl border border-primary/15 bg-primary/[0.05] px-6 py-7 sm:px-8 sm:py-9">
         <div className="relative grid gap-8 lg:grid-cols-[minmax(0,1fr)_19rem] lg:items-end">
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <Badge className="border-white/15 bg-white/10 text-sky-100 hover:bg-white/10">创作向导</Badge>
-              <Badge className="border-white/15 bg-white/10 text-slate-200 hover:bg-white/10">
+              <Badge className="border-primary/20 bg-primary/10 text-primary hover:bg-primary/10">创作向导</Badge>
+              <Badge variant="secondary">
                 {journey.graduated ? "首章已完成" : `第 ${Math.min(journey.completedCount + 1, journey.totalCount)} 步 / 共 ${journey.totalCount} 步`}
               </Badge>
             </div>
-            <h1 className="mt-5 max-w-3xl text-3xl font-semibold leading-tight tracking-normal sm:text-4xl">{journey.headline}</h1>
-            <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-300">{journey.description}</p>
-            <div className="mt-6 border-l border-sky-300/70 pl-4">
-              <div className="text-xs font-medium uppercase tracking-[0.12em] text-sky-200">为什么推荐这一步</div>
-              <p className="mt-2 text-sm leading-6 text-slate-300">{journey.reason}</p>
+            <h1 className="mt-5 max-w-3xl text-3xl font-semibold leading-tight tracking-normal text-foreground sm:text-4xl">{journey.headline}</h1>
+            <p className="mt-4 max-w-3xl text-sm leading-7 text-muted-foreground">{journey.description}</p>
+            <div className="mt-6 border-l border-primary/40 pl-4">
+              <div className="text-xs font-medium uppercase tracking-[0.12em] text-primary">为什么推荐这一步</div>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">{journey.reason}</p>
             </div>
           </div>
           <div className="space-y-3">
             {primaryButton}
             {journey.novel ? (
-              <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                <div className="text-xs text-slate-400">当前作品</div>
-                <div className="mt-1 truncate font-semibold">{journey.novel.title}</div>
-                <div className="mt-1 text-xs text-slate-300">{journey.novel.creationExperience === "simple" ? "简易创作" : "专业创作"}</div>
+              <div className="rounded-xl border border-border/50 bg-background/70 p-4">
+                <div className="text-xs text-muted-foreground">当前作品</div>
+                <div className="mt-1 truncate font-semibold text-foreground">{journey.novel.title}</div>
+                <div className="mt-1 text-xs text-muted-foreground">{journey.novel.creationExperience === "simple" ? "简易创作" : "专业创作"}</div>
               </div>
             ) : null}
           </div>
@@ -137,14 +136,14 @@ export default function HelpPage() {
                 className={cn(
                   "grid gap-3 border-b px-5 py-4 last:border-b-0 sm:grid-cols-[2.5rem_minmax(0,1fr)_auto] sm:items-center sm:px-6",
                   milestone.status === "current" && "bg-primary/[0.04]",
-                  milestone.status === "attention" && "bg-amber-50/70",
+                  milestone.status === "attention" && "bg-warning/10",
                 )}
               >
                 <span className={cn(
                   "flex h-9 w-9 items-center justify-center rounded-full border",
-                  milestone.status === "completed" && "border-emerald-500 bg-emerald-500 text-white",
+                  milestone.status === "completed" && "border-success bg-success text-success-foreground",
                   milestone.status === "current" && "border-primary bg-primary text-primary-foreground",
-                  milestone.status === "attention" && "border-amber-500 bg-amber-500 text-white",
+                  milestone.status === "attention" && "border-warning bg-warning text-warning-foreground",
                   milestone.status === "pending" && "text-muted-foreground",
                 )}>
                   <MilestoneIcon milestone={milestone} index={index} />
@@ -190,12 +189,12 @@ export default function HelpPage() {
       </section>
 
       {journey.graduated ? (
-        <section className="flex flex-col gap-4 rounded-2xl border border-emerald-200 bg-emerald-50/60 p-5 sm:flex-row sm:items-center sm:justify-between">
+        <section className="flex flex-col gap-4 rounded-2xl border border-success/30 bg-success/10 p-5 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-start gap-3">
-            <CheckCircle2 className="mt-0.5 h-6 w-6 text-emerald-700" />
+            <CheckCircle2 className="mt-0.5 h-6 w-6 text-success" />
             <div>
-              <div className="font-semibold text-emerald-950">第一本书的新手路线完成</div>
-              <p className="mt-1 text-sm leading-6 text-emerald-900/75">向导会保留这份成果，首页将继续聚焦当前项目和下一步创作。</p>
+              <div className="font-semibold text-foreground">第一本书的新手路线完成</div>
+              <p className="mt-1 text-sm leading-6 text-muted-foreground">向导会保留这份成果，首页将继续聚焦当前项目和下一步创作。</p>
             </div>
           </div>
           <Button variant="outline" asChild><Link to="/novels"><BookOpenText className="h-4 w-4" /> 查看全部小说</Link></Button>
