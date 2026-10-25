@@ -17,6 +17,22 @@
 
 ---
 
+## 2026-10-25 · LOOP-32 · BUG-5 任务阶段词表中英混写收敛
+
+- **类别**: 缺陷修复(主对话执行)
+- **目标**: BUG-5 —— `NovelWorkflowTask.currentStage` 持久化值中英混写(多数写入点用中文标签,个别混入英文 key),步骤索引解析可能回落 0。
+- **现状审计**:
+  - 写入侧:绝大多数工作流写入点经 `stageLabel(...)`/`NOVEL_WORKFLOW_STAGE_LABELS` 持久化中文标签;唯一混入英文 key 的写入点是 `DirectorProductionExperienceService.ts`(`currentStage: "chapter_execution"`);
+  - 读取侧:workflow detail 步骤由 `currentItemKey`/`checkpointType` 推导(不依赖 currentStage);list 路径展示 currentStage 作为标签回退;`resolveStageIndex` 按 key 匹配,中文标签命中失败回落 0。
+- **改动**:
+  1. `resolveStageIndex` 先按 key 匹配,未命中再按 label 匹配 —— 中文标签与英文 key 均可命中正确步骤索引,存量中英混写数据自动兼容;
+  2. `DirectorProductionExperienceService` 写入改用 `NOVEL_WORKFLOW_STAGE_LABELS.chapter_execution`,写入点全部统一为中文标签;
+  3. 守卫 `workflowStageVocabulary.test.js`(4 条:key 命中、label 命中、未知回落 0、写入点静态扫描无英文 key 混入)。
+- **验证**: server build 0 错误;守卫 4/4;server 全量 **1457 / 1445 过 / 0 失败 / 12 跳过**。client 未动。
+- **发布说明**: 运行记录的步骤显示一致性属用户可见修复,已记 release-notes/README(2026-10-25)。
+- **残留**: 无(存量中英混写数据由读取侧兼容,无需迁移)。
+- **下一步**: BUG 线仅剩 **BUG-7**(需所有者产品语义决策)。可转入 UI/OPS 线或等待决策。
+
 ## 2026-10-25 · LOOP-31 · BUG-6 + BUG-8 任务中心两处一致性修复
 
 - **类别**: 缺陷修复(主对话执行)

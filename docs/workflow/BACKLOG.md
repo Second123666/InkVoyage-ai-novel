@@ -40,7 +40,8 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 29. ~~**LOOP-29 BUG-10 comic 内联提示词迁移**~~ ✅ 完成(2026-10-25):`factExtractionPrompt` 迁入 prompting 并注册,governance integration 恢复全绿。
 30. ~~**LOOP-30 BUG-3 + BUG-4 小项清理**~~ ✅ 完成(2026-10-25):pnpm WARN 消失;移动端外观页专属落点齐全,238/238 + 1448/0 全绿。
 31. ~~**LOOP-31 BUG-6 + BUG-8**~~ ✅ 完成(2026-10-25):拆书步骤词表补齐全阶段;任务中心隐藏行与 overview 计数同源;守卫 6 条,全量 1453/0。
-32. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **BUG-5**(任务阶段词表中英分裂,M/P2),或转入 UI/OPS 线;BUG-7 需所有者产品语义决策后再动。
+32. ~~**LOOP-32 BUG-5 任务阶段词表中英混写收敛**~~ ✅ 完成(2026-10-25):resolveStageIndex 兼容 key/label,写入点统一中文标签,守卫 4 条,全量 1457/0。
+33. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → BUG 线仅剩 **BUG-7**(需所有者产品语义决策);可转入 UI/OPS 线(按 P 排:UI-2/3/4/5、OPS-1/2/3/4),或先拍板 BUG-7 决策。
     **完成项打勾规则(2026-10-20 所有者要求)**:每轮收尾同步更新 BACKLOG —— 完成项 `[x]` + ✅,进行中 `[/]`,入口建议划线。
 
 ---
@@ -177,9 +178,8 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 - [x] **BUG-4 移动端路由元数据缺 /settings/appearance 登记** · S · P3(= LOOP-30,2026-10-25 完成) ✅
   结果:`MOBILE_ROUTE_PATTERNS` 补登记 `settings-appearance`(外观与主题,more 组),`index.css` 两块补 `.mobile-route-settings-appearance`,导航测试 `routedPaths` 补 `/settings/appearance`;移动端该页使用专属布局与标题。client 238/238。
 
-- [ ] **BUG-5 任务阶段词表中英分裂** · M · P2(LOOP-4 审计 INC-8,partly)
-  `NovelWorkflowTask.currentStage` 持久化中文标签,通用步骤表用英文键,且存在英文写入混入(如 `chapter_execution`);list 路径步骤索引可能回落 0。需独立一轮统一阶段词表(持久化值 ↔ 步骤键 ↔ 展示标签的映射收敛),涉及写入点迁移。
-  验收:任一 currentStage 值在步骤解析中命中正确索引;守卫测试覆盖中英混写。
+- [x] **BUG-5 任务阶段词表中英分裂** · M · P2(= LOOP-32,2026-10-25 完成) ✅
+  结果:`resolveStageIndex` 先按 key 再按 label 解析,存量中英混写数据均命中正确步骤索引;唯一英文 key 写入点(`DirectorProductionExperienceService`)改用 `NOVEL_WORKFLOW_STAGE_LABELS.chapter_execution`,写入侧全部统一中文标签;守卫 `workflowStageVocabulary.test.js`(4 条:key/label 命中、未知回落、写入点静态扫描)。
 
 - [x] **BUG-6 拆书任务步骤词表缺口** · S · P2(= LOOP-31,2026-10-25 完成) ✅
   结果:`BOOK_ANALYSIS_STEPS` 补齐 `loading_cache`/`generating_overview`,步骤流与 `BookAnalysisStage` 全集一致,中段进度不再回落第 0 步;产品语义核实:draft 在拆书专属页面可见,archived 为显式归档全站隐藏 —— 均有明确语义,无需改。守卫 `bookAnalysisSteps.test.js`(2 条:词表覆盖 + 索引正确)。
