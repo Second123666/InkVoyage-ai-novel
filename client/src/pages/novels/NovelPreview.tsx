@@ -8,6 +8,7 @@ import { downloadNovelExport, getNovelChapters, getNovelDetail } from "@/api/nov
 import { queryKeys } from "@/api/queryKeys";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { buildPreviewEditRecommendation, buildReadingProgress, resolveRecommendationRoute } from "./previewReading";
 
 function countWords(content: string | null | undefined): number {
   const text = content?.trim() ?? "";
@@ -97,6 +98,15 @@ export default function NovelPreview() {
   );
   const activeContent = chapterText(activeChapter?.content);
   const totalWordCount = useMemo(() => chapters.reduce((sum, chapter) => sum + countWords(chapter.content), 0), [chapters]);
+  const readingProgress = useMemo(
+    () => buildReadingProgress({ activeOrder: activeChapter?.order, totalChapters: chapters.length }),
+    [activeChapter, chapters],
+  );
+  const editRecommendation = useMemo(
+    () => buildPreviewEditRecommendation({ activeChapterId: activeChapter?.id, activeOrder: activeChapter?.order }),
+    [activeChapter],
+  );
+  const recommendationRoute = resolveRecommendationRoute(id, editRecommendation);
   const downloadFullMutation = useMutation({
     mutationFn: () => downloadNovelExport(id, "txt", "full", novel?.title),
     onSuccess: ({ blob, fileName }) => {
@@ -215,6 +225,27 @@ export default function NovelPreview() {
           <div className="text-xs tracking-[0.22em] text-muted-foreground">{novel?.status === "published" ? "PUBLISHED" : "DRAFT"}</div>
           <h1 className="mt-4 text-3xl font-semibold tracking-normal text-foreground sm:text-4xl">{novel?.title ?? "小说预览"}</h1>
           <p className="mt-3 text-sm text-muted-foreground">{formatCount(totalWordCount)} 字 · {generatedChapters.length}/{chapters.length} 章已生成</p>
+
+          <div className="mx-auto mt-5 max-w-md space-y-1.5">
+            <div className="flex items-center justify-between text-xs text-muted-foreground">
+              <span>阅读进度</span>
+              <span className="tabular-nums">{readingProgress.progressLabel} · {readingProgress.percentLabel}</span>
+            </div>
+            <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+              <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${readingProgress.percent}%` }} />
+            </div>
+          </div>
+
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
+            <Button asChild>
+              <Link to={recommendationRoute}><Edit3 className="mr-1.5 h-4 w-4" />{editRecommendation.label}</Link>
+            </Button>
+            {editRecommendation.kind !== "workspace" ? (
+              <Button asChild variant="outline">
+                <Link to={`/novels/${id}/edit`}><Settings2 className="mr-1.5 h-4 w-4" />打开工作区</Link>
+              </Button>
+            ) : null}
+          </div>
           </div>
 
           <article className="whitespace-pre-wrap text-[17px] leading-[2.15] text-foreground sm:text-[18px]">
