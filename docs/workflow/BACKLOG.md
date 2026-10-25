@@ -42,7 +42,8 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 31. ~~**LOOP-31 BUG-6 + BUG-8**~~ ✅ 完成(2026-10-25):拆书步骤词表补齐全阶段;任务中心隐藏行与 overview 计数同源;守卫 6 条,全量 1453/0。
 32. ~~**LOOP-32 BUG-5 任务阶段词表中英混写收敛**~~ ✅ 完成(2026-10-25):resolveStageIndex 兼容 key/label,写入点统一中文标签,守卫 4 条,全量 1457/0。
 33. ~~**LOOP-33 UI-1 第三批 B:设置页语义 token 收敛**~~ ✅ 完成(2026-10-25):设置模块 15 处硬编码色迁移,0 残留,守卫 1 条,client 239/239。
-34. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **UI-1 第三批剩余结构对齐**(世界三页/model-routes 组织/style-engine 结构/anti-ai-rules),或 **UI-5 开源 Showcase**;BUG-7 仍需所有者产品语义决策。
+34. ~~**LOOP-34 UI-1 第三批 C:世界样本卡状态与下一步引导**~~ ✅ 完成(2026-10-25):resolveWorldGuidance 纯函数 + 卡片引导区,守卫 5 条,client 244/244。
+35. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **UI-1 第三批剩余**(generator 分步工作区 / style-engine 结构 / anti-ai-rules / model-routes 组织),或 **UI-5 开源 Showcase**;BUG-7 仍需所有者产品语义决策。
     **完成项打勾规则(2026-10-20 所有者要求)**:每轮收尾同步更新 BACKLOG —— 完成项 `[x]` + ✅,进行中 `[/]`,入口建议划线。
 
 ---
@@ -211,6 +212,7 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
   **基线复核(2026-10-20)**:rollout 计划记载的第一批/第二批(2026-07-14)经代码验证属实(语义 token 存在、`components/assetLibrary/` 共享组件被知识库/题材/基础角色三页引用),原描述已过时。
   **本轮完成(第三批 A,LOOP-6)**:写法引擎视觉收敛 —— `writingFormula` 模块 ~300 处调色板硬编码色全部迁移到语义 token,删除 `index.css` 的 `.writing-formula-theme` 暗色 hack 块与 4 处装饰渐变,创建弹窗收敛为常规尺寸;守卫测试 `client/tests/styleEngineVisualContracts.test.js`。
   **第三批 B(LOOP-33)**:设置模块 ~15 处硬编码色(emerald/amber/sky/red/slate)全部迁移到语义 token(success/warning/info/destructive/muted),0 残留;守卫 `client/tests/settingsVisualContracts.test.js`。
+  **第三批 C(LOOP-34)**:世界样本库卡片接入 `resolveWorldGuidance` 纯函数,显示状态/可支撑步骤/下一步;守卫 `client/tests/worldGuidance.test.js`。
   **第三批剩余**:
   - 世界三页(`/worlds`、`/worlds/generator`、`/worlds/:id/workspace`):状态/推荐深化动作与分步工作区的结构对齐(色值仅 1 处,几乎干净);
   - 设置(`/settings/model-routes` 组织 + 设置内部 17 处色值);
