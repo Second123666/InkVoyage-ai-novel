@@ -64,17 +64,17 @@ const REF_KIND_LABEL: Record<string, string> = {
 };
 
 const REF_KIND_COLOR: Record<string, string> = {
-  character_sheet: "border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-700 dark:bg-sky-900/20 dark:text-sky-300",
-  character_expression: "border-pink-200 bg-pink-50 text-pink-700 dark:border-pink-700 dark:bg-pink-900/20 dark:text-pink-300",
-  character_face: "border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-700 dark:bg-sky-900/20 dark:text-sky-300",
-  asset: "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-700 dark:bg-amber-900/20 dark:text-amber-300",
-  scene: "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-700 dark:bg-emerald-900/20 dark:text-emerald-300",
+  character_sheet: "border-category-1/30 bg-category-1/10 text-category-1",
+  character_expression: "border-category-5/30 bg-category-5/10 text-category-5",
+  character_face: "border-category-1/30 bg-category-1/10 text-category-1",
+  asset: "border-category-3/30 bg-category-3/10 text-category-3",
+  scene: "border-category-4/30 bg-category-4/10 text-category-4",
 };
 
 const DENSITY_BADGE: Record<string, { label: string; className: string }> = {
-  low: { label: "低密度", className: "border-emerald-200 bg-emerald-50 text-emerald-700" },
-  medium: { label: "中密度", className: "border-sky-200 bg-sky-50 text-sky-700" },
-  high: { label: "高密度", className: "border-amber-200 bg-amber-50 text-amber-700" },
+  low: { label: "低密度", className: "border-category-4/30 bg-category-4/10 text-category-4" },
+  medium: { label: "中密度", className: "border-category-1/30 bg-category-1/10 text-category-1" },
+  high: { label: "高密度", className: "border-category-3/30 bg-category-3/10 text-category-3" },
 };
 
 function densityBadge(value: string | null | undefined): { label: string; className: string } {
@@ -283,7 +283,7 @@ function StripView({
                     loading={idx < 3 ? "eager" : "lazy"}
                   />
                   {imageStale && (
-                    <span className="absolute left-2 top-2 rounded border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-700">
+                    <span className="absolute left-2 top-2 rounded border border-warning/40 bg-warning/10 px-2 py-0.5 text-[10px] font-medium text-warning">
                       待重抽
                     </span>
                   )}
@@ -421,7 +421,7 @@ function PanelDetailDialog({
                   className="mx-auto max-h-72 w-full rounded-md object-contain lg:max-h-none"
                 />
                 {imageStale && (
-                  <span className="absolute left-2 top-2 rounded border border-amber-200 bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-700">
+                  <span className="absolute left-2 top-2 rounded border border-warning/40 bg-warning/10 px-2 py-0.5 text-[11px] font-medium text-warning">
                     待重抽
                   </span>
                 )}
@@ -454,7 +454,7 @@ function PanelDetailDialog({
               )}
             </Button>
             {imageStale && (
-              <p className="mt-2 rounded border border-amber-200 bg-amber-50 px-2 py-1.5 text-xs leading-relaxed text-amber-800">
+              <p className="mt-2 rounded border border-warning/40 bg-warning/10 px-2 py-1.5 text-xs leading-relaxed text-warning">
                 画面脚本已在上次生图后修改，重抽后图片才会使用新的脚本。
               </p>
             )}
@@ -783,7 +783,7 @@ export function PanelsGridPanel({ projectId, provider }: { projectId: string; pr
                       loading="lazy"
                     />
                     {imageStale && (
-                      <span className="absolute left-2 top-2 rounded border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-700">
+                      <span className="absolute left-2 top-2 rounded border border-warning/40 bg-warning/10 px-2 py-0.5 text-[10px] font-medium text-warning">
                         待重抽
                       </span>
                     )}

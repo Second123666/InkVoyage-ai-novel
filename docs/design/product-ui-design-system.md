@@ -140,6 +140,13 @@
 
 新增颜色前，应先判断能否映射到语义变量。确实需要新增时，先扩展全局 token，再使用。
 
+#### 分类色（category token）
+
+- 需要“区分多个同类类别”而不是表达状态时（资产类型、事实类别、性别、密度等），使用受控分类色 `category-1..6`：定义在 `client/src/index.css` 的浅色与深色主题，`tailwind.config.ts` 暴露为 `category-N`。
+- 不要用状态色（success/warning/info/destructive）承担分类含义，也不要新增调色板色或一次性十六进制颜色。
+- 用法：chip 用 `border-category-N/30 bg-category-N/10 text-category-N`；点状标记用 `bg-category-N`。分类色不得表达成败或风险语义。
+- 新增类别时优先在现有 6 个令牌内复用；确需更多色阶时先扩展全局 token，并同步守卫 `client/tests/categoryColorContracts.test.js`。
+
 ### Typography
 
 - 页面主标题用于对象和阶段，不用于装饰。

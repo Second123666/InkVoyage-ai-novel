@@ -208,9 +208,9 @@ const GENDER_LABELS: Record<ComicCharacterGender, string> = {
 
 const GENDER_BADGE_STYLE: Record<ComicCharacterGender, string> = {
   unknown: "border-border bg-muted text-muted-foreground",
-  male: "border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-700 dark:bg-sky-900/20 dark:text-sky-300",
-  female: "border-pink-200 bg-pink-50 text-pink-700 dark:border-pink-700 dark:bg-pink-900/20 dark:text-pink-300",
-  other: "border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-700 dark:bg-violet-900/20 dark:text-violet-300",
+  male: "border-category-1/30 bg-category-1/10 text-category-1",
+  female: "border-category-5/30 bg-category-5/10 text-category-5",
+  other: "border-category-2/30 bg-category-2/10 text-category-2",
 };
 
 function GenderSelector({ character }: { character: ComicCharacter }) {
@@ -360,9 +360,9 @@ function VisualAnchorEditor({ character }: { character: ComicCharacter }) {
       {editing ? (
         <>
           {/* AI 协助优化 */}
-          <div className="mt-3 rounded-md border border-violet-300/50 bg-violet-50/40 px-2.5 py-2 dark:border-violet-700/50 dark:bg-violet-900/10">
+          <div className="mt-3 rounded-md border border-info/40 bg-info/10 px-2.5 py-2">
             <div className="flex items-center justify-between gap-2">
-              <p className="flex items-center gap-1 text-[10px] font-semibold text-violet-700 dark:text-violet-300">
+              <p className="flex items-center gap-1 text-[10px] font-semibold text-info">
                 <Bot className="h-3 w-3" />
                 AI 协助优化
               </p>
@@ -855,19 +855,19 @@ const ASSET_TYPE_LABELS: Record<CharacterAssetType, string> = {
 const ASSET_TYPE_ORDER: CharacterAssetType[] = ["costume", "weapon", "item", "vehicle", "ability", "other"];
 
 const ASSET_TYPE_ACCENT: Record<CharacterAssetType, { chip: string; dot: string; soft: string }> = {
-  costume: { chip: "border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-700/50 dark:bg-violet-900/20 dark:text-violet-300", dot: "bg-violet-500", soft: "hover:bg-violet-50 hover:border-violet-300 dark:hover:bg-violet-900/20" },
-  weapon:  { chip: "border-rose-200 bg-rose-50 text-rose-700 dark:border-rose-700/50 dark:bg-rose-900/20 dark:text-rose-300", dot: "bg-rose-500", soft: "hover:bg-rose-50 hover:border-rose-300 dark:hover:bg-rose-900/20" },
-  item:    { chip: "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-700/50 dark:bg-amber-900/20 dark:text-amber-300", dot: "bg-amber-500", soft: "hover:bg-amber-50 hover:border-amber-300 dark:hover:bg-amber-900/20" },
-  vehicle: { chip: "border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-700/50 dark:bg-sky-900/20 dark:text-sky-300", dot: "bg-sky-500", soft: "hover:bg-sky-50 hover:border-sky-300 dark:hover:bg-sky-900/20" },
-  ability: { chip: "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-700/50 dark:bg-emerald-900/20 dark:text-emerald-300", dot: "bg-emerald-500", soft: "hover:bg-emerald-50 hover:border-emerald-300 dark:hover:bg-emerald-900/20" },
+  costume: { chip: "border-category-2/30 bg-category-2/10 text-category-2", dot: "bg-category-2", soft: "hover:bg-category-2/10 hover:border-category-2/30" },
+  weapon:  { chip: "border-category-5/30 bg-category-5/10 text-category-5", dot: "bg-category-5", soft: "hover:bg-category-5/10 hover:border-category-5/30" },
+  item:    { chip: "border-category-3/30 bg-category-3/10 text-category-3", dot: "bg-category-3", soft: "hover:bg-category-3/10 hover:border-category-3/30" },
+  vehicle: { chip: "border-category-1/30 bg-category-1/10 text-category-1", dot: "bg-category-1", soft: "hover:bg-category-1/10 hover:border-category-1/30" },
+  ability: { chip: "border-category-4/30 bg-category-4/10 text-category-4", dot: "bg-category-4", soft: "hover:bg-category-4/10 hover:border-category-4/30" },
   other:   { chip: "border-border bg-muted text-muted-foreground", dot: "bg-muted-foreground/60", soft: "hover:bg-muted/60" },
 };
 
 const STATUS_DOT_STYLE: Record<string, string> = {
   idle: "bg-muted-foreground/30",
-  generating: "bg-sky-500 animate-pulse",
-  done: "bg-emerald-500",
-  error: "bg-rose-500",
+  generating: "bg-info animate-pulse",
+  done: "bg-success",
+  error: "bg-destructive",
 };
 
 const STATUS_DOT_TITLE: Record<string, string> = {
@@ -1183,9 +1183,9 @@ const FACT_CATEGORY_BADGE: Record<
   string,
   { label: string; className: string }
 > = {
-  completed: { label: "已发生", className: "border-sky-200 bg-sky-50 text-sky-700 dark:border-sky-700 dark:bg-sky-900/20 dark:text-sky-300" },
-  revealed: { label: "首次登场", className: "border-violet-200 bg-violet-50 text-violet-700 dark:border-violet-700 dark:bg-violet-900/20 dark:text-violet-300" },
-  state_changed: { label: "状态变化", className: "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-700 dark:bg-amber-900/20 dark:text-amber-300" },
+  completed: { label: "已发生", className: "border-category-1/30 bg-category-1/10 text-category-1" },
+  revealed: { label: "首次登场", className: "border-category-2/30 bg-category-2/10 text-category-2" },
+  state_changed: { label: "状态变化", className: "border-category-3/30 bg-category-3/10 text-category-3" },
 };
 
 function FactsSection({ projectId }: { projectId: string }) {

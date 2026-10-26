@@ -47,6 +47,12 @@ const config: Config = {
           DEFAULT: "hsl(var(--info))",
           foreground: "hsl(var(--info-foreground))",
         },
+        "category-1": "hsl(var(--category-1))",
+        "category-2": "hsl(var(--category-2))",
+        "category-3": "hsl(var(--category-3))",
+        "category-4": "hsl(var(--category-4))",
+        "category-5": "hsl(var(--category-5))",
+        "category-6": "hsl(var(--category-6))",
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",

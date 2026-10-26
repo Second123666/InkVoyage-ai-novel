@@ -25,6 +25,13 @@
   --warning-foreground: 48 100% 96%;
   --info: 199 78% 36%;
   --info-foreground: 204 100% 97%;
+  /* 分类色(UI-6):仅用于资产类型/事实类别/性别/密度等"类别区分",不表达状态语义。 */
+  --category-1: 199 75% 38%;
+  --category-2: 262 55% 48%;
+  --category-3: 32 85% 34%;
+  --category-4: 142 55% 32%;
+  --category-5: 350 65% 42%;
+  --category-6: 187 70% 32%;
   --border: 214.3 31.8% 91.4%;
   --input: 214.3 31.8% 91.4%;
   --ring: 222.2 84% 4.9%;
@@ -116,6 +123,12 @@
   --success: 142 55% 48%;
   --warning: 38 92% 55%;
   --info: 199 80% 58%;
+  --category-1: 199 75% 65%;
+  --category-2: 262 65% 72%;
+  --category-3: 38 85% 62%;
+  --category-4: 142 55% 58%;
+  --category-5: 350 70% 68%;
+  --category-6: 187 65% 60%;
 }
 
 /* Prompt Workbench predates the shared theme tokens and carries a dense set of
