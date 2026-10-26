@@ -249,8 +249,8 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
   在低边框规范之上做"加法"而非堆装饰:明暗双主题切换(基于语义 token)、微交互与过渡(生产链进度、状态变化、卡片 hover 层级)、Loading/Empty 的插画化与品牌感、正文阅读氛围(章节页排印密度)。
   验收:核心页明暗两套走查通过;所有动效可被 `prefers-reduced-motion` 关闭;typecheck 通过;截图记入 PROGRESS。
 
-- [/] **UI-3 可视化富化(按可视化栈定盘落地)** · M–L · P2(LOOP-46 审计:主要面已达标)
-  **已完成**:① `WorldVisualizationBoard` 已拆到 `WorldGraphCanvas` 并使用 React Flow;② 角色关系网/势力图谱 `CharacterRelationshipGraphPanel` 使用 React Flow;⑤ 紧张度曲线 `TensionCurveFlowCanvas` 使用 React Flow;故事世界图谱(INN-C1/LOOP-13/14)亦为 React Flow + 懒加载。**剩余增量**:③ 故事时间线视图、④ 导演工作流步骤图、⑥ 统计面板(Recharts)→ 登记 UI-7,待排期。
+- [x] **UI-3 可视化富化(按可视化栈定盘落地)** · M–L · P2(= LOOP-46 主要面 + LOOP-52~54 增量,2026-10-26 整项完成) ✅
+  **已完成**:① `WorldVisualizationBoard` 已拆到 `WorldGraphCanvas` 并使用 React Flow;② 角色关系网/势力图谱 `CharacterRelationshipGraphPanel` 使用 React Flow;⑤ 紧张度曲线 `TensionCurveFlowCanvas` 使用 React Flow;故事世界图谱(INN-C1/LOOP-13/14)亦为 React Flow + 懒加载。**剩余增量已由 UI-7 完成**:③ 故事时间线视图、④ 导演工作流步骤图、⑥ 统计面板(Recharts)。
   栈已定盘(React Flow + d3 数学 + Recharts,全部懒加载零首屏增量),候选面按该文档优先级:
   ① `WorldVisualizationBoard`(836 行手写)迁 React Flow + d3-force;
   ② 角色关系网与势力图谱(React Flow 节点图);
