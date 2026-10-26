@@ -59,6 +59,9 @@ export interface ProductionBoardModel {
     ratio: number;
   }>;
   unassignedChapterCount: number;
+  // UI-7 统计图表数据:卷字数与质量债务问题码分布(供 Recharts 面板使用)。
+  wordCountByVolume: Array<{ name: string; wordCount: number }>;
+  debtIssueCounts: Array<{ code: string; count: number }>;
 }
 
 export function buildProductionBoardModel(input: {
@@ -131,6 +134,33 @@ export function buildProductionBoardModel(input: {
 
   const unassignedChapterCount = chapters.filter((chapter) => !assignedOrders.has(chapter.order)).length;
 
+  const wordCountByVolume = volumeProgress.map((volume, index) => {
+    const volumeChapters = (input.volumes.find((item) => item.id === volume.volumeId)?.chapters ?? [])
+      .map((chapter) => chapterByOrder.get(chapter.chapterOrder))
+      .filter((chapter): chapter is ProductionBoardChapterInput => Boolean(chapter));
+    return {
+      name: `第 ${index + 1} 卷`,
+      wordCount: volumeChapters.reduce((sum, chapter) => sum + Math.max(0, chapter.wordCount ?? 0), 0),
+    };
+  });
+  const unassignedWordCount = chapters
+    .filter((chapter) => !assignedOrders.has(chapter.order))
+    .reduce((sum, chapter) => sum + Math.max(0, chapter.wordCount ?? 0), 0);
+  if (unassignedWordCount > 0) {
+    wordCountByVolume.push({ name: "未挂卷", wordCount: unassignedWordCount });
+  }
+
+  const issueCodeCounts = new Map<string, number>();
+  for (const chapter of chapters) {
+    for (const code of chapter.qualityDebt?.issueCodes ?? []) {
+      issueCodeCounts.set(code, (issueCodeCounts.get(code) ?? 0) + 1);
+    }
+  }
+  const debtIssueCounts = Array.from(issueCodeCounts.entries())
+    .map(([code, count]) => ({ code, count }))
+    .sort((left, right) => right.count - left.count || left.code.localeCompare(right.code))
+    .slice(0, 8);
+
   return {
     totalChapters,
     totalWordCount,
@@ -140,5 +170,7 @@ export function buildProductionBoardModel(input: {
     debtHotspots,
     volumeProgress,
     unassignedChapterCount,
+    wordCountByVolume,
+    debtIssueCounts,
   };
 }

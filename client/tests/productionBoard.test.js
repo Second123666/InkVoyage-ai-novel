@@ -90,6 +90,36 @@ test("看板聚合:状态分布含零项、待处理按严重度优先、债务�
   assert.deepEqual(empty.debtHotspots, []);
 });
 
+test("统计面板:卷字数与债务问题码聚合、Recharts 懒加载纪律", async () => {
+  const chapters = [
+    chapter({ id: "c1", order: 1, status: "completed", wordCount: 3000 }),
+    chapter({ id: "c2", order: 2, status: "quality_debt", qualityDebt: debt(["A", "B"]) }),
+    chapter({ id: "c3", order: 3, status: "quality_debt", qualityDebt: debt(["A"]), wordCount: 1200 }),
+  ];
+  const model = buildProductionBoardModel({
+    chapters,
+    volumes: [
+      { id: "v1", sortOrder: 1, title: "第一卷", chapters: [{ chapterOrder: 1 }, { chapterOrder: 2 }] },
+    ],
+  });
+  assert.deepEqual(model.wordCountByVolume, [
+    { name: "第 1 卷", wordCount: 3000 },
+    { name: "未挂卷", wordCount: 1200 },
+  ], "卷字数按卷聚合,未挂卷章节单独统计");
+  assert.deepEqual(model.debtIssueCounts, [
+    { code: "A", count: 2 },
+    { code: "B", count: 1 },
+  ], "问题码按命中章节数降序聚合");
+
+  const page = await read("src/pages/novels/productionBoard/ProductionBoardPage.tsx");
+  assert.match(page, /lazy\(\(\) => import\("\.\/ProductionStatsCharts"\)\)/, "统计图表必须按需懒加载");
+  assert.doesNotMatch(page, /from "recharts"/, "看板主界面不得直接引入 Recharts");
+
+  const charts = await read("src/pages/novels/productionBoard/ProductionStatsCharts.tsx");
+  assert.match(charts, /from "recharts"/, "图表组件使用既有可视化栈依赖");
+  assert.doesNotMatch(charts, /#[0-9a-fA-F]{6}/, "图表颜色必须使用语义 token,不得新增硬编码色");
+});
+
 test("看板路由、入口与页面装配", async () => {
   const router = await read("src/router/index.tsx");
   assert.match(router, /import\("@\/pages\/novels\/productionBoard\/ProductionBoardPage"\)/, "看板页必须懒加载注册");

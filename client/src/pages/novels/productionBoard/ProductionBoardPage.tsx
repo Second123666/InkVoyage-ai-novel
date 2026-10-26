@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { lazy, Suspense, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight } from "lucide-react";
@@ -9,6 +9,9 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import ProductionCostPanel from "./ProductionCostPanel";
 import { buildProductionBoardModel, CHAPTER_STATUS_META } from "./productionBoardModel";
+
+// UI-7 统计图表:Recharts 依赖只在按需 chunk 内加载,看板主界面与首屏不引入图表库。
+const ProductionStatsCharts = lazy(() => import("./ProductionStatsCharts"));
 
 // INN-C2 生产看板:章节状态、质量债务热点与卷进度一屏总览(复用既有投影,不新增后端契约)。
 const TONE_CLASS: Record<string, string> = {
@@ -180,6 +183,14 @@ export default function ProductionBoardPage() {
               </div>
             )}
           </section>
+
+          <Suspense fallback={<div className="rounded-xl bg-muted/20 p-4 text-xs text-muted-foreground">正在加载统计图表…</div>}>
+            <ProductionStatsCharts
+              statusCounts={model.statusCounts}
+              wordCountByVolume={model.wordCountByVolume}
+              debtIssueCounts={model.debtIssueCounts}
+            />
+          </Suspense>
 
           <ProductionCostPanel novelId={id} />
         </>
