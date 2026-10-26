@@ -1,6 +1,6 @@
 # 改进待办池 · Backlog
 
-更新:2026-10-25
+更新:2026-10-26
 配套流程:[improvement-workflow.md](improvement-workflow.md) · 进度:[PROGRESS.md](PROGRESS.md)
 
 状态标记:`[ ]` 待做 · `[/]` 进行中 · `[x]` 完成 · `[~]` 冻结/搁置 · `[!]` 降级为实验
@@ -59,7 +59,8 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 48. ~~**LOOP-48 RF-4 文档一致性清理**~~ ✅ 完成(2026-10-26):519 引用校验,修复 11 个失效引用,剩余 3 项为环境文件/构建产物。
 49. ~~**LOOP-49 RF-5 依赖面收敛**~~ ✅ 完成(2026-10-26):运行时环 0(假环为类型边),RAG 单例惰性化,守卫 2 条,server 1464/1452/0。
 50. ~~**LOOP-50 OPS-3 许可与归属梳理**~~ ✅ 完成(2026-10-26):NOTICE 衍生声明 + README + wiki + 守卫 4 条。
-51. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **OPS-4 对外文档审校**;其后 UI-6(promptWorkbench 主题、可视化分类色)、UI-7 可视化增量、BUG-7、OPS-1/2 仍需所有者决策/排期。
+51. ~~**LOOP-51 OPS-4 对外文档审校**~~ ✅ 已完成(2026-10-26):失效链接 7 条修复 + slug 守卫;自动导演过时流程 5 文档重写;运行记录/创作向导术语统一;备份补主密钥;README 与 release-notes 对齐。
+52. **待所有者决策/排期**:UI-7(可视化增量,可排期)、UI-8(截图刷新,需真实数据环境)、UI-6(分类色体系)、BUG-7(恢复豁免语义)、OPS-1(转公开历史清理)、OPS-2(命名与身份链接清单)。
     **完成项打勾规则(2026-10-20 所有者要求)**:每轮收尾同步更新 BACKLOG —— 完成项 `[x]` + ✅,进行中 `[/]`,入口建议划线。
 
 ---
@@ -267,6 +268,10 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
   首页/项目概览成为"可截图的一页 demo":当前创作状态、主链亮点、下一步动作一屏;服务"个人开源作品"定位,与公开介绍站(`site/`)表述一致。
   验收:新访客 30 秒内理解"这是什么、怎么开始";与 `site/` 无表述冲突。
 
+- [ ] **UI-8 公开文档与 README 截图刷新** · S · P2(LOOP-51 审计发现,**需真实数据环境**)
+  现状:docs/public 与 README 多处产品截图与当前 UI 不一致 —— 旧侧栏「任务中心/短剧即将推出/漫画 Beta」、旧模型路由页(planner/writer/review 标识)、旧创作中枢审批线程、旧自动导演创建弹窗(四种运行模式)。LOOP-51 已移除两张误导性最强的创建弹窗截图,其余待重截。
+  做法:在配置好示例小说的环境按文档页逐张重截,替换同名文件;同步核对 alt 文案与图注。验收:文档与 README 不再出现已下线的入口名/模式/页面结构。
+
 - [ ] **UI-6 分类 chip 色彩体系决策** · S · P2(LOOP-38 审计发现,**需所有者/设计决策**)
   短剧/漫画的分类 chip(资产类型 costume/vehicle、事实类别 completed/revealed、性别、密度)用 sky/violet/amber/emerald 区分多个类别。语义 token 只有 success/destructive/warning/info/muted,折叠会丢失类别区分度。
   待决策:① 为"分类色"新增一组受控 token(如 category-1..N);② 保留多色但纳入设计规范并允许;③ 改用"单色 + 图标/文字前缀"区分。
@@ -278,6 +283,8 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
   删 `refs/remotes/upstream/*` + `git gc --prune=now`,复检历史无旧 key;遵守红线(绝不 push --all/--mirror)。
 - [ ] **OPS-2 品牌与命名定稿** · S · P2
   是否改项目名、README/介绍站/包名统一表述;由所有者拍板。
+  **输入清单(LOOP-51 审计)**:README 的 Releases/Latest Release 链接、GitHub Pages 介绍站链接、Trendshift 徽标、Ani Book Skill 链接、vibe-doctor 的 GitHub blob 链接,以及 `site/`、`client/src/components/layout/ProjectGithubLink.tsx`、creativeHub 等处的上游仓库引用 —— 定稿后一次性统一为自有仓库/站点。
 - [x] **OPS-3 LICENSE / NOTICE / CLA 归属梳理** · S · P2(= LOOP-50,2026-10-26 完成) ✅
   结果:审计确认许可栈完整(LICENSE 双许可 + AGPL 全文、CLA 版权保留 + 商业再许可、CONTRIBUTING、5 包 license 一致);NOTICE 补充「独立衍生」声明与上游保留条款,README 同步;新增 wiki `product/licensing-and-attribution.md` 与守卫 `server/tests/licensing.test.js`(4 条)。
-- [ ] **OPS-4 对外文档审校** · S · P3。
+- [x] **OPS-4 对外文档审校** · S · P3(= LOOP-51,2026-10-26 完成) ✅
+  结果:3 个子代理并行审计(模块 21 篇 / 顶层·流程·手册 13 篇 / 链接与 manifest),高严重度结论回归代码核实后落地 —— 7 条失效 `#/docs` 链接修复并新增 slug 守卫(负向测试通过);自动导演"四种运行模式"过时流程在 5 篇文档重写为「先完成导演准备 → 简易/专业创作」;「任务中心→运行记录」61 处、「新手上路→创作向导」14 处统一;备份清单补主密钥成对备份;恢复手册去内部术语;README 与 release-notes 对齐 2026-10-26。验证:35 md 链接全通过、manifest 35/35/17、site typecheck 0 错误。残留:截图过期 → UI-8;上游身份链接 → OPS-2。

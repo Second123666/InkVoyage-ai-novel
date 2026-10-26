@@ -17,6 +17,31 @@
 
 ---
 
+## 2026-10-26 · LOOP-51 · 对外文档审校(OPS-4)
+
+- **类别**: 文档 / 开源就绪(OPS 线;主对话执行)
+- **目标**: OPS-4 —— README 与 docs/public 的对外表述、链接、产品事实一致性全面审校。
+- **审计方法**: 3 个只读子代理并行(21 篇模块文档 / 13 篇顶层·流程·手册 / 全量链接与 site manifest);高严重度结论逐条回归代码核实(`RUN_MODE_OPTIONS`、运行记录只读语义、加密备份要求),不盲信审计意见。
+- **改动**:
+  1. **失效链接 ×7**(全在 development-roadmap.md):`#/docs/flow-*`、`playbook-*` 旧 slug 改为 manifest 现行 id;删除指向不存在的 `module-book-world` 链接。**防回退**:`scripts/check-docs-manifest.cjs` 新增文档内 `#/docs/<id>` 校验(负向注入坏 slug 确认可拦截),现校验 35 文档 / 35 可寻址 id / 17 阶段 key。
+  2. **过时产品流程重写 ×5 文档**:自动导演已无"四种运行模式"—— 创建页固定「先完成导演准备」,准备完成后选简易创作/专业创作,「正文后去 AI 检测与修正」为开关(以 `RUN_MODE_OPTIONS` / `DEFAULT_VISIBLE_RUN_MODE` 与接管页代码为准);重写 faq、usage-guide、end-to-end-production、auto-director-pipeline、first-novel-walkthrough 相关段落,删除展示已下线模式的旧截图(README 同名旧图一并移除)。
+  3. **术语统一**:「任务中心」→「运行记录」61 处(16 文件,仅保留图片文件名);「新手上路」→「创作向导」14 处(与导航一致);「漫画工坊」→「漫画工作台」;novels「三种开书入口」改正为四种;site manifest 三条标题/描述同步(运行记录只读定位、创作中枢只读定位)。
+  4. **安全事实**:installation/faq/troubleshooting 备份清单补主密钥文件(`data/secrets/master.key`)与成对备份说明(API Key 已加密落库,缺主密钥无法恢复)。
+  5. **恢复手册去实现化**:recovery-by-phase 的 waiting approval / taskId / checkpointType / stale 等内部说法改为页面可见语言;troubleshooting 移除面向开发者的架构规则;task-center 队列章节加「开发者参考」定位;vibe-coding 页注明面向维护者。
+  6. **README**:最新更新块与 release-notes 对齐到 2026-10-26(并修正"安全"小节混入修复项的错位);6 处改口式/开发者向表述清理;文档计数补充"另有完整版本更新历史"。
+  7. **release-notes 收尾**:按日期拆分 10-25/10-26 块并清除"不再/现在"式叙述(此前工作区遗留改动,本轮核验后纳入提交)。
+- **验证**:
+  - 全量相对链接复检:35 个 md(34 docs/public + README)**ALL LINKS OK**,图片目标全部存在;
+  - `pnpm check:docs-manifest`:35 文档登记 / 35 可寻址 id / 17 导演阶段 key;负向注入坏 slug 时正确失败;
+  - `pnpm --filter @ai-novel/site typecheck`:0 错误(manifest 是唯一 TS 改动);
+  - server/client 运行时零改动,沿用 LOOP-50 全量 `1464 / 1452 / 0` 与 LOOP-46 client `271/271`;UI 验收(截图)按规则留待所有者。
+- **遗留**:
+  - 公开文档与 README 的产品截图多处与当前 UI 不一致(旧侧栏「任务中心/短剧即将推出/漫画 Beta」、旧模型路由页、旧创作中枢),需在配置好数据的真实环境重截 → **UI-8**;
+  - README/site/client 的上游身份链接(Releases、GitHub Pages、Trendshift、vibe-doctor 的 GitHub blob)与命名定稿绑定 → 并入 **OPS-2** 输入清单;
+  - 技术型 flow/模块文档保留内部实现参考(README 明示「自动导演阶段全景」供开发者查阅),已用「开发者参考/代码来源」标注边界。
+- **发布说明**: 纯文档审校,无产品行为变化,未新增发布说明条目;release-notes 既有条目的日期归属与表述已修订。
+- **下一步**: OPS-4 完成。后续 **UI-7(可视化增量)/ UI-8(截图刷新)** 可排期执行;**UI-6(分类色)、BUG-7(恢复豁免语义)、OPS-1(转公开)、OPS-2(命名与身份链接)** 需所有者拍板。
+
 ## 2026-10-26 · LOOP-50 · OPS-3 许可、归属与贡献授权梳理
 
 - **类别**: 开源就绪(OPS 线;主对话执行)
