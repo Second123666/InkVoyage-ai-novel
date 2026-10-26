@@ -17,6 +17,19 @@
 
 ---
 
+## 2026-10-26 · LOOP-56 · UI-6 受控分类色 token
+
+- **类别**: UI(设计系统;主对话执行;所有者已决策:新增受控 category token)
+- **目标**: 给“分类 chip”一套受控调色板,消除 sky/violet/emerald/amber/rose 等散落调色板色。
+- **改动**:
+  1. 新增 `category-1..6` token(浅色/深色两套,`index.css`)+ Tailwind 暴露(`category-N`);
+  2. 漫画角色/面板两个文件迁移:性别、资产类型、事实类别、面板类型、密度 → category token;生成状态点 → info/success/destructive;AI 协助框 → info;待重抽提示 → warning;
+  3. 设计规范新增「分类色」规则(`docs/design/product-ui-design-system.md`);守卫 `categoryColorContracts.test.js`(2 条:token 定义完整、目标文件零调色板残留 + 状态语义正确)。
+- **验证**: client typecheck 0 错误;client **280/280**;client build 通过且产物 CSS 含 `bg/border/text-category-*`;server 未动,沿用 LOOP-54 `1470 / 1458 / 0`。UI 视觉验收(明暗两套)留待所有者。
+- **发布说明**: 分类 chip 色彩收敛属细微视觉调整,按规则跳过。
+- **遗留**: 可视化画布的分类色(关系图/世界图谱节点)仍为独立设计面,可后续复用同一 token 体系迁移。
+- **下一步**: BUG-7 恢复语义(已获决策)。
+
 ## 2026-10-26 · LOOP-55 · OPS-1 转公开前本地历史清理
 
 - **类别**: 开源就绪(安全 / 仓库治理;主对话执行,所有者已批准)
