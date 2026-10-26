@@ -192,6 +192,8 @@ export interface TimelineRepository {
   }): Promise<StoryTimelineEvent[]>;
   listPlannedEventsForChapter(input: { novelId: string; chapterIndex: number }): Promise<StoryTimelineEvent[]>;
   listForbiddenEventsForChapter(input: { novelId: string; chapterIndex: number }): Promise<StoryTimelineEvent[]>;
+  listEventsForNovel(input: { novelId: string; limit?: number }): Promise<{ items: StoryTimelineEvent[]; truncated: boolean }>;
+  listHooksForNovel(input: { novelId: string; limit?: number }): Promise<{ items: TimelineHook[]; truncated: boolean }>;
   listOpenHooks(input: { novelId: string; chapterIndex: number }): Promise<TimelineHook[]>;
   listActiveConstraints(input: { novelId: string; chapterId?: string; chapterIndex: number }): Promise<TimelineConstraint[]>;
   getChapterTimeAnchor(input: { novelId: string; chapterId: string }): Promise<ChapterTimeAnchor | null>;
@@ -256,6 +258,32 @@ export class PrismaTimelineRepository implements TimelineRepository {
       take: 12,
     });
     return rows.map(mapTimelineEvent);
+  }
+
+  async listEventsForNovel(input: { novelId: string; limit?: number }): Promise<{ items: StoryTimelineEvent[]; truncated: boolean }> {
+    const limit = input.limit ?? 400;
+    const rows = await prisma.storyTimelineEvent.findMany({
+      where: { novelId: input.novelId },
+      orderBy: [{ eventOrder: "asc" }, { updatedAt: "asc" }],
+      take: limit + 1,
+    });
+    return {
+      items: rows.slice(0, limit).map(mapTimelineEvent),
+      truncated: rows.length > limit,
+    };
+  }
+
+  async listHooksForNovel(input: { novelId: string; limit?: number }): Promise<{ items: TimelineHook[]; truncated: boolean }> {
+    const limit = input.limit ?? 200;
+    const rows = await prisma.timelineHook.findMany({
+      where: { novelId: input.novelId },
+      orderBy: [{ createdInChapterIndex: "asc" }, { createdAt: "asc" }],
+      take: limit + 1,
+    });
+    return {
+      items: rows.slice(0, limit).map(mapTimelineHook),
+      truncated: rows.length > limit,
+    };
   }
 
   async listOpenHooks(input: { novelId: string; chapterIndex: number }): Promise<TimelineHook[]> {

@@ -528,6 +528,7 @@ body {
   .mobile-route-base-characters,
   .mobile-route-story-graph,
   .mobile-route-production-board,
+  .mobile-route-story-timeline,
   .mobile-route-novel-edit,
   .mobile-route-chapter-edit {
     overflow-x: hidden;
@@ -565,6 +566,7 @@ body {
   .mobile-route-base-characters,
   .mobile-route-story-graph,
   .mobile-route-production-board,
+  .mobile-route-story-timeline,
   .mobile-route-novel-edit,
   .mobile-route-chapter-edit,
   .mobile-page-novel-edit,

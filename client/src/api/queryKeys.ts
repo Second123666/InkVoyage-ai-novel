@@ -40,6 +40,7 @@ export const queryKeys = {
     worldSlice: (id: string) => ["novels", "world-slice", id] as const,
     snapshots: (id: string) => ["novels", "snapshots", id] as const,
     storyGraph: (id: string) => ["novels", "story-graph", id] as const,
+    storyTimeline: (id: string) => ["novels", "story-timeline", id] as const,
     costReport: (id: string, days: number) => ["novels", "cost-report", id, days] as const,
     productionBudget: (id: string) => ["novels", "production-budget", id] as const,
   },

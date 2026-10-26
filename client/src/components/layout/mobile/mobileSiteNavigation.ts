@@ -29,6 +29,7 @@ export const MOBILE_ROUTE_PATTERNS: MobileRoutePattern[] = [
   { key: "story-graph", pattern: /^\/novels\/[^/]+\/story-graph\/?$/, title: "故事世界图谱", group: "novels" },
   { key: "production-board", pattern: /^\/novels\/[^/]+\/production-board\/?$/, title: "生产看板", group: "novels" },
   { key: "chapter-edit", pattern: /^\/novels\/[^/]+\/chapters\/[^/]+\/?$/, title: "章节正文", group: "novels" },
+  { key: "story-timeline", pattern: /^\/novels\/[^/]+\/story-timeline\/?$/, title: "故事时间线", group: "novels" },
   { key: "drama", pattern: /^\/drama\/?$/, title: "短剧", group: "creation" },
   { key: "creative-hub", pattern: /^\/creative-hub\/?$/, title: "创作中枢", group: "creation" },
   { key: "chat-legacy", pattern: /^\/chat-legacy\/?$/, title: "旧版聊天", group: "creation" },

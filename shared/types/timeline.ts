@@ -174,6 +174,17 @@ export const timelineHookSchema = z.object({
   updatedAt: z.string(),
 });
 
+export const storyTimelineOverviewSchema = z.object({
+  events: z.array(storyTimelineEventSchema),
+  hooks: z.array(timelineHookSchema),
+  stats: z.object({
+    eventCount: z.number().int(),
+    hookCount: z.number().int(),
+    eventsTruncated: z.boolean(),
+    hooksTruncated: z.boolean(),
+  }),
+});
+
 export const timelineConstraintTypeSchema = z.enum([
   "must_include",
   "must_continue",
@@ -341,6 +352,7 @@ export type TimelineHookDraft = z.infer<typeof timelineHookDraftSchema>;
 export type TimelineStateTargetType = z.infer<typeof timelineStateTargetTypeSchema>;
 export type TimelineStateChange = z.infer<typeof timelineStateChangeSchema>;
 export type StoryTimelineEvent = z.infer<typeof storyTimelineEventSchema>;
+export type StoryTimelineOverview = z.infer<typeof storyTimelineOverviewSchema>;
 export type ChapterTimeAnchor = z.infer<typeof chapterTimeAnchorSchema>;
 export type TimelineHook = z.infer<typeof timelineHookSchema>;
 export type TimelineConstraint = z.infer<typeof timelineConstraintSchema>;

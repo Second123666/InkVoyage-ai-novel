@@ -299,7 +299,13 @@ function DesktopNovelEditView(props: NovelEditViewProps) {
                     这里收纳次级信息。首屏只保留当前步骤和恢复接管入口，避免主工作区被项目辅助信息挤满。
                   </DialogDescription>
                 </DialogHeader>
-                <div className="flex justify-end">
+                <div className="flex flex-wrap justify-end gap-2">
+                  <Button asChild variant="outline" size="sm">
+                    <Link to={`/novels/${id}/story-timeline`}>
+                      打开故事时间线
+                      <ArrowRight className="ml-1 h-4 w-4" />
+                    </Link>
+                  </Button>
                   <Button asChild variant="outline" size="sm">
                     <Link to={`/novels/${id}/production-board`}>
                       打开生产看板
