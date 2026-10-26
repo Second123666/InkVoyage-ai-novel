@@ -17,6 +17,22 @@
 
 ---
 
+## 2026-10-26 · LOOP-65 · 公开前许可与旧品牌素材清理
+
+- **类别**: 开源就绪(OPS 线收尾)
+- **背景**: 所有者准备把私有仓库转为公开,要求处理剩余的许可附加限制、无归属第三方 skill 与旧品牌截图。
+- **改动**:
+  1. **许可**:`LICENSE` 去掉自定义前缀与“服务型商用须单独授权”条款,恢复纯 AGPL-3.0 原文;`NOTICE` 保留上游版权与独立衍生声明,补充上游 MIT/Apache/AGPL 历史许可、当前 AGPL-3.0-only 与商业合作说明;`README` License 段、`CLA.md`、`CONTRIBUTING.md` 同步去掉商业再许可承诺;
+  2. **第三方 skill**:删除 `.agents/skills/shadcn-ui` 与 `.claude/skills/shadcn-ui`(来源 google-labs-code/stitch-skills,Apache-2.0,仓库内无独立许可归属),同步删除 `skills-lock.json`;
+  3. **旧品牌素材**:删除角色库/知识库/导演模式旧截图 5 张与自动导演流程旧截图 8 张,移除对应公开文档图片引用;`auto-director-pipeline.md` 的“界面截图路径”改为“操作路径说明”;
+  4. **社交预览**:用当前墨航 InkVoyage 品牌与桌面图标重做 1280x640 / 640x320 与站点 OG 图;
+  5. **守卫**:`licensing.test.js` 扩为 6 条,锁定纯 AGPL、上游归属、CLA 边界、workspace 许可、shadcn skill 不回流、旧品牌截图不回流;
+  6. **远端 tags**:经所有者确认,删除 GitHub 上 67 个上游旧 tag,复核 `git ls-remote --tags github` 为 0;删除前清单保存在 `.logs/github-tags-before-delete-2026-10-26.txt`。
+- **验证**:`node --test server/tests/licensing.test.js` 6/6;`check:docs-manifest` 通过;全库检查无残留旧图片引用;`git grep` 无旧品牌文件名;远端 tags 0。
+- **发布说明**:已记 release-notes/README(2026-10-26)。
+- **遗留**:GitHub Releases 需在页面核对并删除旧记录;桌面 productName/appId/APP_NAME 仍为旧技术标识(数据目录/更新通道迁移另行处理);UI-8 剩余截图由所有者补拍。
+- **下一步**:核对 Releases 与仓库设置后切换仓库可见性。
+
 ## 2026-10-26 · LOOP-64 · 开发启动降噪(`pnpm dev` 控制台)
 
 - **类别**: 开发体验 / 缺陷修复

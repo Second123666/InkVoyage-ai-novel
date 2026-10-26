@@ -1,21 +1,32 @@
 墨航 InkVoyage (InkVoyage)
-Copyright 2026 ExplosiveCoderflome and contributors
 
-This repository (墨航 InkVoyage) is an independently maintained derivative of
-the upstream "AI-Novel-Writing-Assistant" project. Upstream copyright notices and license
+Upstream project:
+  AI-Novel-Writing-Assistant
+  Copyright 2026 ExplosiveCoderflome and contributors
+
+This repository is an independently maintained derivative of the upstream
+"AI-Novel-Writing-Assistant" project. Upstream copyright notices and license
 terms are preserved. Modifications and new contributions made in this
-repository are Copyright 2026 Second123666 and contributors (replace with the
-maintainer's legal name before a formal release if required).
+repository are Copyright 2026 Second123666 and contributors.
 
-This repository uses a dual-license model.
+Upstream license history:
+- Public revisions released before 2026-04-19 were published under the MIT
+  License.
+- Revisions from 2026-04-19 through 2026-04-25 were published under the
+  Apache License, Version 2.0.
+- Current upstream revisions are published under the GNU Affero General
+  Public License v3.0 only (AGPL-3.0-only).
 
-By default, this repository is distributed under the GNU Affero General Public
-License v3.0 only (AGPL-3.0-only).
+This repository is distributed under the GNU Affero General Public License
+v3.0 only (AGPL-3.0-only). The full license text is in LICENSE.
 
-Service-style commercial use requires separate commercial authorization from
-the project maintainer. This includes using this project, or a modified version
-of it, as a backend or core service to provide SaaS, hosted, managed, or
-similar services to third parties.
+Commercial cooperation:
+  Commercial cooperation inquiries are welcome and can be directed to the
+  project maintainer. This does not change the open-source license: the
+  repository and any modified version remain available under AGPL-3.0-only,
+  and upstream portions remain subject to their original license terms.
 
-Please comply with the open-source license terms and obtain the appropriate
-authorization where applicable.
+Third-party notices:
+  Dependencies are declared in the workspace package manifests and remain
+  subject to their own licenses. Third-party assets added later must record
+  their source and license here or in the relevant directory.
