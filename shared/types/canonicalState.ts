@@ -74,6 +74,13 @@ export const canonicalOpenConflictStateSchema = z.object({
   updatedAt: z.string().nullable().optional(),
 });
 
+const canonicalPayoffRiskSignalSchema = z.object({
+  code: z.string(),
+  severity: z.enum(["low", "medium", "high", "critical"]),
+  summary: z.string(),
+  stale: z.boolean().optional(),
+});
+
 export const canonicalPayoffStateSchema = z.object({
   id: z.string(),
   ledgerKey: z.string(),
@@ -90,6 +97,8 @@ export const canonicalPayoffStateSchema = z.object({
   payoffChapterId: z.string().nullable().optional(),
   statusReason: z.string().nullable().optional(),
   confidence: z.number().nullable().optional(),
+  // A1-G3:对账产生的风险信号随快照进入运行时账本,注入侧无需回查数据库。
+  riskSignals: z.array(canonicalPayoffRiskSignalSchema).default([]),
   createdAt: z.string().nullable().optional(),
   updatedAt: z.string().nullable().optional(),
 });

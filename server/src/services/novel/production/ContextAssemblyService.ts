@@ -66,16 +66,23 @@ function buildPayoffDirective(
   }
 
   const targetStart = payoff.targetStartChapterOrder;
+  // A1-G5:逾期条目不再只按 pressure 轻触,而是升级为 payoff 指令 ——
+  // 本章必须兑现或明确说明延期,避免逾期在注入侧被弱化为背景压力。
   const operation: ChapterPayoffDirective["operation"] = payoff.currentStatus === "setup"
     ? (typeof targetStart === "number" && targetStart <= chapterOrder ? "touch" : "seed")
     : payoff.currentStatus === "hinted"
       ? "touch"
-      : payoff.currentStatus === "pending_payoff" || payoff.currentStatus === "overdue"
-        ? "pressure"
-        : "touch";
-  const reason = payoff.statusReason?.trim()
-    || payoff.summary?.trim()
-    || "按当前章节窗口轻触该伏笔，不提前兑现。";
+      : payoff.currentStatus === "overdue"
+        ? "payoff"
+        : payoff.currentStatus === "pending_payoff"
+          ? "pressure"
+          : "touch";
+  const reason = payoff.currentStatus === "overdue"
+    ? payoff.statusReason?.trim()
+      || "该伏笔已超过目标窗口，本章需要兑现或明确说明延期。"
+    : payoff.statusReason?.trim()
+      || payoff.summary?.trim()
+      || "按当前章节窗口轻触该伏笔，不提前兑现。";
   return {
     title: payoff.title,
     ledgerKey: payoff.ledgerKey,

@@ -10,6 +10,7 @@ import {
   buildCharacterArcText,
   buildCharacterGuidanceText,
   buildLedgerItemLine,
+  buildPayoffLedgerInjectionSections,
   buildParticipantText,
   buildPendingCandidateGuardText,
   buildRelationStageText,
@@ -223,6 +224,7 @@ export function buildChapterWriterContextBlocks(
   options: ChapterWriterBlockOptions = {},
 ): PromptContextBlock[] {
   writeContext = normalizeChapterWriteContext(writeContext);
+  const payoffLedgerSections = buildPayoffLedgerInjectionSections(writeContext);
   const mode = options.mode ?? "full";
   const isIncremental = mode === "incremental";
   const includeVolumeWindow = mode === "full" || mode === "review";
@@ -412,13 +414,13 @@ export function buildChapterWriterContextBlocks(
           writeContext.ledgerSummary
             ? `Payoff ledger summary: pending=${writeContext.ledgerSummary.pendingCount}, urgent=${writeContext.ledgerSummary.urgentCount}, overdue=${writeContext.ledgerSummary.overdueCount}`
             : "Payoff ledger summary: none",
-          toListBlock("Urgent payoffs", writeContext.ledgerUrgentItems.map((item) => buildLedgerItemLine(item, "urgent"))),
-          toListBlock("Overdue payoffs", writeContext.ledgerOverdueItems.map((item) => buildLedgerItemLine(item, "overdue"))),
-          toListBlock(
-            "Active pending payoffs",
-            writeContext.ledgerPendingItems.slice(0, 3).map((item) => buildLedgerItemLine(item, "pending")),
-          ),
-        ].join("\n"),
+          toListBlock("Urgent payoffs", payoffLedgerSections.urgentLines),
+          toListBlock("Overdue payoffs", payoffLedgerSections.overdueLines),
+          toListBlock("Active pending payoffs", payoffLedgerSections.pendingLines),
+          payoffLedgerSections.overflowCount > 0
+            ? `另有 ${payoffLedgerSections.overflowCount} 项伏笔未展开；优先处理上面的紧急与逾期条目。`
+            : "",
+        ].filter(Boolean).join("\n"),
       })
       : null,
     createContextBlock({

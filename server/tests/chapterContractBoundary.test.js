@@ -57,7 +57,8 @@ test("chapter payoff directives never turn overdue pressure into direct payoff",
   assert.deepEqual(
     directives.map((item) => [item.ledgerKey, item.operation]),
     [
-      ["overdue-now", "pressure"],
+      // INN-A1b A1-G5:逾期条目升级为 payoff 指令,要求本章兑现或明确说明延期。
+      ["overdue-now", "payoff"],
       ["pending-now", "pressure"],
       ["setup-later", "seed"],
       ["hinted-now", "touch"],

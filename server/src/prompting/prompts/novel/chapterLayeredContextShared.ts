@@ -342,6 +342,36 @@ export function buildLedgerItemLine(
   ], 4).join(" | ");
 }
 
+// A1-G7:台账注入条数上限与截断顺序 —— 紧急/逾期优先保留,超出的条目只给汇总提示,
+// 避免长篇账本把固定上下文预算吃光。
+export const PAYOFF_LEDGER_INJECTION_LIMITS = {
+  urgent: 4,
+  overdue: 4,
+  pending: 3,
+} as const;
+
+export function buildPayoffLedgerInjectionSections(writeContext: Pick<
+  ChapterWriteContext,
+  "ledgerUrgentItems" | "ledgerOverdueItems" | "ledgerPendingItems"
+>): {
+  urgentLines: string[];
+  overdueLines: string[];
+  pendingLines: string[];
+  overflowCount: number;
+} {
+  const urgent = writeContext.ledgerUrgentItems.slice(0, PAYOFF_LEDGER_INJECTION_LIMITS.urgent);
+  const overdue = writeContext.ledgerOverdueItems.slice(0, PAYOFF_LEDGER_INJECTION_LIMITS.overdue);
+  const pending = writeContext.ledgerPendingItems.slice(0, PAYOFF_LEDGER_INJECTION_LIMITS.pending);
+  return {
+    urgentLines: urgent.map((item) => buildLedgerItemLine(item, "urgent")),
+    overdueLines: overdue.map((item) => buildLedgerItemLine(item, "overdue")),
+    pendingLines: pending.map((item) => buildLedgerItemLine(item, "pending")),
+    overflowCount: (writeContext.ledgerUrgentItems.length - urgent.length)
+      + (writeContext.ledgerOverdueItems.length - overdue.length)
+      + (writeContext.ledgerPendingItems.length - pending.length),
+  };
+}
+
 export function buildParticipantText(writeContext: ChapterWriteContext): string {
   if (writeContext.participants.length === 0) {
     return "出场角色：无";

@@ -37,6 +37,7 @@ export const RUNTIME_PROMPT_BUDGET_PROFILES: PromptBudgetProfile[] = [
       "reader_experience",
       "character_hard_facts",
       "payoff_directives",
+      "payoff_ledger",
       "style_contract",
       "volume_window",
       "participant_subset",

@@ -17,6 +17,8 @@ export const CHAPTER_CONTEXT_PROVIDER_CONTRACTS: readonly ChapterContextProvider
   { id: "character_hard_facts", stages: ["write", "review", "repair"], inputDependencies: ["characterRoster", "characterHardFacts"], priority: 120, tier: "hard_required", required: true, tokenBudget: 900, failureSemantics: "block" },
   { id: "previous_chapter_result", stages: ["write", "review", "repair"], inputDependencies: ["chapterOrder", "previousChapterTail", "previousChaptersSummary"], priority: 115, tier: "hard_required", required: true, tokenBudget: 700, failureSemantics: "block" },
   { id: "chapter_obligations", stages: ["write", "review", "repair"], inputDependencies: ["plan", "chapterMission"], priority: 125, tier: "hard_required", required: true, tokenBudget: 800, failureSemantics: "block" },
+  // INN-A1b A1-G8:伏笔台账注入遥测 —— 有在册伏笔时记录是否真的进入上下文,缺失按降级语义继续。
+  { id: "payoff_ledger", stages: ["write"], inputDependencies: ["ledgerPendingItems", "ledgerUrgentItems", "ledgerOverdueItems", "ledgerSummary"], priority: 95, tier: "situational", required: false, tokenBudget: 500, failureSemantics: "degrade" },
   { id: "world_context", stages: ["write", "review", "repair", "preview"], inputDependencies: ["novelId", "storyWorldSlice"], priority: 90, tier: "situational", required: false, tokenBudget: 700, failureSemantics: "degrade" },
   { id: "rag_context", stages: ["write", "review", "repair", "preview"], inputDependencies: ["chapterMission", "novelId"], priority: 60, tier: "optional", required: false, tokenBudget: 900, failureSemantics: "omit" },
   // INN-A3 分层递归记忆:后段章节的全书快照与卷内回顾,缺失按降级语义继续并被 gating 记录。
@@ -29,7 +31,7 @@ export const CHAPTER_CONTEXT_PROVIDER_CONTRACTS: readonly ChapterContextProvider
 export function evaluateChapterContextProviderContracts(input: {
   stage: ChapterContextProviderStage;
   chapterOrder: number;
-  contextPackage: Pick<GenerationContextPackage, "characterRoster" | "characterHardFacts" | "plan" | "chapterMission" | "previousChapterTail" | "previousChaptersSummary" | "storyWorldSlice" | "ragContext" | "bookStateSnapshot" | "volumeRecap" | "characterArcEvents">;
+  contextPackage: Pick<GenerationContextPackage, "characterRoster" | "characterHardFacts" | "plan" | "chapterMission" | "previousChapterTail" | "previousChaptersSummary" | "storyWorldSlice" | "ragContext" | "bookStateSnapshot" | "volumeRecap" | "characterArcEvents" | "ledgerPendingItems" | "ledgerUrgentItems" | "ledgerOverdueItems" | "ledgerSummary">;
 }): ContextGatingDecision[] {
   const decisions: ContextGatingDecision[] = [];
   for (const contract of CHAPTER_CONTEXT_PROVIDER_CONTRACTS) {
@@ -48,6 +50,16 @@ export function evaluateChapterContextProviderContracts(input: {
     } else if (contract.id === "chapter_obligations") {
       available = Boolean(input.contextPackage.plan) && Boolean(input.contextPackage.chapterMission);
       reason = available ? "章节义务已提供" : "章节规划或任务义务缺失";
+    } else if (contract.id === "payoff_ledger") {
+      // 兼容旧上下文包:账本字段缺失时按"无账本"处理,不阻塞生成。
+      const ledgerItemCount = (input.contextPackage.ledgerPendingItems?.length ?? 0)
+        + (input.contextPackage.ledgerUrgentItems?.length ?? 0)
+        + (input.contextPackage.ledgerOverdueItems?.length ?? 0);
+      applicable = ledgerItemCount > 0 || (input.contextPackage.ledgerSummary?.totalCount ?? 0) > 0;
+      available = ledgerItemCount > 0 && Boolean(input.contextPackage.ledgerSummary);
+      reason = available
+        ? "伏笔账本已进入注入上下文"
+        : "账本有记录但注入上下文缺失，按降级语义继续";
     } else if (contract.id === "world_context") {
       available = Boolean(input.contextPackage.storyWorldSlice);
       reason = available ? "世界上下文已提供" : "没有可用世界切片，按降级语义继续";

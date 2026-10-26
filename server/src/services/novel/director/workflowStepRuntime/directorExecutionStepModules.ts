@@ -790,7 +790,7 @@ export const DIRECTOR_EXECUTION_STEP_MODULES: Record<
       id: DIRECTOR_EXECUTION_STEP_IDS.payoff_ledger_sync,
       stage: "quality_repair",
       adapter: getDirectorExecutionNodeAdapter("payoff_ledger_sync"),
-      promptAssets: [{ id: "novel.payoff_ledger.sync", version: "v5" }],
+      promptAssets: [{ id: "novel.payoff_ledger.sync", version: "v6" }],
     }),
     inspectFacts: async (context) => {
       const activeArtifacts = getActiveArtifactsFromContext(context, ["reader_promise", "repair_ticket"]);

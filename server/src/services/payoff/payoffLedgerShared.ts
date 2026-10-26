@@ -289,6 +289,47 @@ export function isPayoffOverdueAtChapter(
     && item.targetEndChapterOrder < chapterOrder;
 }
 
+// A1-G6:pending 条目按目标窗口排序 —— 截止越早越靠前,无窗口的条目排在最后,
+// 让注入与 planner 看到的是"最该先处理"的顺序,而不是数据库更新顺序。
+export function sortPayoffItemsByWindow<T extends {
+  targetStartChapterOrder?: number | null;
+  targetEndChapterOrder?: number | null;
+  lastTouchedChapterOrder?: number | null;
+  title: string;
+}>(items: T[]): T[] {
+  const MAX = Number.MAX_SAFE_INTEGER;
+  return items.slice().sort((left, right) => {
+    const leftEnd = left.targetEndChapterOrder ?? MAX;
+    const rightEnd = right.targetEndChapterOrder ?? MAX;
+    if (leftEnd !== rightEnd) {
+      return leftEnd - rightEnd;
+    }
+    const leftStart = left.targetStartChapterOrder ?? MAX;
+    const rightStart = right.targetStartChapterOrder ?? MAX;
+    if (leftStart !== rightStart) {
+      return leftStart - rightStart;
+    }
+    const leftTouched = left.lastTouchedChapterOrder ?? MAX;
+    const rightTouched = right.lastTouchedChapterOrder ?? MAX;
+    if (leftTouched !== rightTouched) {
+      return leftTouched - rightTouched;
+    }
+    return left.title.localeCompare(right.title, "zh-Hans-CN");
+  });
+}
+
+// planner 空账本回退:旧版状态快照仍保留终结状态,账本表为空时用它们补齐
+// paidOff/failed 计数,避免回退摘要恒为 0(INN-A1b)。
+export function countForeshadowTerminalStates(states: Array<{ status: string }>): {
+  paidOffCount: number;
+  failedCount: number;
+} {
+  return {
+    paidOffCount: states.filter((state) => state.status === "paid_off").length,
+    failedCount: states.filter((state) => state.status === "failed").length,
+  };
+}
+
 export function buildPayoffLedgerSummary(
   items: PayoffLedgerItem[],
   chapterOrder?: number | null,
@@ -397,6 +438,7 @@ export function buildSyntheticPayoffIssues(
         signal.code !== "payoff_paid_without_setup"
         && signal.code !== "payoff_regressed"
         && signal.code !== "payoff_missing_progress"
+        && signal.code !== "sync_stale"
       ) {
         continue;
       }
@@ -410,7 +452,9 @@ export function buildSyntheticPayoffIssues(
           ? "补足前置铺垫，或将当前章节的兑现强度降回铺垫/推进态。"
           : signal.code === "payoff_regressed"
             ? "检查是否误把已兑现伏笔重新打开；如属新线索，请改成新的账本项。"
-            : "为该伏笔补上明确推进动作，避免账本继续停滞。",
+            : signal.code === "sync_stale"
+              ? "先重新同步伏笔账本，确认该条目的最新状态后再决定推进或兑现。"
+              : "为该伏笔补上明确推进动作，避免账本继续停滞。",
       });
     }
   }

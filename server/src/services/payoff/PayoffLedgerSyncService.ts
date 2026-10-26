@@ -15,6 +15,7 @@ import {
   buildPayoffLedgerResponse,
   buildSyntheticPayoffIssues,
   clearStaleRiskSignal,
+  countForeshadowTerminalStates,
   dedupeRiskSignals,
   mapPayoffLedgerRow,
   resolvePayoffLedgerSyncLedgerKey,
@@ -369,7 +370,32 @@ export class PayoffLedgerSyncService {
         rows = await this.loadLedgerRows(novelId);
       }
     }
+    if (rows.length === 0) {
+      // INN-A1b:空账本回退摘要不再把 paidOff/failed 恒置为 0 ——
+      // 从最近一次状态快照的伏笔终结状态补齐,planner 的回收率判断才有真实分母。
+      const fallbackCounts = await this.loadForeshadowFallbackCounts(novelId);
+      const response = buildPayoffLedgerResponse([], options.chapterOrder);
+      return {
+        ...response,
+        summary: {
+          ...response.summary,
+          ...fallbackCounts,
+        },
+      };
+    }
     return buildPayoffLedgerResponse(rows.map(mapPayoffLedgerRow), options.chapterOrder);
+  }
+
+  private async loadForeshadowFallbackCounts(novelId: string): Promise<{
+    paidOffCount: number;
+    failedCount: number;
+  }> {
+    const snapshot = await prisma.storyStateSnapshot.findFirst({
+      where: { novelId },
+      orderBy: { createdAt: "desc" },
+      select: { foreshadowStates: { select: { status: true } } },
+    });
+    return countForeshadowTerminalStates(snapshot?.foreshadowStates ?? []);
   }
 
   // A1-G1 用户手动登记伏笔:直接写 canonical 表,初始 setup、来源标记 manual;

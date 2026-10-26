@@ -8,6 +8,7 @@ import { prisma } from "../../../db/prisma";
 import {
   classifyPayoffLedgerItems,
   mapPayoffLedgerRow,
+  sortPayoffItemsByWindow,
 } from "../../payoff/payoffLedgerShared";
 import { characterResourceLedgerService } from "../characterResource/CharacterResourceLedgerService";
 
@@ -279,10 +280,12 @@ export class CanonicalStateService {
       payoffChapterId: item.payoffChapterId,
       statusReason: item.statusReason,
       confidence: item.confidence,
+      riskSignals: item.riskSignals,
       createdAt: item.createdAt,
       updatedAt: item.updatedAt,
     });
-    const pendingPayoffs = classifiedPayoffs.pendingItems.map(toCanonicalPayoff);
+    // A1-G6:pending 按目标窗口排序(截止早的优先),注入与 planner 共用同一顺序。
+    const pendingPayoffs = sortPayoffItemsByWindow(classifiedPayoffs.pendingItems).map(toCanonicalPayoff);
     const urgentPayoffs = classifiedPayoffs.urgentItems.map(toCanonicalPayoff);
     const overduePayoffs = classifiedPayoffs.overdueItems.map(toCanonicalPayoff);
     // A1-G21:回收/失败计数随快照落库,让运行时账本摘要能反映真实回收进度(此前恒 0)。
@@ -526,13 +529,13 @@ export function buildRuntimeLedgerFromCanonical(
     lastSnapshotId: snapshot.sourceSnapshotId ?? null,
     sourceRefs: [],
     evidence: [],
-    riskSignals: [],
+    riskSignals: item.riskSignals ?? [],
     statusReason: item.statusReason ?? null,
     confidence: item.confidence ?? null,
     createdAt: item.createdAt ?? snapshot.createdAt,
     updatedAt: item.updatedAt ?? snapshot.createdAt,
   });
-  const pendingItems = snapshot.narrative.pendingPayoffs.map((item) => toRuntimeItem(item));
+  const pendingItems = sortPayoffItemsByWindow(snapshot.narrative.pendingPayoffs).map((item) => toRuntimeItem(item));
   const urgentItems = snapshot.narrative.urgentPayoffs.map((item) => toRuntimeItem(item));
   const overdueItems = snapshot.narrative.overduePayoffs.map((item) => toRuntimeItem(item));
   return {
