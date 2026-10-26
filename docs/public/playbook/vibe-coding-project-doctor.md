@@ -21,7 +21,7 @@
 .agents/skills/ai-novel-vibe-doctor/SKILL.md
 ```
 
-[查看完整 SKILL.md](https://github.com/ExplosiveCoderflome/AI-Novel-Writing-Assistant/blob/main/.agents/skills/ai-novel-vibe-doctor/SKILL.md)
+[查看完整 SKILL.md](https://github.com/Second123666/AI-novel/blob/main/.agents/skills/ai-novel-vibe-doctor/SKILL.md)
 
 ## 完整 SKILL.md 内容
 
@@ -30,14 +30,14 @@
 ````markdown
 ---
 name: ai-novel-vibe-doctor
-description: Diagnose and repair AI-Novel-Writing-Assistant repository problems with evidence-first root-cause classification. Use when a vibe-coding agent is asked to investigate startup or build failures, model and task errors, UI/backend state mismatches, auto-director or chapter recovery issues, dirty data, migration compatibility, or regressions in this project. Do not use for unrelated feature design or destructive cleanup without explicit authorization and a verified backup.
+description: Diagnose and repair InkVoyage repository problems with evidence-first root-cause classification. Use when a vibe-coding agent is asked to investigate startup or build failures, model and task errors, UI/backend state mismatches, auto-director or chapter recovery issues, dirty data, migration compatibility, or regressions in this project. Do not use for unrelated feature design or destructive cleanup without explicit authorization and a verified backup.
 ---
 
-# AI Novel Vibe Doctor
+# InkVoyage Vibe Doctor
 
 ## 目标
 
-帮助使用者在 AI-Novel-Writing-Assistant 仓库中定位真实根因，并完成范围最小但链路闭合的修复。始终保护小说数据、用户手写内容、未提交改动和项目既有工作流。
+帮助使用者在 墨航 InkVoyage 仓库中定位真实根因，并完成范围最小但链路闭合的修复。始终保护小说数据、用户手写内容、未提交改动和项目既有工作流。
 
 ## 开始前
 

@@ -1,4 +1,4 @@
-# AI 小说创作工作台 / AI Novel Production Engine
+# 墨航 InkVoyage
 一个面向长篇小说创作的 AI Native 开源项目。
 
 当前开发主线：
@@ -12,10 +12,6 @@
 ![Editor](https://img.shields.io/badge/Editor-Plate-7C3AED)
 ![Database](https://img.shields.io/badge/Database-SQLite%20%2B%20Prisma-111827)
 ![Vector DB](https://img.shields.io/badge/RAG-Qdrant-E63946)
-
-<a href="https://trendshift.io/repositories/26664?utm_source=repository-badge&amp;utm_medium=badge&amp;utm_campaign=badge-repository-26664" target="_blank" rel="noopener noreferrer">
-  <img src="https://trendshift.io/api/badge/repositories/26664" alt="ExplosiveCoderflome/AI-Novel-Writing-Assistant | Trendshift" width="250" height="55" />
-</a>
 
 ## ✨ 项目简介
 
@@ -35,14 +31,14 @@
 
 如果你只是想直接下载安装并开始使用，优先从桌面版入口进入：
 
-- 下载入口：[GitHub Releases](https://github.com/ExplosiveCoderflome/AI-Novel-Writing-Assistant/releases)
-- 最新版本页：[Latest Release](https://github.com/ExplosiveCoderflome/AI-Novel-Writing-Assistant/releases/latest)
+- 下载入口：[GitHub Releases](https://github.com/Second123666/AI-novel/releases)
+- 最新版本页：[Latest Release](https://github.com/Second123666/AI-novel/releases/latest)
 - 建议优先下载 `Setup.exe` 安装版；如果你不想安装，或者想放在 U 盘 / 临时目录里直接运行，再选择 `portable` 版本
-- 公开介绍站：[GitHub Pages 介绍站](https://explosivecoderflome.github.io/AI-Novel-Writing-Assistant/) 提供功能预览、模块文档和使用指南
+- 公开介绍站：[GitHub Pages 介绍站](https://second123666.github.io/AI-novel/) 提供功能预览、模块文档和使用指南
 
 ## 用 Codex 持续创作长篇：Ani Book Skill
 
-如果你希望直接在 Codex 的本地工作区推进小说，可以使用 [Ani Book Skill](https://github.com/ExplosiveCoderflome/ani-book-skill)。它将方向判断、故事发动机、章节推进、审校修复和连续性管理组织为一条可恢复、可追溯的长篇创作流程。
+如果你希望直接在 Codex 的本地工作区推进小说，可以使用上游作者维护的 [Ani Book Skill](https://github.com/ExplosiveCoderflome/ani-book-skill)。它将方向判断、故事发动机、章节推进、审校修复和连续性管理组织为一条可恢复、可追溯的长篇创作流程。
 
 这是一条与本项目互补的创作入口：
 
@@ -160,6 +156,7 @@
 
 #### 优化
 
+- 项目更名为「墨航 InkVoyage」，界面、文档与下载入口统一使用新名称。
 - 章节编辑器的面板圆角与状态/差异配色与全站一致，深浅两套主题下对比清晰。
 - 封面生成弹窗适配深色主题，避免固定白底与深灰文字混搭。
 - 写法推荐卡与项目列表的状态配色随主题适配，深浅模式下的状态标记保持一致。
@@ -667,7 +664,7 @@ docs/     设计文档、阶段检查点、模块计划与历史归档
 本项目采用双许可证授权模式：
 
 - 默认情况下，本项目基于 GNU Affero General Public License v3.0 (AGPLv3) 授权，详见 [LICENSE](./LICENSE)；归属与附加说明见 [NOTICE](./NOTICE)。
-- 本项目是上游 `AI-Novel-Writing-Assistant` 的独立衍生版本，上游版权声明与许可条款保留；本仓库的修改与新贡献归当前维护者与贡献者。
+- 墨航 InkVoyage 是上游 `AI-Novel-Writing-Assistant` 的独立衍生版本，上游版权声明与许可条款保留；本仓库的修改与新贡献归当前维护者与贡献者。
 - 服务型商用：将本项目（或其修改版本）作为后端以 SaaS、托管或其他形式向第三方提供服务，须通过作者获取商业授权许可。
 - 请遵守开源协议条款，并在适用场景下取得相应授权。
 

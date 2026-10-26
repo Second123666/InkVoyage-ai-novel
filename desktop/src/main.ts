@@ -231,7 +231,7 @@ function createSplashHtml(): string {
         http-equiv="Content-Security-Policy"
         content="default-src 'none'; style-src 'unsafe-inline'; img-src data:"
       />
-      <title>AI 小说创作工作台</title>
+      <title>墨航 InkVoyage</title>
       <style>
         :root {
           color-scheme: dark;
@@ -304,7 +304,7 @@ function createSplashHtml(): string {
     <body>
       <main class="panel">
         ${brandMark}
-        <div class="title">AI 小说创作工作台</div>
+        <div class="title">墨航 InkVoyage</div>
         <p class="subtitle">正在准备桌面启动壳和打包后的本地写作引擎。</p>
         <div class="meter"><span></span></div>
       </main>
@@ -324,7 +324,7 @@ function createSplashWindow(): BrowserWindow {
     fullscreenable: false,
     frame: false,
     alwaysOnTop: true,
-    title: "AI Novel Writing Assistant v2",
+    title: "墨航 InkVoyage",
     backgroundColor: MAIN_WINDOW_BACKGROUND,
     icon: windowIcon,
   });
@@ -406,7 +406,7 @@ async function showBootstrapFailureDialog(error: unknown): Promise<void> {
   const errorMessage = error instanceof Error ? error.message : String(error);
   const result = await dialog.showMessageBox({
     type: "error",
-    title: "AI 小说创作工作台启动失败",
+    title: "墨航 InkVoyage 启动失败",
     message: "桌面应用未能完成初始化。",
     detail: `${errorMessage}\n\n日志目录:\n${logDir}\n\n日志文件:\n${logFilePath}`,
     buttons: ["打开日志目录", "复制日志路径", "退出"],
@@ -454,7 +454,7 @@ function registerDesktopIpcHandlers(): void {
     const bootstrap = desktopBootstrapStore.getSnapshot();
     const updater = desktopUpdaterStore.getSnapshot();
     const summary = [
-      "AI 小说创作工作台近期日志包摘要",
+      "墨航 InkVoyage 近期日志包摘要",
       `生成时间: ${new Date().toISOString()}`,
       `应用版本: ${app.getVersion()}`,
       `平台: ${process.platform} ${process.arch}`,

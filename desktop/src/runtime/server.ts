@@ -250,7 +250,7 @@ function startPackagedManagedServer(port: number): ManagedDesktopProcess {
       ALLOW_LAN: "false",
     },
     stdio: "pipe",
-    serviceName: "AI Novel Local Server",
+    serviceName: "InkVoyage Local Server",
   });
 
   let hasExited = false;
