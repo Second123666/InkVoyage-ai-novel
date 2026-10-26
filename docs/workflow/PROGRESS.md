@@ -17,6 +17,23 @@
 
 ---
 
+## 2026-10-26 · LOOP-41 · UI-1 第五批:章节编辑器圆角与状态色收敛
+
+- **类别**: UI(设计系统落地;主对话执行)
+- **目标**: UI-1 第五批剩余 —— 章节编辑器收敛圆角、状态块;`story-modes` 资产库化审计。
+- **审计结论**:
+  - `story-modes`:**上游已达标** —— `StoryModeManagementPage` 已是「推进模式库」(树形浏览 + 新建/扩展/编辑/删除),技术字段在编辑弹窗内,页面无裸 JSON 字段;
+  - 章节编辑器:圆角 34×rounded-2xl + 8×rounded-3xl(规范建议卡片 8px),状态/差异/选区用 rose/emerald/amber/sky 调色板与纯白底。
+- **改动**(章节编辑器 6 文件):
+  1. 圆角收敛:rounded-3xl / rounded-2xl → rounded-lg(卡片/面板统一 8px),浮动工具条同步;
+  2. 状态色语义化:21 处(rose→destructive、emerald→success、amber→warning)+ 3 处选区/信息(sky→info)+ 1 处硬编码白底→语义;含 diff 高亮(增/删)、警告框、侧栏选中态、DOM 类名选区高亮(add/remove 两处同步);
+  3. 守卫 `chapterEditorVisualContracts.test.js`(2 条:禁 rounded-3xl/2xl/白底/调色板 + 断言语义色使用)。
+- **验证**: client typecheck 0 错误;守卫 2/2;client **265/265**。server 未动。
+- **发布说明**: 章节编辑器圆角与状态配色与全站一致,深浅主题自适配,细微改进,按规则跳过(与 UI-2 主题层一起验收)。
+- **UI-1 第五批完成**:帮助页(39)、预览页(40)、章节编辑器(41);story-modes 审计达标;chat-legacy 仅兼容维护。
+- **残留**: UI-1 第六批(全站一致性验收);UI-6 / BUG-7 等所有者决策。
+- **下一步**: **LOOP-42 = UI-1 第六批(全站一致性验收)** 或 **UI-5 开源 Showcase**。
+
 ## 2026-10-25 · LOOP-40 · UI-1 第五批:预览页阅读进度与编辑器推荐
 
 - **类别**: UI(设计系统落地;主对话执行)
