@@ -115,6 +115,7 @@ export default function ChapterEditorShell(props: ChapterEditorShellProps) {
   const [revisionScope, setRevisionScope] = useState<ChapterEditorRevisionScope>("selection");
   const [revisionInstruction, setRevisionInstruction] = useState("");
   const [selectedDiagnosticId, setSelectedDiagnosticId] = useState<string | null>(null);
+  const [focusMode, setFocusMode] = useState(false);
 
   useEffect(() => {
     const nextContent = normalizedChapterContent;
@@ -457,7 +458,9 @@ export default function ChapterEditorShell(props: ChapterEditorShellProps) {
           : "尚未选中片段";
   const canRunSelectionRevision = Boolean(getSelectionTarget());
   const headerSaveLabel = getSaveStatusLabel(saveStatus, isDirty);
-  const gridClassName = "xl:grid-cols-[320px_minmax(0,1fr)_400px]";
+  const gridClassName = focusMode
+    ? "grid-cols-1"
+    : "xl:grid-cols-[320px_minmax(0,1fr)_400px]";
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
@@ -488,7 +491,7 @@ export default function ChapterEditorShell(props: ChapterEditorShellProps) {
         </div>
       ) : null}
       <div className={`grid min-h-0 flex-1 gap-4 overflow-hidden ${gridClassName}`}>
-        <ChapterEditorSidebar
+        {!focusMode ? <ChapterEditorSidebar
           chapter={chapter}
           workspace={workspace}
           workspaceStatus={workspaceStatus}
@@ -502,9 +505,18 @@ export default function ChapterEditorShell(props: ChapterEditorShellProps) {
           onSave={() => saveMutation.mutate(contentDraft)}
           onFocusDiagnostic={handleFocusDiagnostic}
           onRunDiagnostic={handleRunDiagnostic}
-        />
+        /> : null}
 
         <div className="relative min-h-0 overflow-hidden">
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="absolute right-3 top-3 z-10 h-7 rounded-full bg-background/90 px-3 text-xs shadow-sm backdrop-blur"
+            onClick={() => setFocusMode((current) => !current)}
+          >
+            {focusMode ? "退出专注" : "专注写作"}
+          </Button>
           <ChapterTextEditor
             value={contentDraft}
             readOnly={session.status !== "idle"}
@@ -534,7 +546,7 @@ export default function ChapterEditorShell(props: ChapterEditorShellProps) {
           />
         </div>
 
-        <div className="min-h-0 overflow-hidden">
+        {!focusMode ? <div className="min-h-0 overflow-hidden">
           <ChapterEditorDirectorPanel
             workspace={workspace}
             workspaceStatus={workspaceStatus}
@@ -558,7 +570,7 @@ export default function ChapterEditorShell(props: ChapterEditorShellProps) {
             onReject={handleReject}
             onRegenerate={handleRegenerate}
           />
-        </div>
+        </div> : null}
       </div>
     </div>
   );

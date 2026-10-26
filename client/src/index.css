@@ -974,3 +974,16 @@ body {
   background-color: hsl(var(--destructive) / 0.1);
   color: hsl(var(--destructive));
 }
+
+/* UI-2 · 无障碍动效:尊重系统"减少动态效果"偏好。
+   加载旋转、脉冲提示与过渡动效统一降级为近乎静止,信息仍由文案与状态色传达。 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

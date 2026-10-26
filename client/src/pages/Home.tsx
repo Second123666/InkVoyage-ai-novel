@@ -27,6 +27,7 @@ import {
 } from "./home/homeViewModel";
 import { HomeAssetHealth } from "./home/components/HomeAssetHealth";
 import { HomeNextActionPanel } from "./home/components/HomeNextActionPanel";
+import HomeShowcaseHero from "./home/components/HomeShowcaseHero";
 import { HomeStatusStrip } from "./home/components/HomeStatusStrip";
 import CreationSetupNotice from "@/components/onboarding/CreationSetupNotice";
 import FirstNovelJourneyStrip from "@/components/onboarding/FirstNovelJourneyStrip";
@@ -224,6 +225,7 @@ export default function Home() {
   return (
     <div className="home-workbench space-y-6">
       <CreationSetupNotice />
+      {!novelQuery.isPending && !hasNovels ? <HomeShowcaseHero /> : null}
       <FirstNovelJourneyStrip />
       <HomeNextActionPanel
         action={nextAction}
