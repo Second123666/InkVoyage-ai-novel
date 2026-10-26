@@ -17,6 +17,20 @@
 
 ---
 
+## 2026-10-26 · LOOP-53 · UI-7② 自动导演工作流步骤图(React Flow + dagre)
+
+- **类别**: UI / 创新增量(可视化;主对话执行)
+- **目标**: UI-7 第二项 —— 用 step catalog 的编排元数据渲染可交互步骤图。
+- **改动**:
+  1. 纯函数 `workflowStepGraphLayout.ts`:22 个步骤节点 + 前置依赖边,Dagre LR 层次布局,输出确定性;`resolveHighlightedStepIds` 按 checkpoint(优先)或当前阶段解析高亮;
+  2. `WorkflowStepGraphCanvas`(React Flow):节点显示步骤名与阶段名、箭头依赖边、`fitView` 与缩放控制;当前步骤 primary ring 高亮;
+  3. 导演跟进页新增「工作流步骤图」折叠区,选中跟进任务时传入 `checkpointType/currentStage`;画布经 `React.lazy` 仅在展开时加载;
+  4. 守卫测试 3 条:布局确定性与依赖边完整性、高亮解析、懒加载与依赖纪律。
+- **验证**: client typecheck 0 错误;client **275/275**;server 未动,沿用 LOOP-50 全量 `1464 / 1452 / 0`。UI 视觉验收留待所有者。
+- **发布说明**: 用户可见,已记 release-notes/README(2026-10-26 新增)。
+- **遗留**: UI-7 剩余 ①故事时间线视图(需小说级时间线只读端点)。
+- **下一步**: LOOP-54 = UI-7① 故事时间线视图。
+
 ## 2026-10-26 · LOOP-52 · UI-7③ 生产看板统计图表(Recharts)
 
 - **类别**: UI / 创新增量(可视化;主对话执行)
