@@ -54,7 +54,8 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 43. ~~**LOOP-43 UI-1 第六批(第二组):小说工作台散落状态色**~~ ✅ 完成(2026-10-26):6 组件 64 处迁语义色,守卫扩至 9 文件,client 268/268。
 44. ~~**LOOP-44 UI-1 第六批(第三组):封面弹窗主题适配**~~ ✅ 完成(2026-10-26):75 处 slate/白底迁语义 token,深色模式失配修复,守卫扩至 11 文件,client 268/268。
 45. ~~**LOOP-45 UI-1 第六批(第四组):零散组件状态/中性色**~~ ✅ 完成(2026-10-26):9 组件 76 处迁语义色(含反色面板语义反转),守卫扩至 20 文件,client 268/268。
-46. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **UI-1 第六批收尾** 或 **UI-5 开源 Showcase**;**UI-6**(promptWorkbench 主题、可视化分类色)与 **BUG-7** 仍需所有者/设计决策。
+46. ~~**LOOP-46 UI 线收尾**(UI-1 第六批 + UI-2 + UI-4 + UI-5,UI-3 审计)~~ ✅ 完成(2026-10-26):UI-1 整项完成、UI-2/4/5 完成、UI-3 主要面达标(增量 UI-7),守卫 3 条,client 271/271。
+47. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **UI-7 可视化增量** 或 **OPS 线**;**UI-6**(promptWorkbench 主题、可视化分类色)与 **BUG-7** 仍需所有者/设计决策。
     **完成项打勾规则(2026-10-20 所有者要求)**:每轮收尾同步更新 BACKLOG —— 完成项 `[x]` + ✅,进行中 `[/]`,入口建议划线。
 
 ---
@@ -219,7 +220,8 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 > 分批落地计划 `docs/plans/product-ui-design-rollout-plan.md`、可视化栈 `docs/design/visualization-stack.md`。
 > 既有规则继续有效:低边框视觉规范、项目自有组件、**不新增 shadcn 组件**、不加装饰渐变、硬编码色值只减不增。
 
-- [/] **UI-1 落实既有设计系统剩余批次** · M · P1(进行中)
+- [x] **UI-1 落实既有设计系统剩余批次** · M · P1(= LOOP-6 + LOOP-33~46,2026-10-26 整项完成) ✅
+  **六批全部完成**:第一批/第二批(上游 2026-07-14);第三批 A-E(写法引擎视觉、设置 token、世界卡引导、路由分组、style-engine 结构终态);第四批(短剧/漫画状态色);第五批(帮助页、预览页、章节编辑器);第六批(全站扫描分组迁移:状态组件 11 处、散落状态色 64 处、封面弹窗 75 处、零散组件 76 处 + 可访问性/文案审计 0 缺口)。守卫:`styleEngineVisualContracts`、`settingsVisualContracts`、`worldGuidance`、`modelRouteGroups`、`worldGenAndAntiAiStructure`、`styleEngineWorkspaceStructure`、`dramaComicStatusColors`、`helpPageVisualContracts`、`previewReading`、`chapterEditorVisualContracts`、`statusColorContracts`(20 文件)。**需决策项**:promptWorkbench 自定义主题与可视化分类色 → UI-6;`.mobile-route-*` 兜底迁移为独立工程(未开工)。
   **基线复核(2026-10-20)**:rollout 计划记载的第一批/第二批(2026-07-14)经代码验证属实(语义 token 存在、`components/assetLibrary/` 共享组件被知识库/题材/基础角色三页引用),原描述已过时。
   **本轮完成(第三批 A,LOOP-6)**:写法引擎视觉收敛 —— `writingFormula` 模块 ~300 处调色板硬编码色全部迁移到语义 token,删除 `index.css` 的 `.writing-formula-theme` 暗色 hack 块与 4 处装饰渐变,创建弹窗收敛为常规尺寸;守卫测试 `client/tests/styleEngineVisualContracts.test.js`。
   **第三批 B(LOOP-33)**:设置模块 ~15 处硬编码色(emerald/amber/sky/red/slate)全部迁移到语义 token(success/warning/info/destructive/muted),0 残留;守卫 `client/tests/settingsVisualContracts.test.js`。
@@ -235,11 +237,13 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
   **之后**:第四批(短剧/漫画衍生页)、第五批(阅读/帮助/兼容页)、第六批(全站一致性验收)。
   验收:以 rollout 计划各批验收条款为准(语义 token、无硬编码色、client typecheck、响应式无横向滚动);不新增后端 API/字段/路由。
 
-- [ ] **UI-2 视觉富化:主题与氛围层** · M · P2
+- [x] **UI-2 视觉富化:主题与氛围层** · M · P2(= LOOP-46,2026-10-26 完成) ✅
+  结果:明暗/暖纸主题切换与语义 token 已具备(上游+UI-1 收敛);补齐全局 `prefers-reduced-motion` 降级(动画/过渡 0.01ms,信息由文案与状态色传达)。守卫 `uiPolishContracts`。
   在低边框规范之上做"加法"而非堆装饰:明暗双主题切换(基于语义 token)、微交互与过渡(生产链进度、状态变化、卡片 hover 层级)、Loading/Empty 的插画化与品牌感、正文阅读氛围(章节页排印密度)。
   验收:核心页明暗两套走查通过;所有动效可被 `prefers-reduced-motion` 关闭;typecheck 通过;截图记入 PROGRESS。
 
-- [ ] **UI-3 可视化富化(按可视化栈定盘落地)** · M–L · P2
+- [/] **UI-3 可视化富化(按可视化栈定盘落地)** · M–L · P2(LOOP-46 审计:主要面已达标)
+  **已完成**:① `WorldVisualizationBoard` 已拆到 `WorldGraphCanvas` 并使用 React Flow;② 角色关系网/势力图谱 `CharacterRelationshipGraphPanel` 使用 React Flow;⑤ 紧张度曲线 `TensionCurveFlowCanvas` 使用 React Flow;故事世界图谱(INN-C1/LOOP-13/14)亦为 React Flow + 懒加载。**剩余增量**:③ 故事时间线视图、④ 导演工作流步骤图、⑥ 统计面板(Recharts)→ 登记 UI-7,待排期。
   栈已定盘(React Flow + d3 数学 + Recharts,全部懒加载零首屏增量),候选面按该文档优先级:
   ① `WorldVisualizationBoard`(836 行手写)迁 React Flow + d3-force;
   ② 角色关系网与势力图谱(React Flow 节点图);
@@ -250,10 +254,16 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
   依赖纪律:**不新引入任何可视化依赖**(栈内依赖 2026-07 已一次定盘);渲染归 React,D3 只做纯计算。
   验收:对应页面有可交互可视化;懒加载 chunk 独立;首屏 bundle 无增量。
 
-- [ ] **UI-4 编辑器与阅读体验富化** · M · P3
+- [x] **UI-4 编辑器与阅读体验富化** · M · P3(= LOOP-46,2026-10-26 完成) ✅
+  结果:预览页排印(17-18px / 行高 2.15)与章节导航已具备;新增章节编辑器**专注模式**(隐藏侧栏与 AI 面板、正文单栏、常驻进出按钮)。版本历史对比已有 `VersionHistoryTab`。守卫 `uiPolishContracts`。
   正文预览/阅读视图排印(字号、行距、章节目录导航、专注模式)、章节版本对比阅读。守 Editor 合同:正文占视觉中心,诊断与建议入侧栏。
 
-- [ ] **UI-5 开源 Showcase 就绪** · S–M · P2
+- [x] **UI-5 开源 Showcase 就绪** · S–M · P2(= LOOP-46,2026-10-26 完成) ✅
+  结果:新增 `HomeShowcaseHero`,仅新访客(无小说)首页展示产品定位一句话 + 「开始第一本小说」CTA + 三个主链亮点,表述与 `site/` 一致;已有创作用户保持行动优先首页。守卫 `uiPolishContracts`。
+
+- [ ] **UI-7 可视化增量:时间线 / 步骤图 / 统计面板** · M · P3(LOOP-46 从 UI-3 拆分)
+  ① 故事时间线视图(`shared/types/timeline.ts` 类型已就绪);② 自动导演工作流步骤图(step catalog 有编排元数据);③ 统计面板(质量分布/字数/RAG 追踪 → Recharts)。
+  依赖纪律:不新引入可视化依赖,全部懒加载、零首屏增量。
   首页/项目概览成为"可截图的一页 demo":当前创作状态、主链亮点、下一步动作一屏;服务"个人开源作品"定位,与公开介绍站(`site/`)表述一致。
   验收:新访客 30 秒内理解"这是什么、怎么开始";与 `site/` 无表述冲突。
 

@@ -225,7 +225,7 @@
 - 第三批：**完成**（2026-10-25）—— A 写法引擎视觉收敛（LOOP-6）；B 设置页语义 token 收敛（LOOP-33，~15 处 0 残留，守卫 `settingsVisualContracts.test.js`）；C 世界样本卡状态/步骤/下一步引导（LOOP-34，守卫 `worldGuidance.test.js`）；D 模型路由按开书/规划/正文/审校/资料分组（LOOP-35，守卫 `modelRouteGroups.test.js`）；结构验收（LOOP-36，generator 四步工作区 / anti-ai-rules 两栏已达目标，守卫 `worldGenAndAntiAiStructure.test.js`）；`/style-engine` 结构终态（LOOP-37，三套工作面板从 88vh/84vh 弹窗改为页面内常驻工作区，守卫 `styleEngineWorkspaceStructure.test.js`）。
 - 第四批：**完成**（2026-10-25 · LOOP-38）—— 短剧/漫画 13 处状态色迁语义 token（结构项审计上游达标；分类 chip 设计张力登记为 UI-6）。
 - 第五批：**完成**（2026-10-25~26 · LOOP-39/40/41）—— 帮助页主题化、预览页阅读进度与编辑推荐、章节编辑器圆角与状态色收敛；story-modes 审计达标；chat-legacy 仅兼容维护。
-- 第六批：待开始。
+- 第六批：**完成**（2026-10-26 · LOOP-42~46）—— 全站扫描分组迁移（状态组件 11 / 散落状态色 64 / 封面弹窗 75 / 零散组件 76 处）;可访问性审计（图标按钮真实缺口 0）与文案复核;剩余需决策项（promptWorkbench 自定义主题、可视化分类色）→ UI-6,`.mobile-route-*` 兜底迁移列为独立工程。
 
 ## 第一批实施结果
 
