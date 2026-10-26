@@ -79,6 +79,7 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 - **质量基线**:server 全量 `1484 / 1472 过 / 0 失败 / 12 跳过`;client `283/283`;client/site/desktop typecheck 绿;`check:docs-manifest` 与公开文档相对链接校验通过。
 - **转公开前置(未完成)**:OPS-1 只做了本地清理;公开前需用 `git ls-remote --tags` 核对**远端仓库**是否残留上游旧 tags,删除后只推 `main`(红线:绝不 `push --all` / `--mirror`)。
 - **归属收尾(LOOP-62)**:sitemap/prerender 生成器、LICENSE/CLA/CONTRIBUTING 标题、桌面构建默认 owner/repo 已统一;README 上游捐赠/QQ 群段已移除,改为 GitHub Issues;上游版权与 AGPL 归属按许可证保留。
+- **素材收尾**:删除 23 个未引用 tracked 文件(旧截图/旧格式 18 张、站点未引用素材 4 个、垃圾文件 2 个),`images/` 13MB → 8.1MB;`TASK.md` 重写为当前路线(无私有分支信息)。
 - **推送状态**:本地 `main` 领先 `github/main` 跟踪引用 139 个提交,尚未推送;需要时只推送 `main`。
 - **续跑入口**:新会话读 `PROGRESS.md` 最新 1–2 条 + 本收尾块即可继续;新一轮从 UI-8 尾图或新需求开始。
 

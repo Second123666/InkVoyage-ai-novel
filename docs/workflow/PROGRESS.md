@@ -29,6 +29,10 @@
 - **验证**: site build 通过,sitemap 中上游 URL **0** 条(37 路由预渲染);`licensing.test.js` **4/4**;`check:docs-manifest` 通过;README 相对链接复检通过。
 - **发布说明**: 仓库治理与归属清理,无产品行为变化,跳过。
 - **遗留**: 桌面安装器/数据目录仍显示旧技术标识(需迁移);其余截图旧品牌由 UI-8 尾图处理。
+- **素材收尾(A/B 档)**:
+  - 删除 23 个未被引用的 tracked 文件:`images/` 旧截图/旧格式 18 张(约 4.6MB)、`site/src/assets` 未引用 4 个(约 1.1MB)、0 字节垃圾文件与空 `server/tmp/query_out.txt`;`images/` 从 13MB 降至 8.1MB(保留 31 张被引用图片与 GitHub 社交预览源);
+  - `TASK.md` 从上游 2026-09 私有分支任务板重写为「当前发展路线与优先级」(当前状态/优先级/中期方向/非目标/续跑入口);
+  - 未跟踪的 `server/tmp/db-backups` 与 `.logs`/`.playwright-mcp` 仅本地保留/可清理,不入库。
 
 ## 2026-10-26 · LOOP-61 · INN-A1b 第二、三批:体验打磨与契约接线
 
