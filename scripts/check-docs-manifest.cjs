@@ -42,6 +42,8 @@ const manifestPaths = [
   ...manifest.matchAll(/"(docs\/(?:public|releases)\/[^"]+\.md)"/g),
 ].map((match) => match[1]);
 const manifestSet = new Set(manifestPaths);
+const manifestDocIds = [...manifest.matchAll(/doc\(\s*"([^"]+)"/g)].map((match) => match[1]);
+const manifestIdSet = new Set(manifestDocIds);
 const expectedPaths = [
   ...walkMarkdownFiles(publicDocsDir).map(toManifestSourcePath),
   toManifestSourcePath(releaseNotesPath),
@@ -51,6 +53,16 @@ const expectedSet = new Set(expectedPaths);
 const missing = expectedPaths.filter((sourcePath) => !manifestSet.has(sourcePath));
 const stale = manifestPaths.filter((sourcePath) => !expectedSet.has(sourcePath));
 const duplicate = manifestPaths.filter((sourcePath, index) => manifestPaths.indexOf(sourcePath) !== index);
+
+const brokenDocLinks = [];
+for (const filePath of walkMarkdownFiles(publicDocsDir)) {
+  const source = fs.readFileSync(filePath, "utf8");
+  for (const match of source.matchAll(/#\/docs\/([A-Za-z0-9_-]+)/g)) {
+    if (!manifestIdSet.has(match[1])) {
+      brokenDocLinks.push(`${toManifestSourcePath(filePath)} -> #/docs/${match[1]}`);
+    }
+  }
+}
 
 function readDirectorProgressKeys() {
   const source = fs.readFileSync(directorProgressPath, "utf8");
@@ -86,6 +98,7 @@ if (
   missing.length > 0
   || stale.length > 0
   || duplicate.length > 0
+  || brokenDocLinks.length > 0
   || missingProgressKeys.length > 0
   || staleProgressKeys.length > 0
 ) {
@@ -106,6 +119,11 @@ if (
     duplicate.forEach((sourcePath) => console.error(`  - ${sourcePath}`));
   }
 
+  if (brokenDocLinks.length > 0) {
+    console.error("\nLinks pointing to unknown #/docs ids:");
+    brokenDocLinks.forEach((link) => console.error(`  - ${link}`));
+  }
+
   if (missingProgressKeys.length > 0) {
     console.error("\nDirectorProgressItemKey values missing from auto-director-pipeline.md:");
     missingProgressKeys.forEach((key) => console.error(`  - ${key}`));
@@ -120,5 +138,5 @@ if (
 }
 
 console.log(
-  `Docs manifest check passed: ${expectedPaths.length} public documents registered; ${codeProgressKeys.length} director progress keys covered.`,
+  `Docs manifest check passed: ${expectedPaths.length} public documents registered; ${manifestDocIds.length} documents addressable by #/docs id; ${codeProgressKeys.length} director progress keys covered.`,
 );

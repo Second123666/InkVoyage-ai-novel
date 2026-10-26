@@ -153,7 +153,7 @@ export const docsManifest: SiteDocCategory[] = [
     docs: [
       doc(
         "module-onboarding",
-        "新手上路",
+        "创作向导",
         "第一次使用时按步骤跑通配置、开书和第一章。",
         "docs/public/modules/onboarding.md",
       ),
@@ -172,13 +172,13 @@ export const docsManifest: SiteDocCategory[] = [
       doc(
         "module-creative-hub",
         "创作中枢",
-        "用对话方式说明目标、发起任务和查看建议。",
+        "用对话方式说明目标、查看创作进度、诊断问题并前往正式工作台。",
         "docs/public/modules/creative-hub.md",
       ),
       doc(
         "module-task-center",
-        "运行记录与任务恢复",
-        "查看后台任务进度、真实失败原因和安全恢复入口。",
+        "运行记录",
+        "查看后台任务的进度、失败原因与来源入口，回到对应页面继续处理。",
         "docs/public/modules/task-center.md",
       ),
     ],
