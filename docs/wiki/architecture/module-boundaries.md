@@ -42,6 +42,9 @@ Wiki 记录稳定规则，计划和检查点保留历史语境。模块治理以
 - 小说导出属于独立业务模块：`server/src/modules/export/` 只负责读取现有小说生产数据、转换导出 DTO、生成 TXT/Markdown/JSON 内容和导出文件名。它不拥有小说、章节、角色、时间线或质量修复事实源，也不在导出过程中写回生产状态。
 - 时间线约束层属于独立业务模块：`server/src/modules/timeline/` 只管理时间线事件、章节时间锚点、钩子、约束和检测报告。它不替代 `StoryStateSnapshot`、`ConsistencyFact` 或 `CharacterTimeline`，也不直接调用章节 writer 改正文。
 - 章节生成、Prompt Registry 和任务中心只能通过时间线模块 facade 获取时间线上下文或检测报告，不应在 writer、route 或 UI 中直接拼接 timeline 表查询规则。
+- **运行时模块图必须无环**(RF-5,LOOP-49):依赖检查只统计值导入,`import type` 编译后擦除、不计为环。`server/tests/dependencyGraph.test.js` 对 `server/src` 全量扫描,任何新增值级循环都会失败;若确需共享结构,优先上移为 `import type` 或把常量迁移到共享层。
+- **重单例惰性化**:RAG 相关服务(`services/rag/index.ts`)通过 getter 惰性实例化,模块加载不再立即构造整条依赖链;新增服务单例时遵循同一模式,避免冷启动顺序敏感。
+- **prompting 对 services 的依赖**:现存引用以 schema/纯工具常量为主(如 `auditSchemas`、`titleGeneration.shared`、`styleContractText`)。新增提示词资产不得再扩大该依赖面:结构化 schema 应放在 prompting 侧或 shared 层,业务服务不得被 prompting 反向持有。
 
 ## 示例
 

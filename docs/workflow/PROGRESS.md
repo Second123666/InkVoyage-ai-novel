@@ -17,6 +17,22 @@
 
 ---
 
+## 2026-10-26 · LOOP-49 · RF-5 依赖面收敛
+
+- **类别**: 重构(RF 线;主对话执行)
+- **目标**: RF-5 —— prompting→services 循环依赖排查 + RAG 单例惰性化。
+- **审计方法**: 自写模块图扫描器遍历 `server/src` 全量 `.ts`,区分**值导入**与 `import type`(类型边编译后擦除,不构成运行时环),DFS 检测环。
+- **结论**:
+  - 初版扫描报告的 23 个环**全部由类型导入构成**(如 `promptTypes ↔ slotTypes` 双向 `import type`;`stateSchemas → stateSnapshotExtraction` 为 `import type`),修正解析器(逐 import 语句、过滤纯 type 子句)后**运行时环 0**;prompting↔services 无运行时环;
+  - 现存 prompting→services 引用以 schema/纯工具常量为主,不构成循环,但作为边界约束写入 wiki(新增资产不得扩大该依赖面)。
+- **改动**:
+  1. `services/rag/index.ts` 改为**惰性单例 getter**(9 个服务按需实例化,重复访问返回同一实例),冷启动不再立即构造整条 RAG 依赖链;
+  2. 守卫 `dependencyGraph.test.js`(2 条:值导入全图零环 + RAG getter 惰性/单例契约);
+  3. `module-boundaries.md` 补充运行时无环、重单例惰性化、prompting 依赖边界三条规则。
+- **验证**: server build 0 错误;守卫 2/2;server 全量 **1464 / 1452 过 / 0 失败 / 12 跳过**。client 未动。
+- **发布说明**: 纯内部依赖治理,无用户可见变化,按规则跳过。
+- **下一步**: **LOOP-50 = OPS-3(LICENSE/NOTICE/CLA)** 或 OPS-4;UI-6 / UI-7 / BUG-7 仍等所有者决策。
+
 ## 2026-10-26 · LOOP-48 · RF-4 文档一致性清理
 
 - **类别**: 文档 / 重构收尾(RF 线;主对话执行)

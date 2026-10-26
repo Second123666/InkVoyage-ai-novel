@@ -57,7 +57,8 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 46. ~~**LOOP-46 UI 线收尾**(UI-1 第六批 + UI-2 + UI-4 + UI-5,UI-3 审计)~~ ✅ 完成(2026-10-26):UI-1 整项完成、UI-2/4/5 完成、UI-3 主要面达标(增量 UI-7),守卫 3 条,client 271/271。
 47. ~~**LOOP-47 RF-3 密钥存储加固**~~ ✅ 完成(2026-10-26):AES-256-GCM 加密落库 + 启动幂等迁移,守卫 5 条,server 1462/1450/0。
 48. ~~**LOOP-48 RF-4 文档一致性清理**~~ ✅ 完成(2026-10-26):519 引用校验,修复 11 个失效引用,剩余 3 项为环境文件/构建产物。
-49. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **RF-5 依赖面收敛** 或 **OPS-3/4**;UI-6(promptWorkbench 主题、可视化分类色)、UI-7 可视化增量、BUG-7 仍需所有者决策/排期。
+49. ~~**LOOP-49 RF-5 依赖面收敛**~~ ✅ 完成(2026-10-26):运行时环 0(假环为类型边),RAG 单例惰性化,守卫 2 条,server 1464/1452/0。
+50. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **OPS-3(LICENSE/NOTICE/CLA)** 或 OPS-4(对外文档审校);UI-6(promptWorkbench 主题、可视化分类色)、UI-7 可视化增量、BUG-7 仍需所有者决策/排期。
     **完成项打勾规则(2026-10-20 所有者要求)**:每轮收尾同步更新 BACKLOG —— 完成项 `[x]` + ✅,进行中 `[/]`,入口建议划线。
 
 ---
@@ -165,10 +166,8 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 - [x] **RF-4 文档一致性清理** · S · P3(= LOOP-48,2026-10-26 完成) ✅
   结果:扫描 160 个 md 文件的 519 个仓库内路径引用 + 相对链接;修复 11 个失效引用(导演模块迁移到 commands/runtime、bookAnalysis publish 子目录、世界设定接管面板替换),历史计划加注不篡改语义。剩余 3 项为设计上不在仓库内/构建产物(`client/.env*`、`site/dist`)。
 
-- [ ] **RF-5 prompting → services 依赖面收敛** · S · P3
-  LOOP-2 已断开 `creativeHubContextResolvers` 一条循环边(改调用时惰性加载);同类顶层 import 未全面排查。
-  顺带:`services/rag/index.js` 模块加载即实例化全部单例,加剧冷加载循环脆弱性,可评估惰性 getter 化。
-  验收:冷启动 `node -e "require('./dist/app.js')"` 类路径无 "is not a constructor";新增守卫测试可选。
+- [x] **RF-5 prompting → services 依赖面收敛** · S · P3(= LOOP-49,2026-10-26 完成) ✅
+  结果:自写模块图扫描器(区分值导入与 `import type`)遍历 `server/src` 全量文件 —— 初报 23 个环经解析器修正后确认为类型边假环,**运行时环 0**、prompting↔services 无运行时环;`services/rag/index.ts` 改为惰性单例 getter(9 个服务按需实例化、单例保持);守卫 `server/tests/dependencyGraph.test.js`(全图零环 + 惰性契约);边界规则写入 wiki `architecture/module-boundaries.md`。验收:冷启动 require 正常(全量套件要求 app 即通过)、新增守卫锁定。
 
 ## 4. 缺陷与稳定性(BUG)
 
