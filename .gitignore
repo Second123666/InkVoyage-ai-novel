@@ -12,6 +12,9 @@ server/.env.local
 server/dev.db
 server/dev.db-shm
 server/dev.db-wal
+# RF-3:本地生成的模型密钥库(与数据库成对备份,严禁提交)
+server/data/
+data/secrets/
 server/tmp_*.js
 server/tmp/**/*.db
 server/tmp/**/*.db*

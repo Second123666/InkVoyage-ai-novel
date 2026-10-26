@@ -9,6 +9,7 @@ import type { ApiResponse } from "@ai-novel/shared/types/api";
 import { ensureRuntimeDatabaseReady } from "./db/runtimeMigrations";
 import { errorHandler } from "./middleware/errorHandler";
 import { loadProviderApiKeys } from "./llm/factory";
+import { secretStore } from "./services/settings/secretStore";
 import astrologyRouter from "./routes/astrology";
 import agentCatalogRouter from "./routes/agentCatalog";
 import agentRunsRouter from "./routes/agentRuns";
@@ -289,9 +290,20 @@ function initializeBackgroundServices(): BackgroundServicesHandle {
     console.warn("[short-story] failed to resume pending production.", error);
   });
 
-  void loadProviderApiKeys().catch((error) => {
-    console.warn("数据库中的模型密钥加载失败，已回退到环境变量。", error);
-  });
+  // RF-3:先把存量明文 API Key 就地加密,再加载到内存缓存。
+  void secretStore.migratePlaintextSecrets()
+    .then((result) => {
+      if (result.migrated > 0) {
+        console.log(`[secret-store] encrypted ${result.migrated} stored API keys.`);
+      }
+      if (result.failed > 0) {
+        console.warn(`[secret-store] ${result.failed} stored API keys could not be encrypted and stay unchanged.`);
+      }
+      return loadProviderApiKeys();
+    })
+    .catch((error) => {
+      console.warn("数据库中的模型密钥加载失败，已回退到环境变量。", error);
+    });
 
   void ensureSystemResourceStarterData()
     .then((systemResourceReport) => {

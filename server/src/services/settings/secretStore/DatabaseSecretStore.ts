@@ -1,10 +1,19 @@
 import { prisma } from "../../../db/prisma";
+import { decryptSecret, encryptSecret, isEncryptedSecret } from "./secretCipher";
 import type { SecretStore, SecretStoreListOptions, SecretStoreRecord, SecretStoreWriteInput } from "./SecretStore";
+
+// RF-3:API Key 落库前加密(AES-256-GCM),读取时解密;存量明文由启动迁移重写为密文。
+function encryptNullableKey(key: string | null | undefined): string | null | undefined {
+  if (key === undefined || key === null) {
+    return key;
+  }
+  return encryptSecret(key);
+}
 
 function toPrismaWriteInput(input: SecretStoreWriteInput): Record<string, unknown> {
   return {
     ...(input.displayName !== undefined ? { displayName: input.displayName } : {}),
-    ...(input.key !== undefined ? { key: input.key } : {}),
+    ...(input.key !== undefined ? { key: encryptNullableKey(input.key) } : {}),
     ...(input.model !== undefined ? { model: input.model } : {}),
     ...(input.baseURL !== undefined ? { baseURL: input.baseURL } : {}),
     ...(input.authMode !== undefined ? { authMode: input.authMode } : {}),
@@ -17,9 +26,25 @@ function toPrismaWriteInput(input: SecretStoreWriteInput): Record<string, unknow
   };
 }
 
+function decryptRecordKey(record: SecretStoreRecord): SecretStoreRecord {
+  if (!record?.key) {
+    return record;
+  }
+  try {
+    return { ...record, key: decryptSecret(record.key) };
+  } catch (error) {
+    // 主密钥丢失/轮换时,把该厂商视为未配置,避免整站启动失败。
+    console.warn(
+      `[secret-store] failed to decrypt API key for provider=${record.provider}; treating as unconfigured.`,
+      error instanceof Error ? error.message : error,
+    );
+    return { ...record, key: null };
+  }
+}
+
 export class DatabaseSecretStore implements SecretStore {
   async listProviders(options?: SecretStoreListOptions): Promise<SecretStoreRecord[]> {
-    return prisma.aPIKey.findMany({
+    const rows = await prisma.aPIKey.findMany({
       where: {
         ...(options?.onlyActive ? { isActive: true } : {}),
         ...(options?.providers?.length
@@ -32,12 +57,14 @@ export class DatabaseSecretStore implements SecretStore {
       },
       orderBy: [{ createdAt: "asc" }],
     });
+    return rows.map((row) => decryptRecordKey(row as SecretStoreRecord));
   }
 
   async getProvider(provider: string): Promise<SecretStoreRecord | null> {
-    return prisma.aPIKey.findUnique({
+    const row = await prisma.aPIKey.findUnique({
       where: { provider },
     });
+    return row ? decryptRecordKey(row as SecretStoreRecord) : null;
   }
 
   async hasProvider(provider: string): Promise<boolean> {
@@ -49,24 +76,26 @@ export class DatabaseSecretStore implements SecretStore {
   }
 
   async createProvider(provider: string, input: SecretStoreWriteInput): Promise<SecretStoreRecord> {
-    return prisma.aPIKey.create({
+    const row = await prisma.aPIKey.create({
       data: ({
         provider,
         ...toPrismaWriteInput(input),
       } as Record<string, unknown>) as never,
     });
+    return decryptRecordKey(row as SecretStoreRecord);
   }
 
   async updateProvider(provider: string, input: SecretStoreWriteInput): Promise<SecretStoreRecord> {
-    return prisma.aPIKey.update({
+    const row = await prisma.aPIKey.update({
       where: { provider },
       data: toPrismaWriteInput(input) as never,
     });
+    return decryptRecordKey(row as SecretStoreRecord);
   }
 
   async upsertProvider(provider: string, input: SecretStoreWriteInput): Promise<SecretStoreRecord> {
     const writeInput = toPrismaWriteInput(input);
-    return prisma.aPIKey.upsert({
+    const row = await prisma.aPIKey.upsert({
       where: { provider },
       update: writeInput as never,
       create: ({
@@ -74,11 +103,49 @@ export class DatabaseSecretStore implements SecretStore {
         ...writeInput,
       } as Record<string, unknown>) as never,
     });
+    return decryptRecordKey(row as SecretStoreRecord);
   }
 
   async deleteProvider(provider: string): Promise<void> {
     await prisma.aPIKey.delete({
       where: { provider },
     });
+  }
+
+  /**
+   * RF-3 迁移:把存量明文 API Key 就地重加密。
+   * - 幂等:已加密行跳过;
+   * - 安全:先做加密→解密往返校验,失败则保留原值并计数;
+   * - 单行失败不阻断其他行。
+   */
+  async migratePlaintextSecrets(): Promise<{ migrated: number; failed: number }> {
+    const rows = await prisma.aPIKey.findMany({
+      select: { provider: true, key: true },
+    });
+    let migrated = 0;
+    let failed = 0;
+    for (const row of rows) {
+      if (!row.key || isEncryptedSecret(row.key)) {
+        continue;
+      }
+      try {
+        const encrypted = encryptSecret(row.key);
+        if (decryptSecret(encrypted) !== row.key) {
+          throw new Error("encrypt/decrypt roundtrip mismatch");
+        }
+        await prisma.aPIKey.update({
+          where: { provider: row.provider },
+          data: { key: encrypted },
+        });
+        migrated += 1;
+      } catch (error) {
+        failed += 1;
+        console.warn(
+          `[secret-store] failed to encrypt stored key for provider=${row.provider}; left unchanged.`,
+          error instanceof Error ? error.message : error,
+        );
+      }
+    }
+    return { migrated, failed };
   }
 }
