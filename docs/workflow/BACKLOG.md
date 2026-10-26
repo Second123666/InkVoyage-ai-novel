@@ -62,7 +62,9 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 51. ~~**LOOP-51 OPS-4 对外文档审校**~~ ✅ 已完成(2026-10-26):失效链接 7 条修复 + slug 守卫;自动导演过时流程 5 文档重写;运行记录/创作向导术语统一;备份补主密钥;README 与 release-notes 对齐。
 52. ~~**LOOP-52~54 UI-7 可视化增量**~~ ✅ 已完成(2026-10-26):统计面板 / 工作流步骤图 / 故事时间线三项落地,零新增依赖、全部懒加载。
 53. ~~**LOOP-55 OPS-1 本地历史清理**~~ ✅ 已完成(2026-10-26):upstream 引用 + 上游 tags 清除,历史密钥复检通过。
-54. ~~**LOOP-56 UI-6 受控分类色 token**~~ ✅ 已完成(2026-10-26)。下一项 **BUG-7 恢复语义**(仅显式用户恢复清除 pmr,已获决策);**待所有者输入**:OPS-2 新项目名;UI-8 截图刷新需真实数据环境。
+54. ~~**LOOP-56 UI-6 受控分类色 token**~~ ✅ 已完成(2026-10-26)。
+55. ~~**LOOP-57 BUG-7 恢复语义**~~ ✅ 已完成(2026-10-26):pmr 仅由显式用户恢复动作清除,守卫锁定。
+56. **剩余**:OPS-2 待所有者提供新项目名后统一品牌与身份链接;UI-8 截图刷新需真实数据环境(所有者执行);其余待办均已闭环。
     **完成项打勾规则(2026-10-20 所有者要求)**:每轮收尾同步更新 BACKLOG —— 完成项 `[x]` + ✅,进行中 `[/]`,入口建议划线。
 
 ---
@@ -201,10 +203,8 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 - [x] **BUG-6 拆书任务步骤词表缺口** · S · P2(= LOOP-31,2026-10-25 完成) ✅
   结果:`BOOK_ANALYSIS_STEPS` 补齐 `loading_cache`/`generating_overview`,步骤流与 `BookAnalysisStage` 全集一致,中段进度不再回落第 0 步;产品语义核实:draft 在拆书专属页面可见,archived 为显式归档全站隐藏 —— 均有明确语义,无需改。守卫 `bookAnalysisSteps.test.js`(2 条:词表覆盖 + 索引正确)。
 
-- [ ] **BUG-7 命令入队无条件清除待手动恢复标记** · S · P1(LOOP-4 审计 INC-3,partly;**需所有者产品语义决策**)
-  `DirectorCommandService.markCommandAcceptedOnTask` 在任何导演命令入队时把 `pendingManualRecovery` 清回 false 并置 queued;agent 工具 enqueueContinueCommand 属可达路径。与"仅显式用户恢复可清除 pmr"的 AGENTS 契约存在张力。
-  待决策:哪些入队路径可视作"显式恢复"(用户 UI 动作 / 用户批准的 agent 运行 / 后台自动)?决策后加守卫并在非豁免路径保留 pmr。
-  验收:决策落地 + 守卫测试锁定允许清除的路径清单。
+- [x] **BUG-7 命令入队无条件清除待手动恢复标记** · S · P1(= LOOP-57,2026-10-26 完成) ✅
+  决策(所有者):仅显式用户恢复动作可清除。结果:`markCommandAcceptedOnTask` 默认保留 pmr,新增 `options.clearPendingManualRecovery`;HTTP 命令入口与用户工作台(continue/resume/retry/approve/accept/takeover、导演跟进动作、任务适配器、恢复服务)显式传 true;agent 工具与后台自动恢复保持不清除。守卫 `pendingManualRecoverySemantics.test.js` 锁定白名单;server 全量 1473/1461/0。
 
 - [x] **BUG-8 混合视图隐藏行与 overview 计数不对齐** · S · P3(= LOOP-31,2026-10-25 完成) ✅
   结果:`parseLinkedPipelineJobId` 移入 `taskCenterVisibility` 单一来源;新增 `collectLinkedPipelineJobIdsFromRows` 供 overview 复用同一代理状态规则;`listTasks` 移除 kind=novel_pipeline 隐藏旁路;overview 的 pipeline 计数排除被代理行。切换筛选不再"凭空出现/消失"。守卫 4 条(含静态断言)。

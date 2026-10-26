@@ -17,6 +17,20 @@
 
 ---
 
+## 2026-10-26 · LOOP-57 · BUG-7 待手动恢复标记语义收敛
+
+- **类别**: 缺陷修复(运行时契约;主对话执行;所有者已决策:仅显式用户恢复动作可清除)
+- **目标**: 命令入队不再无条件清除 `pendingManualRecovery`;agent 工具与后台自动入队保留标记。
+- **改动**:
+  1. `DirectorCommandService`:相关 enqueue 方法新增 `options.clearPendingManualRecovery`(默认 false);`markCommandAcceptedOnTask` 仅在显式 true 时清除标记,写入侧按条件携带 `pendingManualRecovery: false`;
+  2. 显式用户恢复入口传 true:导演命令 HTTP 入口(continue / resume_from_checkpoint / retry / approve_gate / accept_manual_changes / takeover)、工作流 continue 的 approve/continue 两条路径、创作体验选择、导演跟进动作执行器、任务适配器 continue、任务恢复服务;
+  3. agent 工具(`directorRuntimeTools`)与后台自动恢复(`NovelWorkflowRuntimeService`)保持默认不清除;
+  4. 守卫 `pendingManualRecoverySemantics.test.js`(3 条:默认保留条件写、清除白名单 + agent/后台禁入、用户入口覆盖计数);3 条既有导演命令测试更新到新契约(默认保留 / 显式清除)。
+- **验证**: server build 0 错误;全量 **1473 测试 / 1461 过 / 0 失败 / 12 跳过**;client 未动,沿用 LOOP-56 `280/280`。
+- **发布说明**: 用户可见修复,已记 release-notes/README(2026-10-26 修复)。
+- **遗留**: 无。
+- **下一步**: 剩余仅 OPS-2(待新项目名)与 UI-8(需真实数据环境)。
+
 ## 2026-10-26 · LOOP-56 · UI-6 受控分类色 token
 
 - **类别**: UI(设计系统;主对话执行;所有者已决策:新增受控 category token)
