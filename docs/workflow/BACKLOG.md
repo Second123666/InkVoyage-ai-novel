@@ -66,7 +66,8 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 55. ~~**LOOP-57 BUG-7 恢复语义**~~ ✅ 已完成(2026-10-26):pmr 仅由显式用户恢复动作清除,守卫锁定。
 56. ~~**LOOP-58 UI-8 截图刷新(第一批)**~~ ✅ 已完成(2026-10-26):18 张真实数据截图替换 + 2 张新增/纠偏。
 57. ~~**LOOP-59 OPS-2 品牌与身份统一**~~ ✅ 已完成(2026-10-26):更名「墨航 InkVoyage」,自有仓库/Pages/下载入口统一,内部技术标识保持稳定。
-58. **剩余**:UI-8 尾图由所有者自行补拍(需示例数据);其余待办均已闭环。
+58. **LOOP-60 INN-A1b 第一批** ✅ 已完成(2026-10-26):注入保底/排序/上限、风险信号透传、逾期 payoff 语义、遥测、sync_stale、planner 回退、版本钉住修复。
+59. **进行中**:INN-A1b 第二/三批(UI + 验收字段 + Markdown 导出);UI-8 尾图由所有者自行补拍。
     **完成项打勾规则(2026-10-20 所有者要求)**:每轮收尾同步更新 BACKLOG —— 完成项 `[x]` + ✅,进行中 `[/]`,入口建议划线。
 
 ---
@@ -97,8 +98,9 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
   结果:先审计(上游已有双 AI 写路径 + 注入 + 只读卡片,验收②已达成),再收敛 11 项:手动登记/标记 + manualLocked 锁定语义、入口门控修复、过窗读时升格、停滞扫描(30 章)、回收计数、逾期降质量债、导演/大纲提醒面。契约见 `docs/wiki/architecture/payoff-ledger-lifecycle.md`;计划 `docs/plans/payoff-ledger-mvp.md`;守卫 `server/tests/payoffLedgerMvp.test.js`。
   残留调优 → INN-A1b。
 
-- [ ] **INN-A1b 伏笔账本注入调优与体验打磨** · S–M · P3(LOOP-5 后置项合并登记)
-  清单(A1-G2/G3/G5/G6/G7 注入保底与排序:payoff_ledger 块进 preferredGroups、riskSignals/confidence 透传、overdue 注入升级 payoff 语义、pending 按窗口排序、注入条数上限与截断顺序;G8/G9 上下文遥测与预算档案对齐;G11-UI 窗口行内编辑;G15 卡片筛选与章节跳转;G18 同步状态标记与手动重建入口;G19 验收 requiresFullPayoffReconcile 死字段接线;G23 sync_stale 进合成问题;G24 快照双轨说明强化;G25 Markdown 导出伏笔清单;planner 空账本回退摘要 paidOff/failed 仍为 0)。
+- [/] **INN-A1b 伏笔账本注入调优与体验打磨** · S–M · P3(LOOP-5 后置项合并登记)
+  **第一批完成(LOOP-60)**:G2/G3/G5/G6/G7/G8/G9 注入保底与排序、G23 sync_stale 合成问题、planner 空账本回退计数、对账资产版本 v5→v6 修复;守卫 8 条,server 1481/1469/0。
+  **剩余第二批(UI)**:G11 窗口行内编辑、G15 卡片筛选与章节跳转、G18 同步状态标记与手动重建入口、G24 快照双轨说明强化;**第三批**:G19 验收 `requiresFullPayoffReconcile` 死字段接线、G25 Markdown 导出伏笔清单。
   验收:逐项小步推进,每批保持三套测试绿;完成项从清单划除。
 
 - [x] **INN-A2 全书一致性守卫(Continuity Guard)** · M · P2(= LOOP-7,2026-10-20 完成) ✅

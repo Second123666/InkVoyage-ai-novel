@@ -17,6 +17,26 @@
 
 ---
 
+## 2026-10-26 · LOOP-60 · INN-A1b 第一批:伏笔注入链路调优
+
+- **类别**: 创新 / 调优(A 线写作质量;主对话执行)
+- **目标**: INN-A1b 注入保底与排序清单 —— A1-G2/G3/G5/G6/G7/G8/G9/G23 + planner 空账本回退。
+- **改动**:
+  1. **G2/G9**:`payoff_ledger` 块进入 writer 资产 `preferredGroups`、`contextRequirements`(priority 94)与运行时预算档案,防止预算静默丢弃;
+  2. **G3**:canonical 快照新增 `riskSignals`(可选默认 []),`toCanonicalPayoff` 与运行时账本透传风险信号;confidence 一并保留;
+  3. **G5**:逾期条目注入指令从 `pressure` 升级为 `payoff`(要求本章兑现或明确说明延期),`chapterContractBoundary` 断言同步;
+  4. **G6**:新增 `sortPayoffItemsByWindow`,pending 按目标窗口(截止早优先、无窗口最后)排序,快照与运行时共用;
+  5. **G7**:台账注入上限(紧急 4 / 逾期 4 / 待推进 3)+ 溢出汇总行,防止长篇账本吃光预算;
+  6. **G8**:provider contract 新增 `payoff_ledger` 遥测(有账本才评估,缺失按 degrade 记录);
+  7. **G23**:`sync_stale` 风险信号进入合成问题,附带"重新同步账本"修复建议;
+  8. **planner 空账本回退**:账本为空时从最近状态快照的伏笔终结状态补齐 paidOff/failed,回退摘要不再恒 0;
+  9. **顺带修复**:导演执行模块钉住的伏笔对账资产版本 `v5` → `v6`(与注册表一致);
+  10. 守卫 `payoffLedgerInjectionTuning.test.js`(8 条):排序、透传、逾期升级、上限截断、遥测、sync_stale、回退计数、版本钉住。
+- **验证**: server build 0 错误;全量 **1481 测试 / 1469 过 / 0 失败 / 12 跳过**;client 未动,沿用 LOOP-59 `280/280`。
+- **发布说明**: 内部注入质量与排序调优,无用户可见变化,跳过。
+- **遗留**: INN-A1b 剩余 G11(窗口行内编辑)、G15(卡片筛选与章节跳转)、G18(同步状态标记与手动重建)、G19(验收字段接线)、G24(快照双轨说明)、G25(Markdown 导出伏笔清单)。
+- **下一步**: LOOP-61 = INN-A1b 第二批(UI:G11/G15/G18/G24)。
+
 ## 2026-10-26 · LOOP-59 · OPS-2 品牌与身份统一(墨航 InkVoyage)
 
 - **类别**: 开源就绪 / 品牌(OPS 线;所有者定名)
