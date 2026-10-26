@@ -17,6 +17,19 @@
 
 ---
 
+## 2026-10-26 · LOOP-62 · 归属收尾:剩余上游标识与个人信息清理
+
+- **类别**: 开源就绪(OPS 线收尾)
+- **背景**: 所有者询问仓库是否仍含原项目信息、能否作为自己的项目上传 GitHub。
+- **改动**:
+  1. **法律归属保留**:NOTICE 上游版权与独立衍生声明、README License 段、AGPL 完整文本、`licensing.test.js` 守卫保持不变;NOTICE 增加修改版权行(Second123666,附正式发布前可替换法定姓名的说明);
+  2. **非法律标识清理**:LICENSE 标题改为「墨航 InkVoyage License」并注明衍生关系;CLA/CONTRIBUTING 项目名;`site/scripts/generate-sitemap.cjs` 与 `prerender.cjs` 的 origin/base(此前 site build 会重新生成上游 URL,本轮修复根因并重生成 sitemap);桌面构建默认 owner/repo 与 desktop author;wiki 站点路径;
+  3. **个人信息清理**:移除 README 的上游支付宝捐赠段(二维码图片已不在工作区)与上游 QQ 群二维码段,改为 GitHub Issues 入口;
+  4. **保留**:上游 Ani Book Skill/Agent 链接(明确标注上游维护)、历史 release-notes、git 历史与作者归属;桌面 productName/appId/APP_NAME 与 `@ai-novel/*` 包作用域保持稳定(涉及数据目录/更新通道,需迁移方案另立)。
+- **验证**: site build 通过,sitemap 中上游 URL **0** 条(37 路由预渲染);`licensing.test.js` **4/4**;`check:docs-manifest` 通过;README 相对链接复检通过。
+- **发布说明**: 仓库治理与归属清理,无产品行为变化,跳过。
+- **遗留**: 桌面安装器/数据目录仍显示旧技术标识(需迁移);其余截图旧品牌由 UI-8 尾图处理。
+
 ## 2026-10-26 · LOOP-61 · INN-A1b 第二、三批:体验打磨与契约接线
 
 - **类别**: UI + 缺陷收口(A 线写作质量;主对话执行)
