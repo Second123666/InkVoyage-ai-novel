@@ -3,7 +3,7 @@
   "version": "0.4.24",
   "private": true,
   "license": "AGPL-3.0-only",
-  "author": "AI Novel Writing Assistant Team",
+  "author": "InkVoyage maintainers",
   "description": "Windows desktop runtime for InkVoyage",
   "productName": "AI Novel Writing Assistant v2",
   "main": "dist/main.js",

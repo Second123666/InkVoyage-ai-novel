@@ -7,7 +7,7 @@ const siteRoot = path.resolve(__dirname, "..");
 const distRoot = path.join(siteRoot, "dist");
 const templatePath = path.join(distRoot, "index.html");
 const manifestPath = path.join(distRoot, ".vite", "manifest.json");
-const siteBase = "/AI-Novel-Writing-Assistant/";
+const siteBase = "/AI-novel/";
 
 function normalizeManifestCandidate(candidate) {
   return candidate.replace(/\\/g, "/").replace(/^(\.\.\/)+/, "");
