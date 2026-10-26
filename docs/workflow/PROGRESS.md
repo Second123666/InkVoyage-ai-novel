@@ -17,6 +17,23 @@
 
 ---
 
+## 2026-10-26 · LOOP-59 · OPS-2 品牌与身份统一(墨航 InkVoyage)
+
+- **类别**: 开源就绪 / 品牌(OPS 线;所有者定名)
+- **目标**: 把项目从上游身份统一为「墨航 InkVoyage」,身份链接指向自有仓库与 Pages。
+- **改动**:
+  1. 显示名统一:README 标题、客户端导航/移动端头部/桌面启动壳与错误弹窗、`client/index.html`、桌面窗口 title、站点品牌/标题/meta/结构化数据、public 文档(introduction/installation);
+  2. 身份链接:README Releases/Latest/Pages、客户端 GitHub 入口、站点 repo/Stars/canonical/OG/sitemap/robots、PR 模板 CLA、桌面发布 workflow 的 owner/repo 全部改为 `Second123666/AI-novel` 与 `second123666.github.io/AI-novel/`;移除上游 Trendshift 徽标;
+  3. Pages base path:`site/vite.config.ts`、`site/index.html`、`site/public/404.html` 的 base 改为 `/AI-novel`(否则部署后静态资源 404);
+  4. 归属保留:NOTICE 补充当前名称并保留上游版权;README License 段、Ani Book Skill / ani-book-agent 明确标注「上游作者维护」;
+  5. 内部技术标识保持稳定(包作用域 `@ai-novel/*`、桌面 productName/appId、desktop APP_NAME 数据目录),避免破坏数据路径与更新通道;规则写入 wiki `product/brand-and-identity.md`;
+  6. 发布说明补充更名条目;
+  7. 用新品牌重截 LOOP-58 的 20 张截图(导航/窗口显示「墨航 InkVoyage」),替换同名文件,避免文档文案与截图品牌冲突。
+- **验证**: client typecheck 0 错误、client **280/280**;site typecheck 0 错误、build 通过且 `base = "/AI-novel"`(37 路由预渲染);desktop typecheck 0 错误;docs manifest 35/35/17;35 个 md 相对链接全通过。
+- **发布说明**: 更名用户可见,已记 release-notes/README(2026-10-26 优化)。
+- **遗留**: 桌面 productName/appId/数据目录名与 npm 包作用域未跟随显示名(需迁移方案,另立轮次);Gitee 镜像链接可后续加入 README。
+- **下一步**: 剩余仅 UI-8 尾图(所有者自处理);BACKLOG 全部可执行项闭环。
+
 ## 2026-10-26 · LOOP-58 · UI-8 公开文档截图刷新(部分完成)
 
 - **类别**: UI / 文档资产(主对话执行)

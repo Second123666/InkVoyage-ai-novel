@@ -64,7 +64,9 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 53. ~~**LOOP-55 OPS-1 本地历史清理**~~ ✅ 已完成(2026-10-26):upstream 引用 + 上游 tags 清除,历史密钥复检通过。
 54. ~~**LOOP-56 UI-6 受控分类色 token**~~ ✅ 已完成(2026-10-26)。
 55. ~~**LOOP-57 BUG-7 恢复语义**~~ ✅ 已完成(2026-10-26):pmr 仅由显式用户恢复动作清除,守卫锁定。
-56. ~~**LOOP-58 UI-8 截图刷新(第一批)**~~ ✅ 已完成(2026-10-26):18 张真实数据截图替换 + 2 张新增/纠偏。**剩余**:OPS-2 待所有者提供新项目名;UI-8 剩余截图需示例数据(拆书/知识库/标题/基础角色/质量修复等)。
+56. ~~**LOOP-58 UI-8 截图刷新(第一批)**~~ ✅ 已完成(2026-10-26):18 张真实数据截图替换 + 2 张新增/纠偏。
+57. ~~**LOOP-59 OPS-2 品牌与身份统一**~~ ✅ 已完成(2026-10-26):更名「墨航 InkVoyage」,自有仓库/Pages/下载入口统一,内部技术标识保持稳定。
+58. **剩余**:UI-8 尾图由所有者自行补拍(需示例数据);其余待办均已闭环。
     **完成项打勾规则(2026-10-20 所有者要求)**:每轮收尾同步更新 BACKLOG —— 完成项 `[x]` + ✅,进行中 `[/]`,入口建议划线。
 
 ---
@@ -280,9 +282,11 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 
 - [x] **OPS-1 仓库转公开前历史清理** · S · P0(转公开硬前置)(= LOOP-55,2026-10-26 完成) ✅
   结果:删除 upstream 远端(41 跟踪引用)+ 67 个上游 tags + 过期 reflog + `git gc --prune=now`;可达提交 2597→1363,历史无 `.db/.sqlite` 文件,密钥扫描仅剩测试夹具假值(掩码核验),悬空对象为空。**残留**:转公开前需核对远端仓库 tags(本次仅本地清理);遵守红线,只推 main。
-- [ ] **OPS-2 品牌与命名定稿** · S · P2
-  是否改项目名、README/介绍站/包名统一表述;由所有者拍板。
-  **输入清单(LOOP-51 审计)**:README 的 Releases/Latest Release 链接、GitHub Pages 介绍站链接、Trendshift 徽标、Ani Book Skill 链接、vibe-doctor 的 GitHub blob 链接,以及 `site/`、`client/src/components/layout/ProjectGithubLink.tsx`、creativeHub 等处的上游仓库引用 —— 定稿后一次性统一为自有仓库/站点。
+- [x] **OPS-2 品牌与命名定稿** · S · P2(= LOOP-59,2026-10-26 完成) ✅
+  决策(所有者):新名称「墨航 InkVoyage」。
+  结果:README / 客户端导航与移动端 / 桌面窗口 / 站点 meta 与结构化数据 / public 文档全部统一;Releases、Pages、GitHub、Stars、CLA、sitemap、robots 与桌面发布 workflow 指向自有仓库;Pages base 改为 `/AI-novel`;移除上游 Trendshift 徽标,保留 NOTICE 上游归属与 Ani Book 上游项目标注。规则见 wiki `product/brand-and-identity.md`。
+  验证:client 280/280、site build(base 正确、37 路由)、desktop typecheck、docs manifest 与链接全绿。
+  残留:内部包作用域 `@ai-novel/*`、桌面 productName/appId/数据目录名保持稳定(需迁移方案,另立)。
 - [x] **OPS-3 LICENSE / NOTICE / CLA 归属梳理** · S · P2(= LOOP-50,2026-10-26 完成) ✅
   结果:审计确认许可栈完整(LICENSE 双许可 + AGPL 全文、CLA 版权保留 + 商业再许可、CONTRIBUTING、5 包 license 一致);NOTICE 补充「独立衍生」声明与上游保留条款,README 同步;新增 wiki `product/licensing-and-attribution.md` 与守卫 `server/tests/licensing.test.js`(4 条)。
 - [x] **OPS-4 对外文档审校** · S · P3(= LOOP-51,2026-10-26 完成) ✅
