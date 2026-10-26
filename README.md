@@ -108,6 +108,7 @@ pnpm dev
 
 ```bash
 pnpm dev              # 启动 shared / server / client
+pnpm dev:stop         # 停止本地开发进程并释放 3000 / 5173
 pnpm build            # 生产构建
 pnpm typecheck        # 全仓类型检查
 pnpm test             # 后端快速测试

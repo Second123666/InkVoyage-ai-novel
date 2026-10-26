@@ -18,6 +18,7 @@
     "dev:client": "pnpm --filter @ai-novel/client dev",
     "dev:site": "pnpm --filter @ai-novel/site dev",
     "dev:client:wait": "node scripts/wait-for-port.cjs --port 3000 && pnpm dev:client",
+    "dev:stop": "node scripts/stop-dev.cjs",
     "prepare:desktop-runtime": "pnpm --filter @ai-novel/desktop prepare:runtime",
     "dev:desktop:shell": "node scripts/wait-for-port.cjs --port 3000 && node scripts/wait-for-port.cjs --port 5173 && pnpm --filter @ai-novel/desktop dev",
     "dev:desktop": "node scripts/check-deps.cjs && node scripts/run-with-log.cjs --name desktop-dev -- pnpm dev:desktop:raw",

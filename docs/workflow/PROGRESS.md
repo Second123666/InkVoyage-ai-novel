@@ -25,8 +25,9 @@
 - **改动**:
   1. `dev:raw` 的 client 改为 `dev:client:wait`(先等 3000 端口就绪再启动 Vite),消除启动期代理报错;
   2. `scripts/run-with-log.cjs` 改为显式拼接命令行后交给 shell,保留 Windows `pnpm.cmd` 解析,消除 `DEP0190` 弃用告警;
-  3. 根 `dev` 在启动并发进程前先执行 `server/scripts/stop-stale-dev-server.cjs` —— 修复“旧服务端仍占 3000 → wait-for-port 误判就绪 → 旧进程被杀 → 新服务端编译期代理报错”的启动竞态(2026-10-26 日志复现)。
-- **验证**: `pnpm dev` 启动后 server/client 均 200;无旧进程时启动阶段 `http proxy error` 0 条、`DEP0190` 0 条;文件保存触发的重启与轮询日志仍为预期行为。
+  3. 根 `dev` 在启动并发进程前先执行 `server/scripts/stop-stale-dev-server.cjs` —— 修复“旧服务端仍占 3000 → wait-for-port 误判就绪 → 旧进程被杀 → 新服务端编译期代理报错”的启动竞态(2026-10-26 日志复现);
+  4. 新增 `pnpm dev:stop`(`scripts/stop-dev.cjs`):清理 ts-node-dev 残留并释放 3000/5173,用于 Ctrl+C 提示过多或终端关闭后进程残留的场景。
+- **验证**: `pnpm dev` 启动后 server/client 均 200;无旧进程时启动阶段 `http proxy error` 0 条、`DEP0190` 0 条;`pnpm dev:stop` 后 3000/5173 均返回不可连接(000),文件保存触发的重启与轮询日志仍为预期行为。
 - **发布说明**: 开发体验修复,无产品行为变化,跳过。
 - **遗留**: 轮询频率与 `ts-node-dev` 重启日志属设计内行为;Windows 下 Ctrl+C 的 `终止批处理操作吗(Y/N)` 是 `cmd.exe` 对嵌套 `pnpm.cmd` 的正常提示(乱码为控制台编码),需逐层确认或使用 Windows Terminal/chcp 65001;如需更安静的日常开发,可单独跑 `pnpm dev:server` / `pnpm dev:client:wait`。
 
