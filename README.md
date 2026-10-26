@@ -567,6 +567,12 @@ pnpm db:studio
 pnpm --filter @ai-novel/server test
 pnpm --filter @ai-novel/server test:routes
 pnpm --filter @ai-novel/server test:book-analysis
+pnpm test:all
+pnpm dev:site
+# 桌面打包(仅发布时使用)
+pnpm stage:desktop
+pnpm dist:desktop:nsis
+pnpm dist:desktop:portable
 ```
 
 ## 技术栈与架构

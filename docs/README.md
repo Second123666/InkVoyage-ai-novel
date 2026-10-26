@@ -39,7 +39,8 @@
 承接横切架构说明与工程约定（不改变根目录对外入口）。
 
 - [Backend testing](./architecture/testing.md)：后端 `node:test` 脚本的运行方式与目录约定。
-- [项目使用与操作全流程](./architecture/run-and-usage-guide.md)：本地运行、常用命令与产品使用操作流程。
+
+本地运行、常用命令与产品使用流程见根 [README](../README.md)、[安装与准备](./public/installation.md) 与 [使用方法](./public/usage-guide.md)。
 
 ### `docs/wiki`
 

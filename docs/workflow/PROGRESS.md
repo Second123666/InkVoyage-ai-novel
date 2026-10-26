@@ -17,6 +17,18 @@
 
 ---
 
+## 2026-10-26 · LOOP-63 · docs 收尾:删除过时计划、合并重复指南、补全 wiki 索引
+
+- **类别**: 文档 / 流程收尾
+- **改动**:
+  1. 删除 `docs/plans/style-engine-workspace-structure.md`(LOOP-37 已完成但状态仍写“进行中”,0 引用);
+  2. `docs/architecture/run-and-usage-guide.md` 的独有开发命令并入 README「常用命令」(`test:all` / `dev:site` / 桌面打包),随后删除重复指南;`docs/README.md` 索引改为指向 README + public 安装/使用方法;
+  3. `docs/wiki/README.md` 索引从 19 篇补全到 **84 篇**(按 Architecture / Workflows / Prompts / RAG / Debugging / Product 分组,标题取自各页 H1);
+  4. 保留 `docs/public`(站点 manifest)、`docs/wiki` 其余知识页、`docs/plans` 历史计划、`docs/design`、`docs/releases`、`docs/architecture/testing.md`。
+- **验证**: 全库文档相对链接 **161 文件全部通过**;`check:docs-manifest` 35/35/17;文档总数 161 → **159**;工作区干净。
+- **发布说明**: 纯文档整理,无产品行为变化,跳过。
+- **遗留**: `docs/plans` 中已完成的 RF1/导演历史计划仍保留(可后续归档);wiki 内容未做逐篇时效复核。
+
 ## 2026-10-26 · LOOP-62 · 归属收尾:剩余上游标识与个人信息清理
 
 - **类别**: 开源就绪(OPS 线收尾)
