@@ -31,7 +31,7 @@ export default function SelectionAIFloatingToolbar(props: SelectionAIFloatingToo
 
   return (
     <div
-      className="absolute z-20 w-[320px] rounded-2xl border border-border/70 bg-background/95 p-2 shadow-xl backdrop-blur"
+      className="absolute z-20 w-[320px] rounded-lg border border-border/70 bg-background/95 p-2 shadow-xl backdrop-blur"
       style={{ top: position.top, left: position.left }}
     >
       <div className="flex flex-wrap gap-2">

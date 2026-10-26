@@ -9,7 +9,7 @@ import ChapterEditorShell from "./components/chapterEditor/ChapterEditorShell";
 
 function PageStateCard(props: { message: string }) {
   return (
-    <div className="rounded-3xl border border-border/70 bg-background p-10 text-center text-sm text-muted-foreground shadow-sm">
+    <div className="rounded-lg border border-border/70 bg-background p-10 text-center text-sm text-muted-foreground shadow-sm">
       {props.message}
     </div>
   );

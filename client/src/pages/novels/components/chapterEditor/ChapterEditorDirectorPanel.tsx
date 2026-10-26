@@ -76,7 +76,7 @@ export default function ChapterEditorDirectorPanel(props: ChapterEditorDirectorP
         : session.resolvedIntent?.reasoningSummary || "查看待确认改写";
 
   return (
-    <div className="flex h-full min-h-[420px] flex-col overflow-hidden rounded-3xl border border-border/70 bg-background shadow-sm xl:min-h-0">
+    <div className="flex h-full min-h-[420px] flex-col overflow-hidden rounded-lg border border-border/70 bg-background shadow-sm xl:min-h-0">
       <div className="shrink-0 space-y-3 border-b border-border/70 px-4 py-4">
         <div className="flex items-center justify-between gap-3">
           <div>
@@ -125,7 +125,7 @@ export default function ChapterEditorDirectorPanel(props: ChapterEditorDirectorP
         {isIdle ? (
           <>
             {isWorkspaceLoading ? (
-              <div className="rounded-2xl border border-dashed border-border/70 bg-muted/10 p-4">
+              <div className="rounded-lg border border-dashed border-border/70 bg-muted/10 p-4">
                 <div className="text-sm font-medium text-foreground">AI 正在梳理当前章节</div>
                 <div className="mt-2 text-sm leading-6 text-muted-foreground">
                   正在分析本章在卷中的位置、优先修正任务和可直接处理的片段，你可以稍等几秒再开始。
@@ -138,7 +138,7 @@ export default function ChapterEditorDirectorPanel(props: ChapterEditorDirectorP
               </div>
             ) : null}
 
-            <div className="rounded-2xl border border-border/70 bg-muted/10 p-4">
+            <div className="rounded-lg border border-border/70 bg-muted/10 p-4">
               <div className="text-sm font-medium text-foreground">当前最推荐动作</div>
               {isWorkspaceLoading ? (
                 <div className="mt-3 space-y-3">
@@ -164,7 +164,7 @@ export default function ChapterEditorDirectorPanel(props: ChapterEditorDirectorP
             </div>
 
             {selectedDiagnosticCard ? (
-              <div className="rounded-2xl border border-sky-200 bg-sky-50/70 p-4">
+              <div className="rounded-lg border border-info/30 bg-info/10 p-4">
                 <div className="text-sm font-medium text-foreground">{selectedDiagnosticCard.title}</div>
                 <div className="mt-2 text-sm leading-6 text-muted-foreground">
                   {selectedDiagnosticCard.problemSummary}
@@ -184,12 +184,12 @@ export default function ChapterEditorDirectorPanel(props: ChapterEditorDirectorP
               </div>
             ) : null}
 
-            <div className="rounded-2xl border border-border/70 bg-muted/10 p-4">
+            <div className="rounded-lg border border-border/70 bg-muted/10 p-4">
               <div className="text-sm font-medium text-foreground">告诉 AI 怎么改</div>
               {isWorkspaceLoading ? (
                 <div className="mt-3 space-y-3">
                   <LoadingBar widthClassName="w-1/3" />
-                  <div className="min-h-[140px] animate-pulse rounded-2xl border border-border bg-background" />
+                  <div className="min-h-[140px] animate-pulse rounded-lg border border-border bg-background" />
                   <LoadingBar widthClassName="w-full" />
                   <LoadingBar widthClassName="w-5/6" />
                 </div>
@@ -199,7 +199,7 @@ export default function ChapterEditorDirectorPanel(props: ChapterEditorDirectorP
                     当前目标：{currentTargetDescription}
                   </div>
                   <textarea
-                    className="mt-3 min-h-[140px] w-full resize-none rounded-2xl border border-border bg-background px-3 py-3 text-sm outline-none"
+                    className="mt-3 min-h-[140px] w-full resize-none rounded-lg border border-border bg-background px-3 py-3 text-sm outline-none"
                     placeholder={revisionScope === "selection"
                       ? "例如：让这段更压抑一点，但不要改剧情事实，并把节奏压得更紧。"
                       : "例如：把这一章整体改得更压抑一点，但不要改剧情事实，并且更贴近卷中承压阶段。"}
@@ -227,20 +227,20 @@ export default function ChapterEditorDirectorPanel(props: ChapterEditorDirectorP
         ) : null}
 
         {session.status === "loading" ? (
-          <div className="rounded-2xl border border-dashed border-border/70 bg-muted/10 p-4 text-sm text-muted-foreground">
+          <div className="rounded-lg border border-dashed border-border/70 bg-muted/10 p-4 text-sm text-muted-foreground">
             AI 正在结合章节宏观定位和你的修改要求生成 2 到 3 个候选版本。
           </div>
         ) : null}
 
         {session.status === "error" ? (
-          <div className="rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-900">
+          <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4 text-sm text-destructive">
             {session.errorMessage || "候选生成失败，请重试。"}
           </div>
         ) : null}
 
         {session.status === "ready" && activeCandidate ? (
           <>
-            <div className="rounded-2xl border border-border/70 bg-muted/10 p-4">
+            <div className="rounded-lg border border-border/70 bg-muted/10 p-4">
               <div className="text-sm font-medium text-foreground">AI 理解到的修改目标</div>
               <div className="mt-3 space-y-2 text-sm leading-6 text-muted-foreground">
                 <div>目标：{session.resolvedIntent?.editGoal}</div>
@@ -251,7 +251,7 @@ export default function ChapterEditorDirectorPanel(props: ChapterEditorDirectorP
                 <div>说明：{session.resolvedIntent?.reasoningSummary}</div>
               </div>
               {session.macroAlignmentNote ? (
-                <div className="mt-3 rounded-2xl border border-emerald-200 bg-emerald-50/90 p-3 text-sm leading-6 text-emerald-900">
+                <div className="mt-3 rounded-lg border border-success/30 bg-success/10 p-3 text-sm leading-6 text-success">
                   与本章/本卷目标的对齐：{session.macroAlignmentNote}
                 </div>
               ) : null}
@@ -270,7 +270,7 @@ export default function ChapterEditorDirectorPanel(props: ChapterEditorDirectorP
               ))}
             </div>
 
-            <div className="space-y-2 rounded-2xl border border-border/70 bg-muted/10 p-4">
+            <div className="space-y-2 rounded-lg border border-border/70 bg-muted/10 p-4">
               <div className="text-sm font-medium text-foreground">{activeCandidate.label}</div>
               {activeCandidate.summary ? (
                 <div className="text-sm leading-6 text-muted-foreground">{activeCandidate.summary}</div>
@@ -279,7 +279,7 @@ export default function ChapterEditorDirectorPanel(props: ChapterEditorDirectorP
                 <div className="text-sm leading-6 text-foreground/80">为什么这样改：{activeCandidate.rationale}</div>
               ) : null}
               {activeCandidate.riskNotes && activeCandidate.riskNotes.length > 0 ? (
-                <div className="rounded-2xl border border-amber-200 bg-amber-50/90 p-3 text-sm leading-6 text-amber-900">
+                <div className="rounded-lg border border-warning/30 bg-warning/10 p-3 text-sm leading-6 text-warning">
                   需要注意：{activeCandidate.riskNotes.join("；")}
                 </div>
               ) : null}

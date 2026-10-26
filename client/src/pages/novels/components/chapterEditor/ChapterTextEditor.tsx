@@ -94,13 +94,13 @@ function renderDiffChunk(chunk: ChapterEditorDiffChunk) {
   }
   if (chunk.type === "insert") {
     return (
-      <span key={chunk.id} className="rounded bg-emerald-100/90 px-0.5 text-emerald-950">
+      <span key={chunk.id} className="rounded bg-success/15 px-0.5 text-success">
         {chunk.text}
       </span>
     );
   }
   return (
-    <span key={chunk.id} className="rounded bg-rose-100/80 px-0.5 text-rose-900 line-through">
+    <span key={chunk.id} className="rounded bg-destructive/15 px-0.5 text-destructive line-through">
       {chunk.text}
     </span>
   );
@@ -112,15 +112,15 @@ function renderLoadingPreview(
   surfaceRef: React.RefObject<HTMLDivElement | null>,
 ) {
   return (
-    <div ref={surfaceRef} className={`space-y-4 rounded-2xl bg-muted/10 p-4 ${SURFACE_INNER_PADDING_CLASS_NAME}`}>
+    <div ref={surfaceRef} className={`space-y-4 rounded-lg bg-muted/10 p-4 ${SURFACE_INNER_PADDING_CLASS_NAME}`}>
       <TextBlock text={previewContent.before} className="text-foreground" />
 
       <div className="space-y-3">
-        <div className="rounded-2xl border border-amber-200/80 bg-amber-50/80 p-4">
-          <div className="mb-2 text-xs font-medium text-amber-700">待改写原文</div>
-          <TextBlock text={preview.originalText} className="text-amber-950" />
+        <div className="rounded-lg border border-warning/30 bg-warning/10 p-4">
+          <div className="mb-2 text-xs font-medium text-warning">待改写原文</div>
+          <TextBlock text={preview.originalText} className="text-warning" />
         </div>
-        <div className="rounded-2xl border border-dashed border-border/70 bg-background/80 p-4">
+        <div className="rounded-lg border border-dashed border-border/70 bg-background/80 p-4">
           <div className="mb-2 text-xs font-medium text-muted-foreground">AI 正在生成候选版本</div>
           <div className="space-y-2">
             <div className="h-4 w-11/12 rounded-full bg-muted/70" />
@@ -141,17 +141,17 @@ function renderBlockPreview(
   surfaceRef: React.RefObject<HTMLDivElement | null>,
 ) {
   return (
-    <div ref={surfaceRef} className={`space-y-4 rounded-2xl bg-muted/10 p-4 ${SURFACE_INNER_PADDING_CLASS_NAME}`}>
+    <div ref={surfaceRef} className={`space-y-4 rounded-lg bg-muted/10 p-4 ${SURFACE_INNER_PADDING_CLASS_NAME}`}>
       <TextBlock text={previewContent.before} className="text-foreground" />
 
       <div className="space-y-3">
-        <div className="rounded-2xl border border-rose-200/80 bg-rose-50/80 p-4">
-          <div className="mb-2 text-xs font-medium text-rose-700">原文</div>
-          <TextBlock text={preview.originalText} className="text-rose-950" />
+        <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-4">
+          <div className="mb-2 text-xs font-medium text-destructive">原文</div>
+          <TextBlock text={preview.originalText} className="text-destructive" />
         </div>
-        <div className="rounded-2xl border border-emerald-200/80 bg-emerald-50/90 p-4">
-          <div className="mb-2 text-xs font-medium text-emerald-700">改写</div>
-          <TextBlock text={preview.candidateText} className="text-emerald-950" />
+        <div className="rounded-lg border border-success/30 bg-success/10 p-4">
+          <div className="mb-2 text-xs font-medium text-success">改写</div>
+          <TextBlock text={preview.candidateText} className="text-success" />
         </div>
       </div>
 
@@ -269,7 +269,7 @@ export default function ChapterTextEditor(props: ChapterTextEditorProps) {
     }
     const paragraphNodes = getParagraphElements(surface);
     paragraphNodes.forEach((node) => {
-      node.classList.remove("bg-sky-100/90", "ring-1", "ring-sky-200", "rounded-xl");
+      node.classList.remove("bg-info/15", "ring-1", "ring-info/30", "rounded-xl");
     });
     if (!focusRange) {
       return;
@@ -280,7 +280,7 @@ export default function ChapterTextEditor(props: ChapterTextEditorProps) {
     }
     for (let index = paragraphIndices.startIndex; index <= paragraphIndices.endIndex; index += 1) {
       const node = paragraphNodes[index];
-      node?.classList.add("bg-sky-100/90", "ring-1", "ring-sky-200", "rounded-xl");
+      node?.classList.add("bg-info/15", "ring-1", "ring-info/30", "rounded-xl");
     }
     paragraphNodes[paragraphIndices.startIndex]?.scrollIntoView({
       block: "center",
@@ -346,7 +346,7 @@ export default function ChapterTextEditor(props: ChapterTextEditorProps) {
           <div
             key={`marker:${marker.index}`}
             className={`absolute left-0 flex w-12 justify-end pr-3 text-[11px] font-semibold ${
-              isHighlighted ? "text-sky-700" : "text-muted-foreground"
+              isHighlighted ? "text-info" : "text-muted-foreground"
             }`}
             style={{ top: `${marker.top}px`, transform: "translateY(-50%)" }}
           >
@@ -358,7 +358,7 @@ export default function ChapterTextEditor(props: ChapterTextEditorProps) {
   ) : null;
 
   return (
-    <div ref={containerRef} className="relative flex h-full min-h-[540px] flex-col overflow-hidden rounded-3xl border border-border/70 bg-background shadow-sm xl:min-h-0">
+    <div ref={containerRef} className="relative flex h-full min-h-[540px] flex-col overflow-hidden rounded-lg border border-border/70 bg-background shadow-sm xl:min-h-0">
       <div className="shrink-0 flex items-center justify-between border-b border-border/70 px-4 py-3">
         <div className="text-sm font-medium text-foreground">正文</div>
         <div className="text-xs text-muted-foreground">{helperText}</div>
@@ -369,7 +369,7 @@ export default function ChapterTextEditor(props: ChapterTextEditorProps) {
           {preview?.mode === "inline" && previewContent ? (
             <div
               ref={surfaceRef}
-              className={`${INLINE_PREVIEW_BODY_CLASS_NAME} ${SURFACE_INNER_PADDING_CLASS_NAME} min-h-full rounded-2xl bg-muted/15 p-4 text-foreground`}
+              className={`${INLINE_PREVIEW_BODY_CLASS_NAME} ${SURFACE_INNER_PADDING_CLASS_NAME} min-h-full rounded-lg bg-muted/15 p-4 text-foreground`}
             >
               {previewContent.before}
               {preview.diffChunks.map((chunk) => renderDiffChunk(chunk))}
@@ -382,7 +382,7 @@ export default function ChapterTextEditor(props: ChapterTextEditorProps) {
           ) : readOnly ? (
             <div
               ref={surfaceRef}
-              className={`min-h-full rounded-2xl bg-muted/10 p-4 text-foreground ${SURFACE_INNER_PADDING_CLASS_NAME}`}
+              className={`min-h-full rounded-lg bg-muted/10 p-4 text-foreground ${SURFACE_INNER_PADDING_CLASS_NAME}`}
             >
               <TextBlock text={normalizedContent} />
             </div>
@@ -390,7 +390,7 @@ export default function ChapterTextEditor(props: ChapterTextEditorProps) {
             <Plate editor={editor} onSelectionChange={updateSelection} onValueChange={handleValueChange}>
               <div ref={surfaceRef} className="min-h-full">
                 <PlateContent
-                  className={`${EDITOR_BODY_CLASS_NAME} ${SURFACE_INNER_PADDING_CLASS_NAME} min-h-full rounded-2xl bg-muted/10 p-4 outline-none [&_p]:text-foreground`}
+                  className={`${EDITOR_BODY_CLASS_NAME} ${SURFACE_INNER_PADDING_CLASS_NAME} min-h-full rounded-lg bg-muted/10 p-4 outline-none [&_p]:text-foreground`}
                   onFocus={() => {
                     isUserEditingRef.current = true;
                   }}

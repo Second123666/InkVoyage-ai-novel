@@ -56,7 +56,7 @@ export default function ChapterEditorSidebar(props: ChapterEditorSidebarProps) {
   return (
     <div className="min-h-0 overflow-hidden">
       <div className="flex h-full min-h-0 flex-col gap-4 overflow-y-auto pr-1">
-        <div className="shrink-0 rounded-3xl border border-border/70 bg-background p-4 shadow-sm">
+        <div className="shrink-0 rounded-lg border border-border/70 bg-background p-4 shadow-sm">
           <div className="flex flex-col gap-4">
             {onBack ? (
               <div>
@@ -107,7 +107,7 @@ export default function ChapterEditorSidebar(props: ChapterEditorSidebarProps) {
           </div>
         </div>
 
-        <div className="shrink-0 rounded-3xl border border-border/70 bg-background p-4 shadow-sm">
+        <div className="shrink-0 rounded-lg border border-border/70 bg-background p-4 shadow-sm">
           <div className="mb-3 flex items-center justify-between gap-3">
             <div className="text-sm font-medium text-foreground">宏观定位</div>
             <span className="text-xs text-muted-foreground">
@@ -160,7 +160,7 @@ export default function ChapterEditorSidebar(props: ChapterEditorSidebarProps) {
           )}
         </div>
 
-        <div className="min-h-0 shrink-0 rounded-3xl border border-border/70 bg-background p-4 shadow-sm">
+        <div className="min-h-0 shrink-0 rounded-lg border border-border/70 bg-background p-4 shadow-sm">
           <div className="mb-3 flex items-center justify-between gap-3">
             <div className="text-sm font-medium text-foreground">待处理问题卡</div>
             <span className="text-xs text-muted-foreground">
@@ -175,11 +175,11 @@ export default function ChapterEditorSidebar(props: ChapterEditorSidebarProps) {
           <div className="space-y-3">
             {isWorkspaceLoading ? (
               <>
-                <div className="rounded-2xl border border-dashed border-border/70 bg-muted/10 p-4 text-sm leading-6 text-muted-foreground">
+                <div className="rounded-lg border border-dashed border-border/70 bg-muted/10 p-4 text-sm leading-6 text-muted-foreground">
                   AI 正在按章节问题、卷内位置和节奏目标梳理优先修正项，请稍候。
                 </div>
                 {[0, 1].map((item) => (
-                  <div key={item} className="rounded-2xl border border-border/70 bg-muted/10 p-3">
+                  <div key={item} className="rounded-lg border border-border/70 bg-muted/10 p-3">
                     <div className="space-y-3">
                       <LoadingBar widthClassName="w-2/5" />
                       <LoadingBar widthClassName="w-1/3" />
@@ -199,11 +199,11 @@ export default function ChapterEditorSidebar(props: ChapterEditorSidebarProps) {
               return (
                 <div
                   key={card.id}
-                  className={`rounded-2xl border p-3 transition ${
+                  className={`rounded-lg border p-3 transition ${
                     isSelected
-                      ? "border-sky-300 bg-sky-50/70"
+                      ? "border-info/40 bg-info/10"
                       : isRecommended
-                        ? "border-emerald-200 bg-emerald-50/60"
+                        ? "border-success/30 bg-success/10"
                         : "border-border/70 bg-muted/10"
                   }`}
                 >
@@ -215,7 +215,7 @@ export default function ChapterEditorSidebar(props: ChapterEditorSidebarProps) {
                       </div>
                     </div>
                     {isRecommended ? (
-                      <span className="rounded-full bg-emerald-100 px-2 py-1 text-[11px] text-emerald-800">
+                      <span className="rounded-full bg-success/15 px-2 py-1 text-[11px] text-success">
                         推荐先修
                       </span>
                     ) : null}
@@ -239,7 +239,7 @@ export default function ChapterEditorSidebar(props: ChapterEditorSidebarProps) {
                 </div>
               );
             }) : (
-              <div className="rounded-2xl border border-dashed border-border/70 bg-muted/10 p-4 text-sm leading-6 text-muted-foreground">
+              <div className="rounded-lg border border-dashed border-border/70 bg-muted/10 p-4 text-sm leading-6 text-muted-foreground">
                 {isWorkspaceError
                   ? "问题卡暂时加载失败，你可以先在右侧直接输入修改意见，或手动选中片段发起修正。"
                   : workspace

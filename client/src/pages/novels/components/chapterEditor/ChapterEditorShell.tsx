@@ -333,7 +333,7 @@ export default function ChapterEditorShell(props: ChapterEditorShellProps) {
 
   if (!chapter) {
     return (
-      <div className="rounded-3xl border border-dashed border-border/70 bg-muted/10 p-10 text-center text-sm text-muted-foreground">
+      <div className="rounded-lg border border-dashed border-border/70 bg-muted/10 p-10 text-center text-sm text-muted-foreground">
         请选择一个章节后开始编辑正文。
       </div>
     );
@@ -462,12 +462,12 @@ export default function ChapterEditorShell(props: ChapterEditorShellProps) {
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
       {qualityDebtDetails ? (
-        <div className="flex shrink-0 flex-col gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-amber-950 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex shrink-0 flex-col gap-3 rounded-lg border border-warning/30 bg-warning/10 px-4 py-3 text-warning sm:flex-row sm:items-center sm:justify-between">
           <div className="flex min-w-0 items-start gap-3">
-            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600" />
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-warning" />
             <div className="min-w-0 text-sm leading-6">
               <div className="font-medium">本章正文可继续使用，但还有质量待优化项</div>
-              <div className="text-xs text-amber-900/80">
+              <div className="text-xs text-warning">
                 来源：{formatQualityDebtSource(qualityDebtDetails.source)} · {qualityDebtDetails.reason || "AI 审校发现了局部问题。"}
                 {` · 自动修复：${formatQualityDebtAttempts(qualityDebtDetails)}`}
               </div>
@@ -478,7 +478,7 @@ export default function ChapterEditorShell(props: ChapterEditorShellProps) {
             type="button"
             size="sm"
             variant="outline"
-            className="shrink-0 border-amber-300 bg-white/70 hover:bg-white"
+            className="shrink-0 border-warning/30 bg-background/70 hover:bg-muted/30"
             disabled={isDirty || saveMutation.isPending || reviewMutation.isPending}
             onClick={() => reviewMutation.mutate()}
           >
