@@ -17,6 +17,22 @@
 
 ---
 
+## 2026-10-26 · LOOP-44 · UI-1 第六批(第三组):封面弹窗主题适配
+
+- **类别**: UI(设计系统落地;主对话执行)
+- **目标**: 第六批下一组 —— `NovelCoverDialog` / `NovelCoverCard`(75 处)色彩性质审计与迁移。
+- **审计结论**: 这批以 **slate 中性色 + 硬编码 `bg-white`/`text-slate-900`** 为主(26×slate-200 边框、8×slate-500 次要文本、12×bg-white 背景、7×focus ring),构成**浅色专用弹窗** —— 深色模式下白底+深灰字与页面失配;少量 emerald/amber 是状态 chip。非分类色,可安全语义化。
+- **改动**:
+  1. `bg-white` → `bg-background`;`text-slate-900/700/600/500/400` → `text-foreground` / `text-muted-foreground`;
+  2. `border-slate-200/300` → `border-border`;`bg-slate-50(/55,/60,/65)` → `bg-muted/40`;`bg-slate-100` → `bg-muted/30`;
+  3. 焦点环 `focus:border-slate-400 ring-slate-200` → `border-ring` / `ring-ring/40`(项目已有 `--ring` token);
+  4. emerald/amber 状态 chip → `success/warning`;
+  5. 守卫 `statusColorContracts` 扩至 **11 文件**并新增 `bg-white`/slate 检测。
+- **验证**: client typecheck 0 错误;守卫 3/3;client **268/268**。server 未动。复扫封面两文件 **0 残留**。
+- **发布说明**: 封面生成弹窗随主题适配(深色模式不再白底失配),用户可见,已记 release-notes/README(2026-10-26)。
+- **残留**: 第六批其余零散组件(NovelStyleRecommendationCard、CharacterAssetSidebar 等);UI-6(promptWorkbench 主题、可视化分类色);`.mobile-route-*` 兜底迁移。
+- **下一步**: **LOOP-45 = 第六批下一组** 或 **UI-5 开源 Showcase**;UI-6 / BUG-7 等所有者决策。
+
 ## 2026-10-26 · LOOP-43 · UI-1 第六批(第二组):小说工作台散落状态色
 
 - **类别**: UI(设计系统落地;主对话执行)
