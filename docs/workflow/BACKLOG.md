@@ -67,7 +67,8 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 56. ~~**LOOP-58 UI-8 截图刷新(第一批)**~~ ✅ 已完成(2026-10-26):18 张真实数据截图替换 + 2 张新增/纠偏。
 57. ~~**LOOP-59 OPS-2 品牌与身份统一**~~ ✅ 已完成(2026-10-26):更名「墨航 InkVoyage」,自有仓库/Pages/下载入口统一,内部技术标识保持稳定。
 58. **LOOP-60 INN-A1b 第一批** ✅ 已完成(2026-10-26):注入保底/排序/上限、风险信号透传、逾期 payoff 语义、遥测、sync_stale、planner 回退、版本钉住修复。
-59. **进行中**:INN-A1b 第二/三批(UI + 验收字段 + Markdown 导出);UI-8 尾图由所有者自行补拍。
+59. ~~**LOOP-61 INN-A1b 第二、三批**~~ ✅ 已完成(2026-10-26):伏笔卡片筛选/跳转/窗口编辑/重新同步、验收字段接线、Markdown 伏笔清单;INN-A1b 整项完成。
+60. **剩余**:UI-8 尾图由所有者自行补拍;其余待办均已闭环。
     **完成项打勾规则(2026-10-20 所有者要求)**:每轮收尾同步更新 BACKLOG —— 完成项 `[x]` + ✅,进行中 `[/]`,入口建议划线。
 
 ---
@@ -98,10 +99,9 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
   结果:先审计(上游已有双 AI 写路径 + 注入 + 只读卡片,验收②已达成),再收敛 11 项:手动登记/标记 + manualLocked 锁定语义、入口门控修复、过窗读时升格、停滞扫描(30 章)、回收计数、逾期降质量债、导演/大纲提醒面。契约见 `docs/wiki/architecture/payoff-ledger-lifecycle.md`;计划 `docs/plans/payoff-ledger-mvp.md`;守卫 `server/tests/payoffLedgerMvp.test.js`。
   残留调优 → INN-A1b。
 
-- [/] **INN-A1b 伏笔账本注入调优与体验打磨** · S–M · P3(LOOP-5 后置项合并登记)
-  **第一批完成(LOOP-60)**:G2/G3/G5/G6/G7/G8/G9 注入保底与排序、G23 sync_stale 合成问题、planner 空账本回退计数、对账资产版本 v5→v6 修复;守卫 8 条,server 1481/1469/0。
-  **剩余第二批(UI)**:G11 窗口行内编辑、G15 卡片筛选与章节跳转、G18 同步状态标记与手动重建入口、G24 快照双轨说明强化;**第三批**:G19 验收 `requiresFullPayoffReconcile` 死字段接线、G25 Markdown 导出伏笔清单。
-  验收:逐项小步推进,每批保持三套测试绿;完成项从清单划除。
+- [x] **INN-A1b 伏笔账本注入调优与体验打磨** · S–M · P3(= LOOP-60/61,2026-10-26 完成) ✅
+  结果:三批全部落地 —— ①注入链路:G2/G9 预算保底、G3 风险信号透传、G5 逾期升级 payoff、G6 窗口排序、G7 注入上限、G8 遥测、G23 sync_stale 合成问题、planner 空账本回退、对账资产版本 v5→v6;②UI:G11 窗口行内编辑、G15 筛选与章节跳转、G18 同步状态与手动重建(POST /payoff-ledger/sync)、G24 双轨说明;③契约导出:G19 验收 `requiresFullPayoffReconcile` 接线(落库结果触发全量对账,候选不触发)、G25 Markdown 伏笔清单。
+  验证:client 283/283、server 1484/1472/0;守卫覆盖注入排序/上限/遥测、UI 合同、验收触发条件与导出内容。
 
 - [x] **INN-A2 全书一致性守卫(Continuity Guard)** · M · P2(= LOOP-7,2026-10-20 完成) ✅
   结果:审校 prompt v3 内置三类矛盾检查协议 + 专用问题码(时间线/动机/世界规则)与取证要求;`services/audit/continuityGuard.ts` 确定性规范化(去重保最严、排序、限量、丢空证据)接入既有治理链,零新增 LLM 调用与执行器分支;链路守卫测试覆盖 high→blocking、medium→质量债。契约见 wiki `novel-generation-quality-guards.md` 第八节;计划 `docs/plans/continuity-guard.md`。
