@@ -280,7 +280,13 @@ async function main() {
   logStream.write(`[run-with-log] cwd ${meta.cwd}\n`);
   logStream.write(`[run-with-log] command ${options.commandArgs.join(" ")}\n\n`);
 
-  const child = spawn(options.commandArgs[0], options.commandArgs.slice(1), {
+  // Node 24 对 "带 args 数组 + shell:true" 会报 DEP0190。这里显式拼一条命令行再交给 shell，
+  // 既保留 Windows 下 pnpm.cmd 的解析，又避免该弃用告警。
+  const quoteForShell = (value) => (
+    /[\s"]/.test(value) ? `"${value.replace(/"/g, '\\"')}"` : value
+  );
+  const commandLine = options.commandArgs.map(quoteForShell).join(" ");
+  const child = spawn(commandLine, {
     cwd: process.cwd(),
     env: {
       ...process.env,
@@ -293,7 +299,7 @@ async function main() {
       RUN_WITH_LOG_LLM_PATH: llmLogPath,
       RUN_WITH_LOG_LLM_REPAIR_PATH: llmRepairLogPath,
     },
-    shell: process.platform === "win32",
+    shell: true,
     stdio: ["inherit", "pipe", "pipe"],
   });
 
