@@ -11,6 +11,7 @@ function createTask(overrides = {}) {
     novelId: "novel-1",
     lane: "auto_director",
     status: "waiting_approval",
+    pendingManualRecovery: false,
     updatedAt: new Date("2026-04-29T12:00:00.000Z"),
     seedPayloadJson: JSON.stringify({
       issueGovernanceVersion: 1,
@@ -553,21 +554,21 @@ test("director command service preserves an explicit chapter range while applyin
   }
 });
 
-test("director command service clears manual recovery state when a stale running task is continued", async () => {
+test("director command service preserves manual recovery state unless the caller is an explicit user recovery", async () => {
   const harness = createHarness(createTask({
     status: "running",
     pendingManualRecovery: true,
     lastError: "Director Worker 已中断，任务已暂停，等待手动恢复。",
   }));
   try {
-    const accepted = await harness.service.enqueueContinueCommand("task-1", {
+    const queued = await harness.service.enqueueContinueCommand("task-1", {
       forceResume: true,
     });
 
-    assert.equal(accepted.status, "queued");
+    assert.equal(queued.status, "queued");
     assert.equal(harness.commands.length, 1);
     assert.equal(harness.task.status, "queued");
-    assert.equal(harness.task.pendingManualRecovery, false);
+    assert.equal(harness.task.pendingManualRecovery, true, "普通入队必须保留待手动恢复标记(BUG-7)");
     assert.equal(harness.task.lastError, null);
     assert.equal(harness.task.finishedAt, null);
     assert.equal(harness.task.cancelRequestedAt, null);
@@ -575,6 +576,17 @@ test("director command service clears manual recovery state when a stale running
       { status: { in: ["queued", "running", "waiting_approval", "failed"] } },
       { pendingManualRecovery: true },
     ]);
+
+    harness.commands[0].status = "succeeded";
+    harness.task.status = "running";
+    harness.task.pendingManualRecovery = true;
+    const recovered = await harness.service.enqueueContinueCommand("task-1", {
+      forceResume: true,
+    }, {
+      clearPendingManualRecovery: true,
+    });
+    assert.equal(recovered.status, "queued");
+    assert.equal(harness.task.pendingManualRecovery, false, "显式用户恢复可以清除标记");
   } finally {
     harness.restore();
   }
@@ -1006,7 +1018,9 @@ test("director command service clears exhausted stale command before accepting a
     harness.task.pendingManualRecovery = true;
     harness.task.lastError = "服务重启后任务已暂停，等待手动恢复。";
 
-    const accepted = await harness.service.enqueueContinueCommand("task-1");
+    const accepted = await harness.service.enqueueContinueCommand("task-1", {}, {
+      clearPendingManualRecovery: true,
+    });
 
     assert.equal(harness.commands[0].status, "stale");
     assert.equal(harness.commands.length, 2);

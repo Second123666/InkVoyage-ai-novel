@@ -171,6 +171,10 @@
 
 - 数据库中的模型 API Key 改为加密存储，旧数据在启动时自动迁移；备份数据库时需同时保留主密钥文件（默认 `data/secrets/master.key`）。
 
+#### 修复
+
+- 修复自动导演任务的「待手动恢复」标记在非用户操作入队时被提前清除的问题：只有你主动继续、恢复、重试或确认时才解除该状态。
+
 完整历史更新见 [docs/releases/release-notes.md](./docs/releases/release-notes.md)。
 
 ## 功能预览

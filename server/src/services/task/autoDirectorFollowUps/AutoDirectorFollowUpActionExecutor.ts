@@ -180,7 +180,9 @@ export class AutoDirectorFollowUpActionExecutor {
 
   readonly novelDirectorService = {
     continueTask: (taskId: string, input?: Parameters<DirectorCommandService["enqueueContinueCommand"]>[1]) =>
-      this.directorCommandService.enqueueContinueCommand(taskId, input).then(() => undefined),
+      this.directorCommandService.enqueueContinueCommand(taskId, input, {
+        clearPendingManualRecovery: true,
+      }).then(() => undefined),
   };
 
   readonly workflowTaskAdapter = new NovelWorkflowTaskAdapter();

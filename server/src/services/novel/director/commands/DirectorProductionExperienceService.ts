@@ -129,6 +129,8 @@ export class DirectorProductionExperienceService {
       ? await this.commandService.enqueueContinueCommand(task.id, {
         continuationMode: "auto_execute_range",
         forceResume: true,
+      }, {
+        clearPendingManualRecovery: true,
       })
       : null;
     return {

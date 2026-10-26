@@ -337,7 +337,9 @@ export class NovelWorkflowTaskAdapter {
   private readonly directorCommandService = new DirectorCommandService(this.workflowService);
   readonly novelDirectorService = {
     continueTask: (taskId: string, input?: Parameters<DirectorCommandService["enqueueContinueCommand"]>[1]) =>
-      this.directorCommandService.enqueueContinueCommand(taskId, input).then(() => undefined),
+      this.directorCommandService.enqueueContinueCommand(taskId, input, {
+        clearPendingManualRecovery: true,
+      }).then(() => undefined),
   };
 
   async list(input: {

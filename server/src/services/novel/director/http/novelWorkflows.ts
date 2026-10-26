@@ -118,9 +118,13 @@ router.post("/:id/continue", validate({ params: continueParamsSchema, body: cont
     const data = body.continuationMode === "resume"
       ? await directorCommandService.enqueueApproveGateCommand(id, {
         continuationMode: body.continuationMode,
+      }, {
+        clearPendingManualRecovery: true,
       })
       : await directorCommandService.enqueueContinueCommand(id, {
         continuationMode: body.continuationMode,
+      }, {
+        clearPendingManualRecovery: true,
       });
     res.status(202).json({
       success: true,

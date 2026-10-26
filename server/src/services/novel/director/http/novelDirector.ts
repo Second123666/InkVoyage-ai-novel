@@ -337,7 +337,9 @@ router.post("/tasks", validate({ body: createTaskSchema }), async (req, res, nex
         data = await commandService.enqueueGenerateCandidatesCommand(body.payload);
         break;
       case "takeover":
-        data = await commandService.enqueueTakeoverCommand(body.payload as DirectorTakeoverRequest);
+        data = await commandService.enqueueTakeoverCommand(body.payload as DirectorTakeoverRequest, {
+          clearPendingManualRecovery: true,
+        });
         break;
       case "workspace_analysis":
         data = await commandService.enqueueWorkspaceAnalysisCommand(body.payload);
@@ -421,13 +423,19 @@ router.post("/tasks/:taskId/commands", validate({ params: taskParamsSchema, body
         data = await commandService.enqueueCalibrateStepCommand(taskId, body.payload);
         break;
       case "accept_manual_changes_and_continue":
-        data = await commandService.enqueueAcceptManualChangesAndContinueCommand(taskId);
+        data = await commandService.enqueueAcceptManualChangesAndContinueCommand(taskId, {
+          clearPendingManualRecovery: true,
+        });
         break;
       case "continue":
-        data = await commandService.enqueueContinueCommand(taskId, body.payload ?? {});
+        data = await commandService.enqueueContinueCommand(taskId, body.payload ?? {}, {
+          clearPendingManualRecovery: true,
+        });
         break;
       case "resume_from_checkpoint":
-        data = await commandService.enqueueRecoveryCommand(taskId, body.payload ?? {});
+        data = await commandService.enqueueRecoveryCommand(taskId, body.payload ?? {}, {
+          clearPendingManualRecovery: true,
+        });
         break;
       case "retry":
         data = await commandService.enqueueRetryCommand({
@@ -440,10 +448,14 @@ router.post("/tasks/:taskId/commands", validate({ params: taskParamsSchema, body
             }
             : undefined,
           batchAlreadyStartedCount: body.payload?.batchAlreadyStartedCount,
+        }, {
+          clearPendingManualRecovery: true,
         });
         break;
       case "approve_gate":
-        data = await commandService.enqueueApproveGateCommand(taskId);
+        data = await commandService.enqueueApproveGateCommand(taskId, {}, {
+          clearPendingManualRecovery: true,
+        });
         break;
       case "policy_update":
         data = await commandService.enqueuePolicyUpdateCommand(taskId, body.payload as DirectorRuntimePolicyUpdateRequest);

@@ -294,15 +294,24 @@ export class DirectorCommandService {
     });
   }
 
-  async enqueueContinueCommand(taskId: string, input: DirectorCommandPayload = {}): Promise<DirectorCommandAcceptedResponse> {
+  async enqueueContinueCommand(
+    taskId: string,
+    input: DirectorCommandPayload = {},
+    options: { clearPendingManualRecovery?: boolean } = {},
+  ): Promise<DirectorCommandAcceptedResponse> {
     return this.enqueueExecutionCommand({
       taskId,
       commandType: "continue",
       payload: input,
+      clearPendingManualRecovery: options.clearPendingManualRecovery,
     });
   }
 
-  async enqueueApproveGateCommand(taskId: string, input: DirectorCommandPayload = {}): Promise<DirectorCommandAcceptedResponse> {
+  async enqueueApproveGateCommand(
+    taskId: string,
+    input: DirectorCommandPayload = {},
+    options: { clearPendingManualRecovery?: boolean } = {},
+  ): Promise<DirectorCommandAcceptedResponse> {
     return this.enqueueExecutionCommand({
       taskId,
       commandType: "approve_gate",
@@ -311,6 +320,7 @@ export class DirectorCommandService {
         continuationMode: "resume",
         forceResume: true,
       },
+      clearPendingManualRecovery: options.clearPendingManualRecovery,
     });
   }
 
@@ -394,7 +404,10 @@ export class DirectorCommandService {
     });
   }
 
-  async enqueueAcceptManualChangesAndContinueCommand(taskId: string): Promise<DirectorCommandAcceptedResponse> {
+  async enqueueAcceptManualChangesAndContinueCommand(
+    taskId: string,
+    options: { clearPendingManualRecovery?: boolean } = {},
+  ): Promise<DirectorCommandAcceptedResponse> {
     return this.enqueueExecutionCommand({
       taskId,
       commandType: "accept_manual_changes_and_continue",
@@ -403,10 +416,15 @@ export class DirectorCommandService {
         continuationMode: "resume",
         forceResume: true,
       },
+      clearPendingManualRecovery: options.clearPendingManualRecovery,
     });
   }
 
-  async enqueueRecoveryCommand(taskId: string, input: DirectorCommandPayload = {}): Promise<DirectorCommandAcceptedResponse> {
+  async enqueueRecoveryCommand(
+    taskId: string,
+    input: DirectorCommandPayload = {},
+    options: { clearPendingManualRecovery?: boolean } = {},
+  ): Promise<DirectorCommandAcceptedResponse> {
     return this.enqueueExecutionCommand({
       taskId,
       commandType: "resume_from_checkpoint",
@@ -414,6 +432,7 @@ export class DirectorCommandService {
         ...input,
         forceResume: true,
       },
+      clearPendingManualRecovery: options.clearPendingManualRecovery,
     });
   }
 
@@ -421,7 +440,7 @@ export class DirectorCommandService {
     taskId: string;
     llmOverride?: Pick<DirectorLLMOptions, "provider" | "model" | "temperature">;
     batchAlreadyStartedCount?: number;
-  }): Promise<DirectorCommandAcceptedResponse> {
+  }, options: { clearPendingManualRecovery?: boolean } = {}): Promise<DirectorCommandAcceptedResponse> {
     const row = await this.workflowService.getTaskById(input.taskId);
     if (!row) {
       throw new AppError("Task not found.", 404);
@@ -440,6 +459,7 @@ export class DirectorCommandService {
         forceResume: true,
         batchAlreadyStartedCount: input.batchAlreadyStartedCount,
       },
+      clearPendingManualRecovery: options.clearPendingManualRecovery,
     });
   }
 
@@ -480,7 +500,10 @@ export class DirectorCommandService {
     return toAcceptedResponse(command, null);
   }
 
-  async enqueueTakeoverCommand(input: DirectorTakeoverRequest): Promise<DirectorCommandAcceptedResponse> {
+  async enqueueTakeoverCommand(
+    input: DirectorTakeoverRequest,
+    options: { clearPendingManualRecovery?: boolean } = {},
+  ): Promise<DirectorCommandAcceptedResponse> {
     const takeoverInput = applyDirectorRunModeContract(input);
     const reusableCommand = await prisma.directorRunCommand.findFirst({
       where: {
@@ -520,6 +543,7 @@ export class DirectorCommandService {
       payload: {
         takeoverRequest: takeoverInput,
       },
+      clearPendingManualRecovery: options.clearPendingManualRecovery,
     });
   }
 
@@ -659,6 +683,7 @@ export class DirectorCommandService {
     payload: DirectorCommandPayload;
     allowTerminalReuse?: boolean;
     preserveLastError?: boolean;
+    clearPendingManualRecovery?: boolean;
   }): Promise<DirectorCommandAcceptedResponse> {
     let row = await this.workflowService.getTaskById(input.taskId);
     if (!row) {
@@ -706,6 +731,7 @@ export class DirectorCommandService {
       const command = await withSqliteRetry(createCommand, { label: "director.command.create" });
       await this.markCommandAcceptedOnTask(input.taskId, input.commandType, {
         preserveLastError: input.preserveLastError,
+        clearPendingManualRecovery: input.clearPendingManualRecovery,
       });
       taskDispatcher.notify({ commandType: input.commandType, taskId: input.taskId });
       return toAcceptedResponse(command, null);
@@ -730,8 +756,11 @@ export class DirectorCommandService {
 
   private async markCommandAcceptedOnTask(taskId: string, commandType: DirectorRunCommandType, options: {
     preserveLastError?: boolean;
+    clearPendingManualRecovery?: boolean;
   } = {}): Promise<void> {
     const taskState = buildAcceptedTaskState(commandType);
+    // BUG-7:待手动恢复标记只能由显式用户恢复动作清除;agent 工具、后台自动与普通入队一律保留。
+    const clearPendingManualRecovery = options.clearPendingManualRecovery === true;
     await prisma.novelWorkflowTask.updateMany({
       where: {
         id: taskId,
@@ -742,7 +771,7 @@ export class DirectorCommandService {
       },
       data: {
         status: "queued",
-        pendingManualRecovery: false,
+        ...(clearPendingManualRecovery ? { pendingManualRecovery: false } : {}),
         ...(options.preserveLastError ? {} : { lastError: null }),
         ...taskState,
         heartbeatAt: new Date(),

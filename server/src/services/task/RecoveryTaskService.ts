@@ -24,7 +24,11 @@ interface RecoveryInitializationDeps {
 }
 
 interface AutoDirectorRecoveryCommandPort {
-  enqueueRecoveryCommand?: (taskId: string) => Promise<unknown>;
+  enqueueRecoveryCommand?: (
+    taskId: string,
+    input?: Parameters<DirectorCommandService["enqueueRecoveryCommand"]>[1],
+    options?: Parameters<DirectorCommandService["enqueueRecoveryCommand"]>[2],
+  ) => Promise<unknown>;
   continueTask?: (taskId: string) => Promise<void>;
 }
 
@@ -318,7 +322,9 @@ export class RecoveryTaskService {
     await this.waitUntilReady();
     if (kind === "novel_workflow") {
       if (this.directorCommandService.enqueueRecoveryCommand) {
-        return this.directorCommandService.enqueueRecoveryCommand(id);
+        return this.directorCommandService.enqueueRecoveryCommand(id, {}, {
+          clearPendingManualRecovery: true,
+        });
       }
       this.scheduleAutoDirectorRecovery(id);
       return null;
