@@ -84,6 +84,7 @@ export interface NovelApplicationServices {
   getPayoffLedger: NovelApplicationMethod;
   createManualPayoffLedgerItem: NovelApplicationMethod;
   updateManualPayoffLedgerItem: NovelApplicationMethod;
+  syncPayoffLedger: NovelApplicationMethod;
   getWorldSlice: NovelApplicationMethod;
   refreshWorldSlice: NovelApplicationMethod;
   updateWorldSliceOverrides: NovelApplicationMethod;
@@ -204,6 +205,7 @@ export const novelApplicationServiceMethodNames = [
   "getPayoffLedger",
   "createManualPayoffLedgerItem",
   "updateManualPayoffLedgerItem",
+  "syncPayoffLedger",
   "getWorldSlice",
   "refreshWorldSlice",
   "updateWorldSliceOverrides",

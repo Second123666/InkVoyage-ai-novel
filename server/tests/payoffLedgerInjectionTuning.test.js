@@ -194,6 +194,108 @@ test("planner 空账本回退：从状态快照补齐 paidOff/failed 计数", ()
   );
 });
 
+test("A1-G18:提供显式伏笔账本重新同步入口", () => {
+  const routeSource = fs.readFileSync(
+    path.join(__dirname, "..", "src", "modules", "novel", "planning", "http", "novelPlanningRoutes.ts"),
+    "utf8",
+  );
+  assert.match(routeSource, /router\.post\(\s*"\/:id\/payoff-ledger\/sync"/);
+  assert.match(routeSource, /novelService\.syncPayoffLedger\(id\)/);
+
+  const contracts = fs.readFileSync(
+    path.join(__dirname, "..", "src", "services", "novel", "application", "NovelApplicationContracts.ts"),
+    "utf8",
+  );
+  assert.match(contracts, /"syncPayoffLedger"/, "应用服务契约必须暴露同步方法");
+});
+
+test("A1-G19:验收 requiresFullPayoffReconcile 只在落库结果上触发全量对账", () => {
+  const {
+    shouldRequestFullPayoffReconcile,
+  } = require("../dist/services/novel/runtime/ChapterAcceptanceAssessmentService.js");
+  const flagged = { assetSyncRecommendation: { requiresFullPayoffReconcile: true } };
+  const unflagged = { assetSyncRecommendation: { requiresFullPayoffReconcile: false } };
+  assert.equal(shouldRequestFullPayoffReconcile(undefined, flagged), true);
+  assert.equal(shouldRequestFullPayoffReconcile(true, flagged), true);
+  assert.equal(shouldRequestFullPayoffReconcile(false, flagged), false, "候选评估不得触发");
+  assert.equal(shouldRequestFullPayoffReconcile(undefined, unflagged), false);
+
+  const source = fs.readFileSync(
+    path.join(__dirname, "..", "src", "services", "novel", "runtime", "ChapterAcceptanceAssessmentService.ts"),
+    "utf8",
+  );
+  assert.match(source, /shouldRequestFullPayoffReconcile\(input\.persist, normalized\)/);
+  assert.match(source, /payoffLedgerSyncService\.syncLedger/);
+});
+
+test("A1-G25:Markdown 导出包含可读的伏笔清单", () => {
+  const { buildMarkdownExportContent } = require("../dist/modules/export/novelExport.formatting.js");
+  const payoffItems = [
+    {
+      id: "p1",
+      novelId: "n1",
+      ledgerKey: "k1",
+      title: "铜钥匙",
+      summary: "",
+      scopeType: "book",
+      currentStatus: "overdue",
+      targetStartChapterOrder: 2,
+      targetEndChapterOrder: 4,
+      sourceRefs: [],
+      evidence: [],
+      riskSignals: [],
+      statusReason: "超过目标窗口",
+      createdAt: "2026-10-26T00:00:00.000Z",
+      updatedAt: "2026-10-26T00:00:00.000Z",
+    },
+    {
+      id: "p2",
+      novelId: "n1",
+      ledgerKey: "k2",
+      title: "旧照片",
+      summary: "",
+      scopeType: "book",
+      currentStatus: "paid_off",
+      sourceRefs: [],
+      evidence: [],
+      riskSignals: [],
+      createdAt: "2026-10-26T00:00:00.000Z",
+      updatedAt: "2026-10-26T00:00:00.000Z",
+    },
+  ];
+  const bundle = {
+    metadata: { exportedAt: "2026-10-26T00:00:00.000Z", novelId: "n1", novelTitle: "测试书" },
+    sections: {
+      pipeline: {
+        latestPipelineJob: null,
+        qualityReport: { summary: { overall: 88 }, totalReports: 1, chapterReports: [] },
+        bible: null,
+        plotBeats: [],
+        payoffLedger: {
+          summary: {
+            totalCount: 2,
+            pendingCount: 0,
+            urgentCount: 0,
+            overdueCount: 1,
+            paidOffCount: 1,
+            failedCount: 0,
+            updatedAt: null,
+          },
+          items: payoffItems,
+          updatedAt: null,
+        },
+        latestStateSnapshot: null,
+        chapterAuditReports: [],
+      },
+    },
+  };
+  const markdown = buildMarkdownExportContent(bundle, "pipeline");
+  assert.match(markdown, /伏笔清单/);
+  assert.match(markdown, /\[已逾期\] 铜钥匙（第 2-4 章）\s*— 超过目标窗口/);
+  assert.match(markdown, /\[已回收\] 旧照片/);
+  assert.match(markdown, /已回收 \/ 已失效/);
+});
+
 test("导演执行模块固定使用最新伏笔对账资产版本", () => {
   const source = fs.readFileSync(
     path.join(__dirname, "..", "src", "services", "novel", "director", "workflowStepRuntime", "directorExecutionStepModules.ts"),

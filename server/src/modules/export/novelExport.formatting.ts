@@ -241,6 +241,47 @@ function buildChapterSummary(section: NovelExportChapterSection): string[] {
   return lines;
 }
 
+const PAYOFF_STATUS_LABELS: Record<string, string> = {
+  setup: "已埋设",
+  hinted: "已提示",
+  pending_payoff: "待回收",
+  paid_off: "已回收",
+  failed: "已失效",
+  overdue: "已逾期",
+};
+
+function formatPayoffWindow(item: { targetStartChapterOrder?: number | null; targetEndChapterOrder?: number | null }): string {
+  const start = item.targetStartChapterOrder;
+  const end = item.targetEndChapterOrder;
+  if (typeof start === "number" && typeof end === "number") {
+    return `（第 ${start}-${end} 章）`;
+  }
+  if (typeof end === "number") {
+    return `（最晚第 ${end} 章）`;
+  }
+  if (typeof start === "number") {
+    return `（从第 ${start} 章开始）`;
+  }
+  return "";
+}
+
+// INN-A1b A1-G25:Markdown 导出直接给出可读的伏笔清单,而不是只留一段 JSON。
+function buildPayoffListLines(payoffLedger: NovelExportPipelineSection["payoffLedger"]): string[] {
+  if (!payoffLedger || payoffLedger.items.length === 0) {
+    return [];
+  }
+  const lines: string[] = ["", "伏笔清单："];
+  for (const item of payoffLedger.items.slice(0, 50)) {
+    const status = PAYOFF_STATUS_LABELS[item.currentStatus] ?? item.currentStatus;
+    const reason = item.statusReason?.trim() ? ` — ${item.statusReason.trim()}` : "";
+    lines.push(`- [${status}] ${item.title}${formatPayoffWindow(item)}${reason}`);
+  }
+  if (payoffLedger.items.length > 50) {
+    lines.push(`- 其余 ${payoffLedger.items.length - 50} 条见下方完整数据。`);
+  }
+  return lines;
+}
+
 function buildPipelineSummary(section: NovelExportPipelineSection): string[] {
   const lines: string[] = [];
   addBullet(lines, "总体质量分", section.qualityReport.summary.overall);
@@ -248,8 +289,16 @@ function buildPipelineSummary(section: NovelExportPipelineSection): string[] {
   addBullet(lines, "审计报告数", section.chapterAuditReports.length);
   addBullet(lines, "情节点数", section.plotBeats.length);
   addBullet(lines, "伏笔账本项数", section.payoffLedger?.items.length ?? 0);
+  addBullet(
+    lines,
+    "已回收 / 已失效",
+    section.payoffLedger
+      ? `${section.payoffLedger.summary.paidOffCount} / ${section.payoffLedger.summary.failedCount}`
+      : null,
+  );
   addBullet(lines, "最近流水线状态", section.latestPipelineJob?.status ?? null);
   addParagraph(lines, "小说圣经原始内容", section.bible?.rawContent ?? null);
+  lines.push(...buildPayoffListLines(section.payoffLedger));
   return lines;
 }
 

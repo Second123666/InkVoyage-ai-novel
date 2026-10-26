@@ -14,6 +14,7 @@ import {
   type ChapterAcceptanceAssessmentOutput,
 } from "../../../prompting/prompts/novel/chapterAcceptance.prompts";
 import { openConflictService } from "../../state/OpenConflictService";
+import { payoffLedgerSyncService } from "../../payoff/PayoffLedgerSyncService";
 import { normalizeScore, ruleScore } from "../novelP0Utils";
 import { detectProseQuality } from "./proseQuality/ProseQualityDetector";
 import { buildAcceptanceCacheIdentity } from "./acceptance";
@@ -240,7 +241,38 @@ function buildFallbackAssessment(content: string): ChapterAcceptanceAssessmentOu
   };
 }
 
+// INN-A1b A1-G19:验收结构化输出里的 requiresFullPayoffReconcile 此前是死字段。
+// 只有真正落库的验收结果才触发全量对账,候选评估(persist=false)不触发。
+export function shouldRequestFullPayoffReconcile(
+  persist: boolean | undefined,
+  assessment: ChapterAcceptanceAssessmentOutput,
+): boolean {
+  return persist !== false
+    && assessment.assetSyncRecommendation?.requiresFullPayoffReconcile === true;
+}
+
 export class ChapterAcceptanceAssessmentService {
+  // 同一章节在同一进程内只自动触发一次全量对账,失败后允许下次验收重试。
+  private readonly requestedPayoffReconcileKeys = new Set<string>();
+
+  private requestFullPayoffReconcile(input: ChapterAcceptanceAssessmentInput): void {
+    const key = `${input.novelId}:${input.chapterId}:${input.chapterOrder}`;
+    if (this.requestedPayoffReconcileKeys.has(key)) {
+      return;
+    }
+    this.requestedPayoffReconcileKeys.add(key);
+    void payoffLedgerSyncService.syncLedger(input.novelId, {
+      chapterOrder: input.chapterOrder,
+      sourceChapterId: input.chapterId,
+    }).catch((error) => {
+      this.requestedPayoffReconcileKeys.delete(key);
+      console.warn("[chapter-runtime] acceptance-requested payoff reconcile failed", {
+        novelId: input.novelId,
+        chapterId: input.chapterId,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    });
+  }
   async getCacheIdentity(input: ChapterAcceptanceAssessmentInput): Promise<string> {
     return buildAcceptanceCacheIdentity(input);
   }
@@ -278,6 +310,9 @@ export class ChapterAcceptanceAssessmentService {
         sourceSnapshotId: null,
         auditReports,
       }).catch(() => null);
+      if (shouldRequestFullPayoffReconcile(input.persist, normalized)) {
+        this.requestFullPayoffReconcile(input);
+      }
     }
     return {
       assessment: normalized,
@@ -299,6 +334,9 @@ export class ChapterAcceptanceAssessmentService {
       sourceSnapshotId: null,
       auditReports,
     }).catch(() => null);
+    if (shouldRequestFullPayoffReconcile(input.persist, result.assessment)) {
+      this.requestFullPayoffReconcile(input);
+    }
     return { ...result, auditReports };
   }
 

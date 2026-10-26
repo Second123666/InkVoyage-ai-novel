@@ -19,6 +19,7 @@ interface RegisterNovelPlanningRoutesInput {
     | "getPayoffLedger"
     | "createManualPayoffLedgerItem"
     | "updateManualPayoffLedgerItem"
+    | "syncPayoffLedger"
   >;
   idParamsSchema: z.ZodType<{ id: string }>;
   chapterParamsSchema: z.ZodType<{ id: string; chapterId: string }>;
@@ -125,6 +126,25 @@ export function registerNovelPlanningRoutes(input: RegisterNovelPlanningRoutesIn
           success: true,
           data,
           message: "伏笔已登记。",
+        } satisfies ApiResponse<typeof data>);
+      } catch (error) {
+        next(error);
+      }
+    },
+  );
+
+  // INN-A1b A1-G18:用户手动触发伏笔账本全量对账(同步状态过期或想立即整理时使用)。
+  router.post(
+    "/:id/payoff-ledger/sync",
+    validate({ params: idParamsSchema }),
+    async (req, res, next) => {
+      try {
+        const { id } = req.params as z.infer<typeof idParamsSchema>;
+        const data = await novelService.syncPayoffLedger(id);
+        res.status(200).json({
+          success: true,
+          data,
+          message: "伏笔账本已重新同步。",
         } satisfies ApiResponse<typeof data>);
       } catch (error) {
         next(error);

@@ -82,6 +82,13 @@ export async function updateNovelPayoffLedgerItem(
   return data;
 }
 
+export async function syncNovelPayoffLedger(id: string) {
+  const { data } = await apiClient.post<ApiResponse<PayoffLedgerResponse>>(
+    `/novels/${id}/payoff-ledger/sync`,
+  );
+  return data;
+}
+
 export async function getChapterStateSnapshot(id: string, chapterId: string) {
   const { data } = await apiClient.get<ApiResponse<StoryStateSnapshot | null>>(`/novels/${id}/chapters/${chapterId}/state-snapshot`);
   return data;

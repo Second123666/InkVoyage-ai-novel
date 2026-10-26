@@ -548,6 +548,10 @@ export class DefaultNovelApplicationServices {
     return this.core.updateManualPayoffLedgerItem(...args);
   }
 
+  syncPayoffLedger(...args: Parameters<NovelCoreService["syncPayoffLedger"]>) {
+    return this.core.syncPayoffLedger(...args);
+  }
+
   getWorldSlice(...args: Parameters<NovelWorldSliceService["getWorldSliceView"]>) {
     return this.worldSliceService.getWorldSliceView(...args);
   }

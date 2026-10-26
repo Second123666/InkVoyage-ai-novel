@@ -282,6 +282,10 @@ export class NovelCoreService {
     return this.reviewService.updateManualPayoffLedgerItem(novelId, itemId, payload);
   }
 
+  async syncPayoffLedger(novelId: string) {
+    return this.reviewService.syncPayoffLedger(novelId);
+  }
+
   async generateChapterHook(novelId: string, options: HookGenerateOptions = {}) {
     return this.generationService.generateChapterHook(novelId, options);
   }

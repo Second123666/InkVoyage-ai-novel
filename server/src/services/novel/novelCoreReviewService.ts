@@ -222,6 +222,11 @@ export class NovelCoreReviewService {
     return payoffLedgerSyncService.updateManualLedgerItem(novelId, itemId, payload);
   }
 
+  // INN-A1b A1-G18:用户手动触发一次全量对账(同步状态过期或想立即整理时使用)。
+  async syncPayoffLedger(novelId: string) {
+    return payoffLedgerSyncService.syncLedger(novelId);
+  }
+
   private async reviewChapterContent(
     novelTitle: string,
     chapterTitle: string,
