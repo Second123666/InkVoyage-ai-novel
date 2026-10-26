@@ -17,6 +17,23 @@
 
 ---
 
+## 2026-10-26 · LOOP-47 · RF-3 密钥存储加固(API Key 加密落库)
+
+- **类别**: 安全 / 重构(RF 线;主对话执行)
+- **目标**: RF-3 —— `DatabaseSecretStore` 明文存储 API Key 改为加密存储,处理旧数据迁移与桌面兼容。
+- **设计**:
+  1. AES-256-GCM,格式 `enc:v1:<iv>:<tag>:<ciphertext>`(base64);无前缀按存量明文透传;
+  2. 主密钥优先级:`AI_NOVEL_MASTER_KEY` → `AI_NOVEL_MASTER_KEY_PATH` → `<cwd>/data/secrets/master.key`(首次自动生成,0600);桌面端 cwd 即用户数据目录,密钥与 SQLite 同目录;
+  3. 写入加密 / 读取解密(create/update/upsert/get/list);
+  4. 启动迁移 `migratePlaintextSecrets()`:幂等、仅处理未加密行、加密→解密往返校验后才写回、单行失败保留原值;在 `loadProviderApiKeys()` 之前执行;
+  5. 解密失败按"该厂商未配置"降级并告警,不阻塞启动。
+- **改动**:新增 `secretCipher.ts`、重写 `DatabaseSecretStore`、`app.ts` 启动接线、双 `.env.example` 文档化主密钥与备份要求、wiki `architecture/secret-storage-encryption.md`、守卫 `secretStorage.test.js`(5 条)。
+- **验证**: server build 0 错误;守卫 5/5(往返/随机 IV/篡改/密钥不匹配/明文兼容/写入加密读取解密/迁移幂等无损);server 全量 **1462 测试 / 1450 过 / 0 失败 / 12 跳过**。client 未动。途中修 2 个自写加密格式缺陷(join 空分隔、前缀重复冒号)。
+- **数据安全说明**:迁移为逐行就地更新且带往返校验,不删除任何行;首次启动真实库前建议先备份 `server/dev.db` 与 `data/secrets/master.key`(密钥文件与其成对备份)。本轮未执行真实库迁移(未启动服务)。
+- **发布说明**: 自托管用户可感知的安全加固(数据库不再保存明文密钥),已记 release-notes/README(2026-10-26)。
+- **残留**: 主密钥轮换工具未做;旧备份中的明文密文混合需人工确认。
+- **下一步**: **LOOP-48 = RF-4 文档一致性清理** 或 **OPS-3/4**;UI-6 / BUG-7 仍等所有者决策。
+
 ## 2026-10-26 · LOOP-46 · UI 线收尾:UI-1 第六批 + UI-2 + UI-4 + UI-5(UI-3 审计)
 
 - **类别**: UI(设计系统与产品体验收尾;主对话执行)
