@@ -561,13 +561,13 @@ export default function NovelBasicInfoForm(props: NovelBasicInfoFormProps) {
       </details>
 
       {continuationSourceMissing ? (
-        <div className="rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-800">
+        <div className="rounded-md border border-warning/30 bg-warning/100/10 px-3 py-2 text-sm text-warning">
           续写模式下需要先选择明确的上游来源，才能保存基本信息。
         </div>
       ) : null}
 
       {continuationAnalysisSectionMissing ? (
-        <div className="rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-sm text-amber-800">
+        <div className="rounded-md border border-warning/30 bg-warning/100/10 px-3 py-2 text-sm text-warning">
           拆书结果需要搭配要注入的拆书章节。
         </div>
       ) : null}

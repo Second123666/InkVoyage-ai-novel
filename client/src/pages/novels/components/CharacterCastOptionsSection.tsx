@@ -307,7 +307,7 @@ export default function CharacterCastOptionsSection(props: CharacterCastOptionsS
         </CardHeader>
         <CardContent className="space-y-4">
           {appliedOption && !isPlannerExpanded ? (
-            <div className="grid gap-4 rounded-2xl border border-border/70 bg-background/80 p-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+            <div className="grid gap-4 rounded-lg border border-border/70 bg-background/80 p-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
               <div className="space-y-2">
                 <div className="flex flex-wrap items-center gap-2">
                   <div className="font-medium">{appliedOption.title}</div>
@@ -333,7 +333,7 @@ export default function CharacterCastOptionsSection(props: CharacterCastOptionsS
           ) : (
             <>
               <div className="grid gap-4 xl:grid-cols-[minmax(280px,0.72fr)_minmax(0,1.28fr)]">
-                <div className="space-y-3 rounded-2xl border border-border/70 bg-muted/20 p-4">
+                <div className="space-y-3 rounded-lg border border-border/70 bg-muted/20 p-4">
                   <div className="space-y-1">
                     <div className="text-sm font-medium">生成指令</div>
                     <div className="text-xs text-muted-foreground">
@@ -426,7 +426,7 @@ export default function CharacterCastOptionsSection(props: CharacterCastOptionsS
                 </div>
 
                 {castOptionsQuery.isLoading ? (
-                  <div className="flex min-h-[260px] items-center justify-center rounded-2xl border border-dashed text-sm text-muted-foreground">
+                  <div className="flex min-h-[260px] items-center justify-center rounded-lg border border-dashed text-sm text-muted-foreground">
                     正在加载阵容方案...
                   </div>
                 ) : castOptions.length > 0 ? (
@@ -438,8 +438,8 @@ export default function CharacterCastOptionsSection(props: CharacterCastOptionsS
                       return (
                         <div
                           key={option.id}
-                          className={`rounded-2xl border p-4 ${
-                            option.status === "applied" ? "border-emerald-500/40 bg-emerald-50/40" : ""
+                          className={`rounded-lg border p-4 ${
+                            option.status === "applied" ? "border-success/40 bg-success/10" : ""
                           }`}
                         >
                           <div className="flex flex-wrap items-start justify-between gap-2">
@@ -479,7 +479,7 @@ export default function CharacterCastOptionsSection(props: CharacterCastOptionsS
                             </div>
                           </div>
                           {requiresQualityConfirmation ? (
-                            <div className="mt-3 rounded-xl border border-amber-300/70 bg-amber-50/70 p-3 text-xs text-amber-900">
+                            <div className="mt-3 rounded-xl border border-warning/40 bg-warning/10 p-3 text-xs text-warning">
                               <div className="font-medium">这套阵容需要你确认后再应用</div>
                               <div className="mt-1">
                                 系统发现它和当前故事设定还有不完全匹配的地方。你可以先应用，再到角色资产里调整。
@@ -492,7 +492,7 @@ export default function CharacterCastOptionsSection(props: CharacterCastOptionsS
                             </div>
                           ) : null}
                           {option.recommendedReason ? (
-                            <div className="mt-3 rounded-xl border border-amber-200/60 bg-amber-50/50 p-3 text-xs text-muted-foreground">
+                            <div className="mt-3 rounded-xl border border-warning/30 bg-warning/10 p-3 text-xs text-muted-foreground">
                               推荐理由：{option.recommendedReason}
                             </div>
                           ) : null}
@@ -525,7 +525,7 @@ export default function CharacterCastOptionsSection(props: CharacterCastOptionsS
                     })}
                   </div>
                 ) : (
-                  <div className="flex min-h-[260px] items-center justify-center rounded-2xl border border-dashed px-6 text-center text-sm text-muted-foreground">
+                  <div className="flex min-h-[260px] items-center justify-center rounded-lg border border-dashed px-6 text-center text-sm text-muted-foreground">
                     还没有阵容方案。先输入一点人物方向，再点击“生成 3 套阵容”。
                   </div>
                 )}

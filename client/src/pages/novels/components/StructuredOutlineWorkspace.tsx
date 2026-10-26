@@ -252,7 +252,7 @@ export default function StructuredOutlineWorkspace(props: StructuredTabViewProps
         <CardContent className="space-y-4 px-0">
           <WorldInjectionHint worldInjectionSummary={worldInjectionSummary} />
           {!hasCharacters ? (
-            <div className="flex items-center justify-between gap-2 rounded-2xl bg-amber-50 px-4 py-3 text-xs text-amber-800">
+            <div className="flex items-center justify-between gap-2 rounded-lg bg-warning/10 px-4 py-3 text-xs text-warning">
               <span>请先补角色，再拆节奏和章节。</span>
               <Button size="sm" variant="outline" onClick={onGoToCharacterTab}>去角色管理</Button>
             </div>
@@ -265,7 +265,7 @@ export default function StructuredOutlineWorkspace(props: StructuredTabViewProps
 
   return (
     <Card className="border-0 bg-transparent shadow-none">
-      <CardHeader className="flex flex-col gap-4 rounded-2xl bg-muted/20 px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
+      <CardHeader className="flex flex-col gap-4 rounded-lg bg-muted/20 px-5 py-4 lg:flex-row lg:items-center lg:justify-between">
         <div className="space-y-1">
           <CardTitle>节奏 / 拆章</CardTitle>
           <div className="text-sm text-muted-foreground">先选卷，再看节奏，再从对应章节里挑当前要细化的一章。</div>
@@ -278,7 +278,7 @@ export default function StructuredOutlineWorkspace(props: StructuredTabViewProps
         <WorldInjectionHint worldInjectionSummary={worldInjectionSummary} />
 
         {directorTakeoverEntry ? (
-          <div className="flex flex-col gap-3 rounded-2xl bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 rounded-lg bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between">
             <div className="space-y-1">
               <div className="text-sm font-medium text-foreground">想让 AI 继续接管当前项目？</div>
               <div className="text-sm text-muted-foreground">
@@ -291,7 +291,7 @@ export default function StructuredOutlineWorkspace(props: StructuredTabViewProps
           </div>
         ) : null}
 
-        <div className="flex flex-wrap items-center gap-2 rounded-2xl bg-muted/20 px-4 py-3 text-xs text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-2 rounded-lg bg-muted/20 px-4 py-3 text-xs text-muted-foreground">
           <span>{generationNotice}</span>
           {hasUnsavedVolumeDraft ? <Badge variant="secondary">含未保存草稿</Badge> : null}
           <Badge variant="outline">当前：第{selectedVolume.sortOrder}卷</Badge>
@@ -299,7 +299,7 @@ export default function StructuredOutlineWorkspace(props: StructuredTabViewProps
           <Badge variant="outline">{refinedChapterCount}/{Math.max(selectedVolumeChapters.length, 1)} 已细化</Badge>
         </div>
 
-        <div className="rounded-2xl bg-primary/5 px-4 py-3 text-sm text-foreground">
+        <div className="rounded-lg bg-primary/5 px-4 py-3 text-sm text-foreground">
           {workspaceGuidance}
         </div>
 
@@ -370,9 +370,9 @@ export default function StructuredOutlineWorkspace(props: StructuredTabViewProps
           }}
         />
 
-        {!strategyPlan ? <div className="rounded-2xl bg-amber-50 px-4 py-3 text-xs text-amber-800">请先在上一阶段生成卷战略建议，再继续当前卷节奏板和拆章。</div> : null}
+        {!strategyPlan ? <div className="rounded-lg bg-warning/10 px-4 py-3 text-xs text-warning">请先在上一阶段生成卷战略建议，再继续当前卷节奏板和拆章。</div> : null}
         {syncMessage ? <div className="text-xs text-muted-foreground">{syncMessage}</div> : null}
-        {locked ? <div className="rounded-2xl bg-amber-50 px-4 py-3 text-xs text-amber-800">当前卷还没有节奏板，章节列表生成已锁定。</div> : null}
+        {locked ? <div className="rounded-lg bg-warning/10 px-4 py-3 text-xs text-warning">当前卷还没有节奏板，章节列表生成已锁定。</div> : null}
 
         <Card className="border-0 bg-muted/15 shadow-none">
           <CardHeader className="pb-3">
@@ -399,7 +399,7 @@ export default function StructuredOutlineWorkspace(props: StructuredTabViewProps
                       });
                     }}
                     className={cn(
-                      "w-full min-w-0 rounded-xl p-3 text-left transition-colors md:min-w-[220px] md:shrink-0 md:rounded-2xl",
+                      "w-full min-w-0 rounded-xl p-3 text-left transition-colors md:min-w-[220px] md:shrink-0 md:rounded-lg",
                       isSelected ? "bg-primary/5 shadow-sm ring-1 ring-primary/15" : "bg-background/70 hover:bg-background",
                     )}
                   >
@@ -421,7 +421,7 @@ export default function StructuredOutlineWorkspace(props: StructuredTabViewProps
 
         {selectedRebalance.length > 0 ? (
           <div className="space-y-3">
-            <div className="flex flex-col gap-3 rounded-2xl bg-muted/20 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-3 rounded-lg bg-muted/20 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="text-sm">
                 检测到 {selectedRebalance.length} 条相邻卷再平衡建议。它们会影响跨卷衔接，但不属于当前主编辑动作。
               </div>

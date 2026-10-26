@@ -6,17 +6,17 @@ type ShellTone = "neutral" | "info" | "success" | "warning" | "danger";
 
 const toneSurfaceClass: Record<ShellTone, string> = {
   neutral: "bg-muted/20",
-  info: "bg-sky-500/10 text-foreground",
-  success: "bg-emerald-500/10 text-foreground",
-  warning: "bg-amber-500/10 text-foreground",
+  info: "bg-info/10 text-foreground",
+  success: "bg-success/100/10 text-foreground",
+  warning: "bg-warning/100/10 text-foreground",
   danger: "bg-destructive/5 text-destructive",
 };
 
 const toneDotClass: Record<ShellTone, string> = {
   neutral: "bg-muted-foreground/45",
-  info: "bg-sky-500",
-  success: "bg-emerald-500",
-  warning: "bg-amber-500",
+  info: "bg-info",
+  success: "bg-success/100",
+  warning: "bg-warning/100",
   danger: "bg-destructive",
 };
 
@@ -31,7 +31,7 @@ export function StepHero(props: {
   children?: ReactNode;
 }) {
   return (
-    <section className={cn("rounded-2xl px-5 py-4", toneSurfaceClass[props.tone ?? "neutral"], props.className)}>
+    <section className={cn("rounded-lg px-5 py-4", toneSurfaceClass[props.tone ?? "neutral"], props.className)}>
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div className="min-w-0">
           {props.eyebrow ? (
@@ -64,7 +64,7 @@ export function StepActionBar(props: {
   className?: string;
 }) {
   return (
-    <div className={cn("flex flex-col gap-3 rounded-2xl px-4 py-3 sm:flex-row sm:items-center sm:justify-between", toneSurfaceClass[props.tone ?? "neutral"], props.className)}>
+    <div className={cn("flex flex-col gap-3 rounded-lg px-4 py-3 sm:flex-row sm:items-center sm:justify-between", toneSurfaceClass[props.tone ?? "neutral"], props.className)}>
       <div className="min-w-0">
         {props.label ? <div className="text-sm font-medium text-foreground">{props.label}</div> : null}
         {props.description ? <div className="mt-1 text-sm leading-6 text-muted-foreground">{props.description}</div> : null}
@@ -84,7 +84,7 @@ export function SectionBlock(props: {
   surface?: boolean;
 }) {
   return (
-    <section className={cn("space-y-4", props.surface && "rounded-2xl bg-muted/15 p-4", props.className)}>
+    <section className={cn("space-y-4", props.surface && "rounded-lg bg-muted/15 p-4", props.className)}>
       {(props.title || props.description || props.actions) ? (
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0">

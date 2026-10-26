@@ -17,6 +17,15 @@ const targets = [
   "../src/pages/novels/components/characterWorkspace/CharacterOverviewTab.tsx",
   "../src/pages/novels/components/cover/NovelCoverDialog.tsx",
   "../src/pages/novels/components/cover/NovelCoverCard.tsx",
+  "../src/pages/novels/components/NovelStyleRecommendationCard.tsx",
+  "../src/pages/novels/components/list/NovelProjectCard.tsx",
+  "../src/pages/novels/components/workspaceShell.tsx",
+  "../src/pages/novels/components/CharacterAssetSidebar.tsx",
+  "../src/pages/novels/components/storyMacroPlan/StoryEngineStudio.tsx",
+  "../src/pages/novels/components/CharacterCastOptionsSection.tsx",
+  "../src/pages/novels/components/CharacterFocusSummary.tsx",
+  "../src/pages/novels/components/NovelBasicInfoForm.tsx",
+  "../src/pages/novels/components/StructuredOutlineWorkspace.tsx",
 ];
 
 const PALETTE = /(?:slate|amber|emerald|sky|rose|red|green|violet)-[0-9]{2,3}|bg-white|text-slate|border-slate|ring-slate/;

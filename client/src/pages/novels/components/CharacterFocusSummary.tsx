@@ -18,19 +18,19 @@ export default function CharacterFocusSummary(props: CharacterFocusSummaryProps)
   const avatarText = selectedCharacter.name.trim().slice(0, 2) || "角";
 
   return (
-    <section className="overflow-hidden rounded-2xl border border-border/70 bg-background shadow-sm">
+    <section className="overflow-hidden rounded-lg border border-border/70 bg-background shadow-sm">
       <div className="grid gap-0 lg:grid-cols-[minmax(0,1fr)_360px]">
         <div className="relative min-w-0 bg-[linear-gradient(135deg,hsl(var(--background))_0%,hsl(var(--muted)/0.55)_100%)] p-5">
-          <div className="absolute inset-y-5 left-0 w-1 rounded-r-full bg-emerald-500" />
+          <div className="absolute inset-y-5 left-0 w-1 rounded-r-full bg-success/100" />
           <div className="flex min-w-0 gap-4">
-            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-emerald-200 bg-emerald-50 text-lg font-semibold text-emerald-900">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-success/30 bg-success/10 text-lg font-semibold text-success">
               {avatarText}
             </div>
             <div className="min-w-0 space-y-3">
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className="truncate text-xl font-semibold tracking-normal">{selectedCharacter.name}</h2>
                 {isProtagonist ? (
-                  <Badge className="gap-1 bg-emerald-600 text-white hover:bg-emerald-600">
+                  <Badge className="gap-1 bg-success text-success-foreground hover:bg-success/90">
                     <Crown className="h-3 w-3" />
                     主角
                   </Badge>

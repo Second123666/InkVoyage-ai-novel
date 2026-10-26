@@ -15,12 +15,12 @@ interface CharacterAssetSidebarProps {
 
 function getCharacterCardClass(isSelected: boolean, isProtagonist: boolean): string {
   const selectedClass = isProtagonist
-    ? "border-emerald-300 bg-emerald-50 shadow-sm"
+    ? "border-success/40 bg-success/10 shadow-sm"
     : "border-primary/40 bg-primary/5 shadow-sm";
   const idleClass = isProtagonist
-    ? "border-emerald-200 bg-emerald-50/40 hover:border-emerald-300 hover:bg-emerald-50"
+    ? "border-success/30 bg-success/10 hover:border-success/40 hover:bg-success/10"
     : "border-border/70 bg-background hover:border-primary/30 hover:bg-muted/20";
-  return `group flex w-full items-stretch gap-2 rounded-2xl border p-2.5 text-left transition ${
+  return `group flex w-full items-stretch gap-2 rounded-lg border p-2.5 text-left transition ${
     isSelected ? selectedClass : idleClass
   }`;
 }
@@ -67,7 +67,7 @@ function CharacterCard(props: {
         className="flex min-w-0 flex-1 items-start gap-2.5 text-left"
       >
         <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border text-sm font-semibold ${
-          isProtagonist ? "border-emerald-200 bg-white text-emerald-800" : "border-border/70 bg-muted/20 text-foreground"
+          isProtagonist ? "border-success/30 bg-background text-success" : "border-border/70 bg-muted/20 text-foreground"
         }`}>
           {avatarText}
         </div>
@@ -118,11 +118,11 @@ export default function CharacterAssetSidebar(props: CharacterAssetSidebarProps)
   const supportingCharacters = characters.filter((character) => !isProtagonistCharacter(character));
 
   return (
-    <div className="space-y-4 rounded-2xl border border-border/70 bg-muted/10 p-3">
+    <div className="space-y-4 rounded-lg border border-border/70 bg-muted/10 p-3">
       <section className="space-y-2">
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-            <Crown className="h-3.5 w-3.5 text-emerald-600" />
+            <Crown className="h-3.5 w-3.5 text-success" />
             主角位
           </div>
           {protagonist ? <Badge variant="outline">主角</Badge> : null}
@@ -146,7 +146,7 @@ export default function CharacterAssetSidebar(props: CharacterAssetSidebarProps)
 
       <section className="space-y-2">
         <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-          <UsersRound className="h-3.5 w-3.5 text-sky-600" />
+          <UsersRound className="h-3.5 w-3.5 text-info" />
           配角与关系角色
         </div>
         {characters.length === 0 ? (

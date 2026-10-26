@@ -45,20 +45,20 @@ export function NovelProjectCard(props: {
   const progressToneClass = workflow.tone === "danger"
     ? "bg-destructive"
     : workflow.tone === "warning"
-      ? "bg-amber-600"
+      ? "bg-warning"
       : workflow.tone === "success"
-        ? "bg-emerald-600"
+        ? "bg-success"
         : workflow.tone === "info"
-          ? "bg-sky-600"
+          ? "bg-info"
           : "bg-primary";
   const progressBorderClass = workflow.tone === "danger"
     ? "border-destructive"
     : workflow.tone === "warning"
-      ? "border-amber-600"
+      ? "border-warning"
       : workflow.tone === "success"
-        ? "border-emerald-600"
+        ? "border-success"
         : workflow.tone === "info"
-          ? "border-sky-600"
+          ? "border-info"
           : "border-primary";
   const isWorkflowPending = props.continuePendingTaskId === task?.id;
   const isDownloadPending = props.downloadPendingNovelId === props.novel.id;
