@@ -17,6 +17,23 @@
 
 ---
 
+## 2026-10-26 · LOOP-43 · UI-1 第六批(第二组):小说工作台散落状态色
+
+- **类别**: UI(设计系统落地;主对话执行)
+- **目标**: 第六批按分批策略推进 —— 迁移小说工作台 6 个组件的散落状态色(64 处)。
+- **改动**:批量 hue→semantic 映射(rose/red→destructive、emerald/green→success、amber→warning、sky→info),alpha 变体优先替换避免前缀截断;同时 rounded-2xl→rounded-lg:
+  1. `OutlineTab`:缺角色/提示警告框、成功提示 → warning/success;
+  2. `StructuredChapterListCard`:3 处待生成/待细化警告 → warning;
+  3. `CharacterDynamicsSection` `riskTone`:高风险→destructive、警告→warning、提示→info;
+  4. `TimelinePanel`:危险/注意/正常 → destructive/warning/success;
+  5. `ChapterExecutionReferencePanel`:质量债务提示框 → warning;
+  6. `CharacterOverviewTab` `StatusPanel`:四种统计 tone → success/info/destructive/warning(保留绿=好、蓝=中、红=坏、黄=注意的语义)。
+  复扫 6 文件:**0 残留、0 畸形类名**。
+- **验证**: client typecheck 0 错误;守卫 `statusColorContracts` 扩至 9 文件 3 条通过;client **268/268**。server 未动。
+- **发布说明**: 状态色一致性细微改进,按规则跳过(与 UI-2 主题层一起验收)。
+- **残留**: 第六批其余分组(NovelCoverDialog 75 处含生成封面调色、NovelStyleRecommendationCard 等);UI-6(promptWorkbench 主题、可视化分类色);`.mobile-route-*` 兜底迁移。
+- **下一步**: **LOOP-44 = 第六批下一组** 或 **UI-5 开源 Showcase**;UI-6 / BUG-7 等所有者决策。
+
 ## 2026-10-26 · LOOP-42 · UI-1 第六批(启动):全站验收扫描 + 状态组件色迁移
 
 - **类别**: UI / 流程(设计系统落地;主对话执行)
