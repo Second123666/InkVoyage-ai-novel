@@ -17,6 +17,22 @@
 
 ---
 
+## 2026-10-26 · LOOP-45 · UI-1 第六批(第四组):零散组件状态/中性色
+
+- **类别**: UI(设计系统落地;主对话执行)
+- **目标**: 第六批下一组 —— 9 个零散组件的 76 处色彩(状态/中性混排)。
+- **改动**:
+  1. `NovelStyleRecommendationCard`:slate 中性 + 白底 → 语义 token;反色深色面板 `bg-slate-950 text-white` → `bg-foreground text-background`(语义反转,深浅皆适配);
+  2. `list/NovelProjectCard`:项目状态色(amber/emerald/sky)→ warning/success/info;
+  3. `workspaceShell`:`info/success/warning` tone 映射从 sky/emerald/amber 改为同义 token;
+  4. `CharacterAssetSidebar`:主角/群像标记 → success/info;
+  5. `StoryEngineStudio`、`CharacterCastOptionsSection`、`CharacterFocusSummary`、`NovelBasicInfoForm`、`StructuredOutlineWorkspace`:就绪/警告/applied/锁定提示 → success/warning;
+  6. 圆角 rounded-2xl→rounded-lg;守卫扩至 **20 文件**。
+- **验证**: client typecheck 0 错误;守卫 3/3;client **268/268**。server 未动。复扫 9 文件 **0 残留**。
+- **发布说明**: 写法推荐卡随主题适配、项目列表状态色一致,用户可见(写法推荐卡深色失配修复),已记 release-notes/README(2026-10-26)。
+- **残留**: 第六批其余(CharacterRelationshipGraphPanel 分类色→UI-6、storyMacro 其余、CharacterDynamics 已完);UI-6;`.mobile-route-*` 迁移。
+- **下一步**: **LOOP-46 = 第六批收尾或 UI-5 开源 Showcase**;UI-6 / BUG-7 等所有者决策。
+
 ## 2026-10-26 · LOOP-44 · UI-1 第六批(第三组):封面弹窗主题适配
 
 - **类别**: UI(设计系统落地;主对话执行)
