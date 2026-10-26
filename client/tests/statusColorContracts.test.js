@@ -9,6 +9,12 @@ const targets = [
   "../src/pages/novels/components/ChapterExecutionStatusFlow.tsx",
   "../src/pages/novels/components/PipelineTab.tsx",
   "../src/pages/novels/components/BookPayoffLedgerCard.tsx",
+  "../src/pages/novels/components/OutlineTab.tsx",
+  "../src/pages/novels/components/StructuredChapterListCard.tsx",
+  "../src/pages/novels/components/CharacterDynamicsSection.tsx",
+  "../src/pages/novels/components/chapterInsights/TimelinePanel.tsx",
+  "../src/pages/novels/components/chapterInsights/ChapterExecutionReferencePanel.tsx",
+  "../src/pages/novels/components/characterWorkspace/CharacterOverviewTab.tsx",
 ];
 
 const PALETTE = /(?:slate|amber|emerald|sky|rose|red|green)-[0-9]{2,3}/;
@@ -40,4 +46,19 @@ test("状态语义正确:进行中/完成/逾期/已兑现/失败各有 token", 
   const ledger = await readFile(new URL(targets[2], import.meta.url), "utf8");
   assert.match(ledger, /border-warning\/40 bg-warning\/10 text-warning/, "逾期用 warning");
   assert.match(ledger, /border-success\/40 bg-success\/10 text-success/, "已兑现用 success");
+});
+
+test("风险分级与统计 tone 也使用语义 token", async () => {
+  const dynamics = await readFile(new URL(targets[5], import.meta.url), "utf8");
+  assert.match(dynamics, /border-destructive\/40/, "高风险用 destructive");
+  assert.match(dynamics, /border-warning\/40/, "警告用 warning");
+  assert.match(dynamics, /border-info\/40/, "提示用 info");
+
+  const timeline = await readFile(new URL(targets[6], import.meta.url), "utf8");
+  assert.match(timeline, /border-destructive\/30 bg-destructive\/10/, "时间线危险用 destructive");
+  assert.match(timeline, /border-success\/30 bg-success\/10/, "时间线正常用 success");
+
+  const overview = await readFile(new URL(targets[8], import.meta.url), "utf8");
+  assert.match(overview, /text-success bg-success\/10 border-success\/10|success/, "统计 tone 用 success");
+  assert.match(overview, /text-info|text-destructive|text-warning/, "统计 tone 覆盖 info/destructive/warning");
 });

@@ -20,12 +20,12 @@ export function getTimelineCheckLabel(status: TimelineCheckSummary["status"]): s
 
 function getTimelineCheckTone(status: TimelineCheckSummary["status"]): string {
   if (status === "failed") {
-    return "border-red-200 bg-red-50 text-red-950";
+    return "border-destructive/30 bg-destructive/10 text-destructive";
   }
   if (status === "warning") {
-    return "border-amber-200 bg-amber-50 text-amber-950";
+    return "border-warning/30 bg-warning/10 text-warning";
   }
-  return "border-emerald-200 bg-emerald-50 text-emerald-950";
+  return "border-success/30 bg-success/10 text-success";
 }
 
 function getTimelineCheckBadgeVariant(status: TimelineCheckSummary["status"]): NonNullable<BadgeProps["variant"]> {
@@ -72,9 +72,9 @@ function TimelineItemList(props: {
   const { title, icon, items, emptyText, tone = "default" } = props;
   const toneClass =
     tone === "critical"
-      ? "border-red-200 bg-red-50/60"
+      ? "border-destructive/30 bg-destructive/10"
       : tone === "warning"
-        ? "border-amber-200 bg-amber-50/60"
+        ? "border-warning/30 bg-warning/10"
         : "border-border/70 bg-background";
 
   return (

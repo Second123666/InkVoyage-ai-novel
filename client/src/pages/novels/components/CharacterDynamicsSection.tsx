@@ -28,11 +28,11 @@ interface CharacterDynamicsSectionProps {
 function riskTone(risk: "none" | "info" | "warn" | "high"): string {
   switch (risk) {
     case "high":
-      return "border-rose-300/70 bg-rose-50 text-rose-700";
+      return "border-destructive/40 bg-destructive/10 text-destructive";
     case "warn":
-      return "border-amber-300/70 bg-amber-50 text-amber-700";
+      return "border-warning/40 bg-warning/10 text-warning";
     case "info":
-      return "border-sky-300/70 bg-sky-50 text-sky-700";
+      return "border-info/40 bg-info/10 text-info";
     default:
       return "border-border/70 bg-background text-muted-foreground";
   }
@@ -186,14 +186,14 @@ export default function CharacterDynamicsSection(props: CharacterDynamicsSection
       </CardHeader>
       <CardContent className="space-y-4">
         {overviewQuery.isLoading ? (
-          <div className="rounded-2xl border border-dashed p-6 text-sm text-muted-foreground">
+          <div className="rounded-lg border border-dashed p-6 text-sm text-muted-foreground">
             正在加载动态角色系统...
           </div>
         ) : null}
 
         {activeView === "overview" && overview ? (
           <div className="space-y-4">
-            <div className="rounded-2xl border border-border/70 bg-muted/20 p-4 text-sm text-muted-foreground">
+            <div className="rounded-lg border border-border/70 bg-muted/20 p-4 text-sm text-muted-foreground">
               {overview.summary}
             </div>
             <div className="grid gap-3 xl:grid-cols-2">
@@ -202,7 +202,7 @@ export default function CharacterDynamicsSection(props: CharacterDynamicsSection
                   key={item.characterId}
                   type="button"
                   onClick={() => onSelectedCharacterChange(item.characterId)}
-                  className="rounded-2xl border border-border/70 p-4 text-left transition hover:border-primary/40 hover:bg-muted/20"
+                  className="rounded-lg border border-border/70 p-4 text-left transition hover:border-primary/40 hover:bg-muted/20"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div>
@@ -224,7 +224,7 @@ export default function CharacterDynamicsSection(props: CharacterDynamicsSection
             </div>
 
             {selectedCharacter ? (
-              <div className="rounded-2xl border border-border/70 bg-background/80 p-4">
+              <div className="rounded-lg border border-border/70 bg-background/80 p-4">
                 <div className="mb-3 text-sm font-medium">手动修正当前角色动态状态</div>
                 <div className="grid gap-3 md:grid-cols-2">
                   <Input
@@ -274,7 +274,7 @@ export default function CharacterDynamicsSection(props: CharacterDynamicsSection
           pendingCandidates.length > 0 ? (
             <div className="grid gap-3 xl:grid-cols-2">
               {pendingCandidates.map((candidate) => (
-                <div key={candidate.id} className="rounded-2xl border border-border/70 p-4">
+                <div key={candidate.id} className="rounded-lg border border-border/70 p-4">
                   <div className="flex flex-wrap items-start justify-between gap-2">
                     <div>
                       <div className="font-medium">{candidate.proposedName}</div>
@@ -313,7 +313,7 @@ export default function CharacterDynamicsSection(props: CharacterDynamicsSection
               ))}
             </div>
           ) : (
-            <div className="rounded-2xl border border-dashed p-6 text-sm text-muted-foreground">
+            <div className="rounded-lg border border-dashed p-6 text-sm text-muted-foreground">
               还没有待确认的新角色候选。写完几章后，这里会自动汇总 AI 抽取到的新人物入口。
             </div>
           )
@@ -323,7 +323,7 @@ export default function CharacterDynamicsSection(props: CharacterDynamicsSection
           overview?.relations?.length ? (
             <div className="grid gap-3 xl:grid-cols-2">
               {overview.relations.map((relation) => (
-                <div key={relation.id} className="rounded-2xl border border-border/70 p-4">
+                <div key={relation.id} className="rounded-lg border border-border/70 p-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="font-medium">{relation.sourceCharacterName}{" -> "}{relation.targetCharacterName}</div>
                     <Badge variant="outline">{relation.stageLabel}</Badge>
@@ -338,7 +338,7 @@ export default function CharacterDynamicsSection(props: CharacterDynamicsSection
               ))}
             </div>
           ) : (
-            <div className="rounded-2xl border border-dashed p-6 text-sm text-muted-foreground">
+            <div className="rounded-lg border border-dashed p-6 text-sm text-muted-foreground">
               当前还没有关系阶段数据。应用阵容或完成章节后，这里会自动出现。
             </div>
           )
@@ -350,7 +350,7 @@ export default function CharacterDynamicsSection(props: CharacterDynamicsSection
               {overview.characters.map((item) => {
                 const assignment = assignmentsByCharacterId.get(item.characterId);
                 return (
-                  <div key={item.characterId} className="rounded-2xl border border-border/70 p-4">
+                  <div key={item.characterId} className="rounded-lg border border-border/70 p-4">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div>
                         <div className="font-medium">{item.name}</div>
@@ -373,7 +373,7 @@ export default function CharacterDynamicsSection(props: CharacterDynamicsSection
               })}
             </div>
           ) : (
-            <div className="rounded-2xl border border-dashed p-6 text-sm text-muted-foreground">
+            <div className="rounded-lg border border-dashed p-6 text-sm text-muted-foreground">
               当前卷还没有角色职责投影。点击上方“重建动态角色”即可初始化。
             </div>
           )

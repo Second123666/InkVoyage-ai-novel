@@ -74,9 +74,9 @@ function PanelHintCard(props: { title: string; content: string }) {
 
 function ReferenceNotice(props: { title: string; description: string }) {
   return (
-    <div className="rounded-xl border border-amber-200 bg-amber-50/90 p-3 text-sm text-amber-900">
+    <div className="rounded-xl border border-warning/30 bg-warning/10 p-3 text-sm text-warning">
       <div className="font-medium">{props.title}</div>
-      <div className="mt-1 leading-6 text-amber-800">{props.description}</div>
+      <div className="mt-1 leading-6 text-warning">{props.description}</div>
     </div>
   );
 }
@@ -131,7 +131,7 @@ export default function ChapterExecutionReferencePanel(props: ChapterExecutionRe
 
   if (!selectedChapter) {
     return (
-      <div className="rounded-2xl border border-dashed border-border/70 bg-background p-4 text-sm leading-6 text-muted-foreground">
+      <div className="rounded-lg border border-dashed border-border/70 bg-background p-4 text-sm leading-6 text-muted-foreground">
         选中章节后，这里会显示任务单、场景拆解、质量反馈、修复记录和诊断信息。
       </div>
     );
@@ -150,7 +150,7 @@ export default function ChapterExecutionReferencePanel(props: ChapterExecutionRe
 
   return (
     <div className="space-y-4">
-      <div className="rounded-2xl border border-border/70 bg-background p-4">
+      <div className="rounded-lg border border-border/70 bg-background p-4">
         <div className="flex items-start justify-between gap-3">
           <div>
             <div className="text-base font-semibold text-foreground">资料诊断</div>
@@ -163,17 +163,17 @@ export default function ChapterExecutionReferencePanel(props: ChapterExecutionRe
       </div>
 
       {qualityDebt ? (
-        <div className="rounded-2xl bg-amber-50/80 p-4 text-sm text-amber-950">
+        <div className="rounded-lg bg-warning/10 p-4 text-sm text-warning">
           <div className="font-semibold">本章有待回收的质量项</div>
-          <div className="mt-2 leading-6 text-amber-900/85">{qualityDebt.reason}</div>
-          <div className="mt-3 grid gap-2 text-xs text-amber-900/75 sm:grid-cols-2">
+          <div className="mt-2 leading-6 text-warning">{qualityDebt.reason}</div>
+          <div className="mt-3 grid gap-2 text-xs text-warning sm:grid-cols-2">
             <span>来源：{qualityDebt.source ? QUALITY_DEBT_SOURCE_LABELS[qualityDebt.source] : "历史质量记录"}</span>
             <span>自动修复：{formatQualityDebtAttempts(qualityDebt)}</span>
             <span>记录时间：{formatQualityDebtTime(qualityDebt.evaluatedAt)}</span>
           </div>
           {qualityDebt.issueCodes.length > 0 ? (
             <div className="mt-3 flex flex-wrap items-center gap-1.5">
-              <span className="mr-1 text-xs text-amber-900/70">问题标记</span>
+              <span className="mr-1 text-xs text-warning">问题标记</span>
               {qualityDebt.issueCodes.map((code) => <Badge key={code} variant="secondary">{code}</Badge>)}
             </div>
           ) : null}
@@ -186,7 +186,7 @@ export default function ChapterExecutionReferencePanel(props: ChapterExecutionRe
       ) : null}
 
       <Tabs value={detailTab} onValueChange={(value) => onAssetTabChange(value as AssetTabKey)}>
-        <TabsList className="grid h-auto w-full grid-cols-2 gap-1 rounded-2xl bg-muted/50 p-1.5">
+        <TabsList className="grid h-auto w-full grid-cols-2 gap-1 rounded-lg bg-muted/50 p-1.5">
           <TabsTrigger value="taskSheet" className="rounded-xl text-xs">任务单</TabsTrigger>
           <TabsTrigger value="sceneCards" className="rounded-xl text-xs">场景</TabsTrigger>
           <TabsTrigger value="quality" className="rounded-xl text-xs">质量</TabsTrigger>
@@ -195,7 +195,7 @@ export default function ChapterExecutionReferencePanel(props: ChapterExecutionRe
         </TabsList>
 
         <TabsContent value="taskSheet" className="space-y-3">
-          <div className="rounded-2xl border bg-muted/20 p-4">
+          <div className="rounded-lg border bg-muted/20 p-4">
             <div className="text-xs text-muted-foreground">本章任务单</div>
             <div className="mt-3 whitespace-pre-wrap text-sm leading-7">
               {selectedChapter.taskSheet?.trim() || "暂无任务单。你可以先让 AI 生成任务单，再回来继续写这章。"}
@@ -214,7 +214,7 @@ export default function ChapterExecutionReferencePanel(props: ChapterExecutionRe
           <ChapterRuntimeLengthCard runtimePackage={runtimePackage} />
           {scenePlan ? (
             <div className="space-y-3">
-              <div className="rounded-2xl border bg-muted/20 p-4">
+              <div className="rounded-lg border bg-muted/20 p-4">
                 <div className="text-xs text-muted-foreground">场景预算合同</div>
                 <div className="mt-3 grid grid-cols-2 gap-3">
                   <MetricBadge label="章节目标" value={`${scenePlan.targetWordCount} 字`} />
@@ -222,7 +222,7 @@ export default function ChapterExecutionReferencePanel(props: ChapterExecutionRe
                 </div>
               </div>
               {scenePlan.scenes.map((scene, index) => (
-                <div key={scene.key} className="rounded-2xl border bg-background p-4">
+                <div key={scene.key} className="rounded-lg border bg-background p-4">
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge variant="outline">场景 {index + 1}</Badge>
                     <Badge variant="secondary">{scene.targetWordCount} 字</Badge>
@@ -236,7 +236,7 @@ export default function ChapterExecutionReferencePanel(props: ChapterExecutionRe
                     <PanelHintCard title="结束状态" content={scene.exitState} />
                   </div>
                   {scene.forbiddenExpansion.length > 0 ? (
-                    <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50/70 p-3 text-sm leading-6 text-amber-900">
+                    <div className="mt-3 rounded-xl border border-warning/30 bg-warning/10 p-3 text-sm leading-6 text-warning">
                       禁止展开：{scene.forbiddenExpansion.join("；")}
                     </div>
                   ) : null}
@@ -244,7 +244,7 @@ export default function ChapterExecutionReferencePanel(props: ChapterExecutionRe
               ))}
             </div>
           ) : (
-            <div className="rounded-2xl border bg-muted/20 p-4">
+            <div className="rounded-lg border bg-muted/20 p-4">
               <div className="text-xs text-muted-foreground">场景拆解</div>
               <div className="mt-3 whitespace-pre-wrap text-sm leading-7">
                 {selectedChapter.sceneCards?.trim()
@@ -265,7 +265,7 @@ export default function ChapterExecutionReferencePanel(props: ChapterExecutionRe
             <MetricBadge label="吸引力" value={String(chapterQualityReport?.engagement ?? "-")} />
           </div>
 
-          <div className="rounded-2xl border p-4 text-sm">
+          <div className="rounded-lg border p-4 text-sm">
             <div className="font-semibold text-foreground">最近审校问题</div>
             {reviewResult?.issues?.length ? (
               <div className="mt-3 space-y-2 text-xs text-muted-foreground">
@@ -281,7 +281,7 @@ export default function ChapterExecutionReferencePanel(props: ChapterExecutionRe
             )}
           </div>
 
-          <div className="rounded-2xl border p-4 text-sm">
+          <div className="rounded-lg border p-4 text-sm">
             <div className="font-semibold text-foreground">结构化审计问题</div>
             {openAuditIssues.length > 0 ? (
               <div className="mt-3 space-y-2 text-xs text-muted-foreground">
@@ -327,7 +327,7 @@ export default function ChapterExecutionReferencePanel(props: ChapterExecutionRe
             />
           ) : null}
 
-          <div className="rounded-2xl border bg-muted/20 p-4">
+          <div className="rounded-lg border bg-muted/20 p-4">
             <div className="text-xs text-muted-foreground">修复记录</div>
             <div className="mt-3 max-h-[420px] overflow-y-auto whitespace-pre-wrap text-sm leading-7">
               {selectedChapter.repairHistory?.trim() || "暂无修复记录。"}

@@ -183,7 +183,7 @@ export default function OutlineTab(props: OutlineTabViewProps) {
         description="AI 会先判断卷战略和卷骨架是否已齐，再决定继续补缺失部分还是重跑当前步骤。"
         entry={props.directorTakeoverEntry}
       />
-      <section className="overflow-hidden rounded-2xl border border-border/70 bg-background shadow-sm">
+      <section className="overflow-hidden rounded-lg border border-border/70 bg-background shadow-sm">
       <div className="border-b border-border/60 bg-[linear-gradient(135deg,hsl(var(--background))_0%,hsl(var(--muted)/0.38)_100%)] px-5 py-4">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div className="space-y-2">
@@ -217,12 +217,12 @@ export default function OutlineTab(props: OutlineTabViewProps) {
       <div className="space-y-5 p-5">
         <WorldInjectionHint worldInjectionSummary={worldInjectionSummary} />
         {!hasCharacters ? (
-          <div className="flex items-center justify-between gap-2 rounded-2xl bg-amber-50 px-4 py-3 text-xs text-amber-800">
+          <div className="flex items-center justify-between gap-2 rounded-lg bg-warning/10 px-4 py-3 text-xs text-warning">
             <span>建议先补齐角色，再生成卷战略和卷骨架。</span>
             <Button size="sm" variant="outline" onClick={onGoToCharacterTab}>去角色管理</Button>
           </div>
         ) : null}
-        <div className="flex flex-wrap items-center gap-2 rounded-2xl bg-muted/20 px-4 py-3 text-xs text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-2 rounded-lg bg-muted/20 px-4 py-3 text-xs text-muted-foreground">
           <span>{generationNotice}</span>
           {hasUnsavedVolumeDraft ? <Badge variant="secondary">含未保存草稿</Badge> : null}
         </div>
@@ -271,11 +271,11 @@ export default function OutlineTab(props: OutlineTabViewProps) {
                 </div>
 
                 {readiness.blockingReasons.length > 0 ? (
-                  <div className="rounded-xl bg-amber-50 p-3 text-xs text-amber-800">
+                  <div className="rounded-xl bg-warning/10 p-3 text-xs text-warning">
                     {readiness.blockingReasons.map((reason) => <div key={reason}>{reason}</div>)}
                   </div>
                 ) : (
-                  <div className="rounded-xl bg-emerald-50 p-3 text-xs text-emerald-800">
+                  <div className="rounded-xl bg-success/10 p-3 text-xs text-success">
                     当前工作区已经具备继续推进的基础条件。
                   </div>
                 )}
@@ -539,7 +539,7 @@ export default function OutlineTab(props: OutlineTabViewProps) {
               {(payoffLedger?.summary.overdueCount ?? 0) > 0 ? (
                 <Badge
                   variant="secondary"
-                  className="ml-1.5 border-amber-300 bg-amber-50 px-1.5 text-[10px] font-medium text-amber-700"
+                  className="ml-1.5 border-warning/40 bg-warning/10 px-1.5 text-[10px] font-medium text-warning"
                 >
                   逾期 {payoffLedger?.summary.overdueCount}
                 </Badge>

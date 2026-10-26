@@ -25,7 +25,7 @@ export default function CharacterOverviewTab(props: CharacterOverviewTabProps) {
   return (
     <div className="space-y-4">
       <div className="grid gap-3 xl:grid-cols-[minmax(0,1.05fr)_minmax(320px,0.95fr)]">
-        <section className="overflow-hidden rounded-2xl border border-border/70 bg-background shadow-sm">
+        <section className="overflow-hidden rounded-lg border border-border/70 bg-background shadow-sm">
           <div className="border-b border-border/60 bg-muted/20 px-4 py-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
@@ -63,7 +63,7 @@ export default function CharacterOverviewTab(props: CharacterOverviewTabProps) {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-border/70 bg-[linear-gradient(135deg,hsl(var(--background))_0%,hsl(var(--muted)/0.45)_100%)] p-4 shadow-sm">
+        <section className="rounded-lg border border-border/70 bg-[linear-gradient(135deg,hsl(var(--background))_0%,hsl(var(--muted)/0.45)_100%)] p-4 shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="text-sm font-medium">行动边界</div>
             <Badge variant={pendingCharacterResourceCount > 0 ? "secondary" : "outline"}>
@@ -82,7 +82,7 @@ export default function CharacterOverviewTab(props: CharacterOverviewTabProps) {
       </div>
 
       <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-        <section className="rounded-2xl border border-border/70 bg-background p-4 shadow-sm">
+        <section className="rounded-lg border border-border/70 bg-background p-4 shadow-sm">
           <div className="flex flex-wrap items-center gap-2">
             <div className="text-sm font-medium">戏剧引擎</div>
             <Badge variant="outline">角色功能</Badge>
@@ -95,7 +95,7 @@ export default function CharacterOverviewTab(props: CharacterOverviewTabProps) {
           </div>
         </section>
 
-        <section className="rounded-2xl border border-border/70 bg-background p-4 shadow-sm">
+        <section className="rounded-lg border border-border/70 bg-background p-4 shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="text-sm font-medium">成长轨道</div>
             <Badge variant="outline">可后续接入思路线</Badge>
@@ -133,10 +133,10 @@ function StatusPanel(props: {
   tone: "emerald" | "sky" | "rose" | "amber";
 }) {
   const toneClass = {
-    emerald: "text-emerald-700 bg-emerald-50 border-emerald-100",
-    sky: "text-sky-700 bg-sky-50 border-sky-100",
-    rose: "text-rose-700 bg-rose-50 border-rose-100",
-    amber: "text-amber-700 bg-amber-50 border-amber-100",
+    emerald: "text-success bg-success/10 border-success/15",
+    sky: "text-info bg-info/10 border-info/15",
+    rose: "text-destructive bg-destructive/10 border-destructive/15",
+    amber: "text-warning bg-warning/10 border-warning/15",
   }[props.tone];
 
   return (
