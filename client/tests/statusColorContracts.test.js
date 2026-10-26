@@ -15,9 +15,11 @@ const targets = [
   "../src/pages/novels/components/chapterInsights/TimelinePanel.tsx",
   "../src/pages/novels/components/chapterInsights/ChapterExecutionReferencePanel.tsx",
   "../src/pages/novels/components/characterWorkspace/CharacterOverviewTab.tsx",
+  "../src/pages/novels/components/cover/NovelCoverDialog.tsx",
+  "../src/pages/novels/components/cover/NovelCoverCard.tsx",
 ];
 
-const PALETTE = /(?:slate|amber|emerald|sky|rose|red|green)-[0-9]{2,3}/;
+const PALETTE = /(?:slate|amber|emerald|sky|rose|red|green|violet)-[0-9]{2,3}|bg-white|text-slate|border-slate|ring-slate/;
 
 test("小说工作台状态组件使用语义 token", async () => {
   const offenders = [];

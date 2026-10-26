@@ -94,7 +94,7 @@ export function NovelCoverCard(props: NovelCoverCardProps) {
 
             <div className="space-y-3">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
+                <span className="rounded-full bg-success/10 px-3 py-1 text-xs font-medium text-success">
                   当前主封面
                 </span>
                 <span className="text-xs text-muted-foreground">共 {assets.length} 张候选图</span>

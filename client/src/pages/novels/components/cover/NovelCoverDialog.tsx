@@ -191,9 +191,9 @@ export function NovelCoverDialog(props: NovelCoverDialogProps) {
     : "原链路 Prompt";
   const currentSendModeClass = promptMode === "direct"
     ? (directPromptSource === "optimized"
-      ? "rounded-full bg-emerald-50 px-3 py-1 text-emerald-700"
-      : "rounded-full bg-amber-50 px-3 py-1 text-amber-700")
-    : "rounded-full bg-slate-100 px-3 py-1 text-slate-700";
+      ? "rounded-full bg-success/10 px-3 py-1 text-success"
+      : "rounded-full bg-warning/10 px-3 py-1 text-warning")
+    : "rounded-full bg-muted/30 px-3 py-1 text-muted-foreground";
 
   const activateDirectPrompt = (value: string, source: DirectPromptSource) => {
     setDirectPrompt(value);
@@ -326,9 +326,9 @@ export function NovelCoverDialog(props: NovelCoverDialogProps) {
         props.onOpenChange(nextOpen);
       }}
     >
-      <DialogContent className="flex max-h-[92vh] w-[96vw] max-w-[1120px] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white p-0">
-        <DialogHeader className="shrink-0 border-b border-slate-200 px-6 pb-4 pt-5">
-          <DialogTitle className="text-[22px] font-semibold tracking-tight text-slate-900">
+      <DialogContent className="flex max-h-[92vh] w-[96vw] max-w-[1120px] flex-col overflow-hidden rounded-2xl border border-border bg-background p-0">
+        <DialogHeader className="shrink-0 border-b border-border px-6 pb-4 pt-5">
+          <DialogTitle className="text-[22px] font-semibold tracking-tight text-foreground">
             生成小说封面主画面
             {promptContext.title ? `：${promptContext.title}` : ""}
           </DialogTitle>
@@ -336,7 +336,7 @@ export function NovelCoverDialog(props: NovelCoverDialogProps) {
 
         <div className="flex-1 space-y-4 overflow-y-auto px-6 py-5">
           {imageProviderOptions.length === 0 ? (
-            <section className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            <section className="rounded-2xl border border-warning/30 bg-warning/10 px-4 py-3 text-sm text-warning">
               <div className="font-medium">还不能开始生成</div>
               <div className="mt-1 leading-6">
                 当前没有已配置的图像模型。请先到
@@ -350,26 +350,26 @@ export function NovelCoverDialog(props: NovelCoverDialogProps) {
             </section>
           ) : null}
 
-          <section className="space-y-2 rounded-2xl border border-slate-200 bg-slate-50/65 p-4">
+          <section className="space-y-2 rounded-2xl border border-border bg-muted/40 p-4">
             <div className="space-y-1">
-              <div className="text-sm font-semibold text-slate-900">小说信息整理稿 / AI优化输入</div>
-              <div className="text-xs leading-5 text-slate-500">
+              <div className="text-sm font-semibold text-foreground">小说信息整理稿 / AI优化输入</div>
+              <div className="text-xs leading-5 text-muted-foreground">
                 系统已经根据当前小说基础信息整理了一版封面输入草稿。你可以直接改，也可以先点“AI优化Prompt”再继续手动调整。
               </div>
             </div>
             <textarea
-              className="min-h-[190px] max-h-[34vh] w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm leading-7 text-slate-900 shadow-sm outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+              className="min-h-[190px] max-h-[34vh] w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm leading-7 text-foreground shadow-sm outline-none transition focus:border-ring focus:ring-2 focus:ring-ring/40"
               placeholder="描述这本书想突出什么样的封面主画面。"
               value={sourcePrompt}
               onChange={(event) => updateSourcePrompt(event.target.value)}
             />
           </section>
 
-          <section className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <section className="rounded-2xl border border-border bg-background p-4 shadow-sm">
             <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
               <div className="space-y-2">
-                <div className="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">优化输出语言</div>
-                <div className="inline-flex w-full rounded-xl border border-slate-200 bg-slate-50 p-1 sm:w-auto">
+                <div className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">优化输出语言</div>
+                <div className="inline-flex w-full rounded-xl border border-border bg-muted/40 p-1 sm:w-auto">
                   <Button
                     type="button"
                     variant={optimizedPromptLanguage === "zh" ? "default" : "ghost"}
@@ -396,7 +396,7 @@ export function NovelCoverDialog(props: NovelCoverDialogProps) {
                   <Button
                     type="button"
                     variant="outline"
-                    className="whitespace-nowrap rounded-xl border-slate-300 bg-white px-4"
+                    className="whitespace-nowrap rounded-xl border-border bg-background px-4"
                     onClick={() => optimizeMutation.mutate()}
                     disabled={optimizeMutation.isPending || !sourcePrompt.trim()}
                   >
@@ -405,7 +405,7 @@ export function NovelCoverDialog(props: NovelCoverDialogProps) {
                   <Button
                     type="button"
                     variant="ghost"
-                    className="whitespace-nowrap rounded-xl px-4 text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+                    className="whitespace-nowrap rounded-xl px-4 text-muted-foreground hover:bg-muted/30 hover:text-foreground"
                     onClick={restoreOriginalChainPrompt}
                     disabled={promptMode !== "direct" && !hasDirectPrompt}
                   >
@@ -414,22 +414,22 @@ export function NovelCoverDialog(props: NovelCoverDialogProps) {
                 </div>
 
                 <div className="flex flex-wrap items-center gap-2 text-sm xl:justify-end">
-                  <span className="text-slate-500">当前发送模式</span>
+                  <span className="text-muted-foreground">当前发送模式</span>
                   <span className={currentSendModeClass}>{currentSendModeLabel}</span>
                 </div>
               </div>
             </div>
           </section>
 
-          <section className="space-y-2 rounded-2xl border border-slate-200 bg-slate-50/55 p-4">
+          <section className="space-y-2 rounded-2xl border border-border bg-muted/40 p-4">
             <div className="space-y-1">
-              <div className="text-sm font-semibold text-slate-900">最终发送 Prompt 预览</div>
-              <div className="text-xs leading-5 text-slate-500">
+              <div className="text-sm font-semibold text-foreground">最终发送 Prompt 预览</div>
+              <div className="text-xs leading-5 text-muted-foreground">
                 这里展示最终会发送给图像模型的 prompt。你可以直接编辑，也可以在 AI 优化后继续做细调。
               </div>
             </div>
             <textarea
-              className="min-h-[240px] max-h-[40vh] w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm leading-7 text-slate-900 shadow-sm outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+              className="min-h-[240px] max-h-[40vh] w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm leading-7 text-foreground shadow-sm outline-none transition focus:border-ring focus:ring-2 focus:ring-ring/40"
               value={finalPromptPreview}
               onChange={(event) => {
                 activateDirectPrompt(event.target.value, "manual");
@@ -439,22 +439,22 @@ export function NovelCoverDialog(props: NovelCoverDialogProps) {
 
           <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
             <input
-              className="rounded-xl border border-slate-200 bg-white p-3 text-sm shadow-sm outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 xl:col-span-2"
+              className="rounded-xl border border-border bg-background p-3 text-sm shadow-sm outline-none transition focus:border-ring focus:ring-2 focus:ring-ring/40 xl:col-span-2"
               placeholder="风格预设，例如：电影感插画，高辨识度"
               value={imageForm.stylePreset}
               onChange={(event) => updateStylePreset(event.target.value)}
             />
             <input
-              className="rounded-xl border border-slate-200 bg-white p-3 text-sm shadow-sm outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200 xl:col-span-2"
+              className="rounded-xl border border-border bg-background p-3 text-sm shadow-sm outline-none transition focus:border-ring focus:ring-2 focus:ring-ring/40 xl:col-span-2"
               placeholder="负向提示词，例如：文字、水印、低清晰度、畸形"
               value={imageForm.negativePrompt}
               onChange={(event) => setImageForm((prev) => ({ ...prev, negativePrompt: event.target.value }))}
             />
 
             <label className="space-y-1 text-sm">
-              <div className="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">模型厂商</div>
+              <div className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">模型厂商</div>
               <SelectControl
-                className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm shadow-sm outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+                className="h-11 w-full rounded-xl border border-border bg-background px-3 text-sm shadow-sm outline-none transition focus:border-ring focus:ring-2 focus:ring-ring/40"
                 value={imageForm.provider}
                 disabled={imageProviderOptions.length === 0}
                 onChange={(event) =>
@@ -475,9 +475,9 @@ export function NovelCoverDialog(props: NovelCoverDialogProps) {
             </label>
 
             <label className="space-y-1 text-sm">
-              <div className="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">尺寸</div>
+              <div className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">尺寸</div>
               <SelectControl
-                className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm shadow-sm outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+                className="h-11 w-full rounded-xl border border-border bg-background px-3 text-sm shadow-sm outline-none transition focus:border-ring focus:ring-2 focus:ring-ring/40"
                 value={imageForm.size}
                 onChange={(event) =>
                   setImageForm((prev) => ({
@@ -492,9 +492,9 @@ export function NovelCoverDialog(props: NovelCoverDialogProps) {
             </label>
 
             <label className="space-y-1 text-sm">
-              <div className="text-xs font-medium uppercase tracking-[0.14em] text-slate-400">生成张数</div>
+              <div className="text-xs font-medium uppercase tracking-[0.14em] text-muted-foreground">生成张数</div>
               <SelectControl
-                className="h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm shadow-sm outline-none transition focus:border-slate-400 focus:ring-2 focus:ring-slate-200"
+                className="h-11 w-full rounded-xl border border-border bg-background px-3 text-sm shadow-sm outline-none transition focus:border-ring focus:ring-2 focus:ring-ring/40"
                 value={String(imageForm.count)}
                 onChange={(event) =>
                   setImageForm((prev) => ({
@@ -538,7 +538,7 @@ export function NovelCoverDialog(props: NovelCoverDialogProps) {
           ) : null}
 
           {activeTask ? (
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
+            <div className="rounded-2xl border border-border bg-muted/40 px-4 py-3 text-sm">
               <div>当前任务状态：{IMAGE_STATUS_TEXT[activeTask.status] ?? activeTask.status}</div>
               {activeTask.error ? (
                 <div className="mt-1 text-xs text-destructive">{activeTask.error}</div>
@@ -546,24 +546,24 @@ export function NovelCoverDialog(props: NovelCoverDialogProps) {
             </div>
           ) : null}
 
-          <section className="space-y-3 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
+          <section className="space-y-3 rounded-2xl border border-border bg-background p-4 shadow-sm">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <div className="text-sm font-semibold text-slate-900">封面图库</div>
-                <div className="text-xs leading-5 text-slate-500">
+                <div className="text-sm font-semibold text-foreground">封面图库</div>
+                <div className="text-xs leading-5 text-muted-foreground">
                   生成成功后会自动回到这里。第一张成功图会在当前没有主封面时自动设为主图。
                 </div>
               </div>
             </div>
 
             {assetsQuery.isLoading ? (
-              <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-8 text-sm text-slate-500">
+              <div className="rounded-xl border border-dashed border-border bg-muted/40 px-4 py-8 text-sm text-muted-foreground">
                 正在读取封面图库...
               </div>
             ) : null}
 
             {!assetsQuery.isLoading && assets.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 py-8 text-sm text-slate-500">
+              <div className="rounded-xl border border-dashed border-border bg-muted/40 px-4 py-8 text-sm text-muted-foreground">
                 还没有封面图。先提交一次生成任务，成功后会出现在这里。
               </div>
             ) : null}
@@ -571,8 +571,8 @@ export function NovelCoverDialog(props: NovelCoverDialogProps) {
             {assets.length > 0 ? (
               <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 {assets.map((asset) => (
-                  <div key={asset.id} className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50/60 p-3">
-                    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white">
+                  <div key={asset.id} className="space-y-3 rounded-2xl border border-border bg-muted/40 p-3">
+                    <div className="overflow-hidden rounded-xl border border-border bg-background">
                       <div className="aspect-[2/3] w-full">
                         <img
                           src={resolveImageAssetUrl(asset.url)}
@@ -585,18 +585,18 @@ export function NovelCoverDialog(props: NovelCoverDialogProps) {
 
                     <div className="flex flex-wrap items-center gap-2">
                       <span className={asset.isPrimary
-                        ? "rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"
-                        : "rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-700"}
+                        ? "rounded-full bg-success/10 px-3 py-1 text-xs font-medium text-success"
+                        : "rounded-full bg-muted/30 px-3 py-1 text-xs font-medium text-muted-foreground"}
                       >
                         {asset.isPrimary ? "当前主封面" : "候选图"}
                       </span>
-                      <span className="text-xs text-slate-500">
+                      <span className="text-xs text-muted-foreground">
                         {asset.width && asset.height ? `${asset.width} x ${asset.height}` : "尺寸待定"}
                       </span>
                     </div>
 
                     {asset.localPath ? (
-                      <div className="text-[11px] leading-5 text-slate-500 break-all">
+                      <div className="text-[11px] leading-5 text-muted-foreground break-all">
                         本地路径：{asset.localPath}
                       </div>
                     ) : null}
