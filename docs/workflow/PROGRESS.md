@@ -30,6 +30,7 @@
   5. **恢复手册去实现化**:recovery-by-phase 的 waiting approval / taskId / checkpointType / stale 等内部说法改为页面可见语言;troubleshooting 移除面向开发者的架构规则;task-center 队列章节加「开发者参考」定位;vibe-coding 页注明面向维护者。
   6. **README**:最新更新块与 release-notes 对齐到 2026-10-26(并修正"安全"小节混入修复项的错位);6 处改口式/开发者向表述清理;文档计数补充"另有完整版本更新历史"。
   7. **release-notes 收尾**:按日期拆分 10-25/10-26 块并清除"不再/现在"式叙述(此前工作区遗留改动,本轮核验后纳入提交)。
+  8. **wiki**:新增 `docs/wiki/product/public-docs-maintenance.md` —— 对外文档维护规则(manifest 登记与 slug 守卫、术语以 UI 为准、流程变更全量同步、截图与主密钥备份要求、技术文档边界)。
 - **验证**:
   - 全量相对链接复检:35 个 md(34 docs/public + README)**ALL LINKS OK**,图片目标全部存在;
   - `pnpm check:docs-manifest`:35 文档登记 / 35 可寻址 id / 17 导演阶段 key;负向注入坏 slug 时正确失败;
