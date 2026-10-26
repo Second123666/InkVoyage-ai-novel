@@ -24,10 +24,11 @@
 - **诊断**: ① 编辑 `server/src` 或 `shared` 时 ts-node-dev / tsc watch **正常重启**,日志频繁但只在保存文件时出现;② `dev:raw` 同时启动 client,服务端 ts-node 编译期间 Vite 对 `/api/health` 连续打印 `ECONNREFUSED`;③ Node 24 对 `run-with-log` 的“args 数组 + shell:true”报 `DEP0190`;④ 导演跟进/运行记录按设计每 3–4 秒轮询,用于实时状态。
 - **改动**:
   1. `dev:raw` 的 client 改为 `dev:client:wait`(先等 3000 端口就绪再启动 Vite),消除启动期代理报错;
-  2. `scripts/run-with-log.cjs` 改为显式拼接命令行后交给 shell,保留 Windows `pnpm.cmd` 解析,消除 `DEP0190` 弃用告警。
-- **验证**: `pnpm dev` 启动后 server/client 均 200;**启动阶段 `http proxy error` 0 条、`DEP0190` 0 条**;文件保存触发的重启与轮询日志仍为预期行为。
+  2. `scripts/run-with-log.cjs` 改为显式拼接命令行后交给 shell,保留 Windows `pnpm.cmd` 解析,消除 `DEP0190` 弃用告警;
+  3. 根 `dev` 在启动并发进程前先执行 `server/scripts/stop-stale-dev-server.cjs` —— 修复“旧服务端仍占 3000 → wait-for-port 误判就绪 → 旧进程被杀 → 新服务端编译期代理报错”的启动竞态(2026-10-26 日志复现)。
+- **验证**: `pnpm dev` 启动后 server/client 均 200;无旧进程时启动阶段 `http proxy error` 0 条、`DEP0190` 0 条;文件保存触发的重启与轮询日志仍为预期行为。
 - **发布说明**: 开发体验修复,无产品行为变化,跳过。
-- **遗留**: 轮询频率与 `ts-node-dev` 重启日志属设计内行为;如需更安静的日常开发,可单独跑 `pnpm dev:server` / `pnpm dev:client:wait`。
+- **遗留**: 轮询频率与 `ts-node-dev` 重启日志属设计内行为;Windows 下 Ctrl+C 的 `终止批处理操作吗(Y/N)` 是 `cmd.exe` 对嵌套 `pnpm.cmd` 的正常提示(乱码为控制台编码),需逐层确认或使用 Windows Terminal/chcp 65001;如需更安静的日常开发,可单独跑 `pnpm dev:server` / `pnpm dev:client:wait`。
 
 ## 2026-10-26 · LOOP-63 · docs 收尾:删除过时计划、合并重复指南、补全 wiki 索引
 
