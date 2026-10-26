@@ -1,0 +1,43 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import { readFile } from "node:fs/promises";
+
+// UI-1 第六批 · 小说工作台状态组件色守卫(LOOP-42)
+// 规则:章节执行流、流水线标签页、伏笔账本卡的状态一律语义 token,不得残留调色板状态色。
+
+const targets = [
+  "../src/pages/novels/components/ChapterExecutionStatusFlow.tsx",
+  "../src/pages/novels/components/PipelineTab.tsx",
+  "../src/pages/novels/components/BookPayoffLedgerCard.tsx",
+];
+
+const PALETTE = /(?:slate|amber|emerald|sky|rose|red|green)-[0-9]{2,3}/;
+
+test("小说工作台状态组件使用语义 token", async () => {
+  const offenders = [];
+  for (const rel of targets) {
+    const source = await readFile(new URL(rel, import.meta.url), "utf8");
+    source.split(/\r?\n/).forEach((line, index) => {
+      if (PALETTE.test(line)) {
+        offenders.push(`${rel.split("/components/").pop()}:${index + 1}`);
+      }
+    });
+  }
+  assert.deepEqual(offenders, [], `以下行需改用语义 token:${offenders.join(", ")}`);
+});
+
+test("状态语义正确:进行中/完成/逾期/已兑现/失败各有 token", async () => {
+  const flow = await readFile(new URL(targets[0], import.meta.url), "utf8");
+  assert.match(flow, /border-info\/40 bg-info\/10 text-info/, "进行中用 info");
+  assert.match(flow, /border-success\/40 bg-success\/10 text-success/, "完成用 success");
+
+  const pipeline = await readFile(new URL(targets[1], import.meta.url), "utf8");
+  assert.match(pipeline, /text-destructive/, "错误信息用 destructive");
+  assert.match(pipeline, /border-success\/30 bg-success\/10/, "完成态用 success");
+  assert.match(pipeline, /border-destructive\/40 bg-destructive\/10/, "失败态用 destructive");
+  assert.match(pipeline, /bg-warning\/10/, "缺角色提示用 warning");
+
+  const ledger = await readFile(new URL(targets[2], import.meta.url), "utf8");
+  assert.match(ledger, /border-warning\/40 bg-warning\/10 text-warning/, "逾期用 warning");
+  assert.match(ledger, /border-success\/40 bg-success\/10 text-success/, "已兑现用 success");
+});

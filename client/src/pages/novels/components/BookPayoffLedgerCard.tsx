@@ -60,13 +60,13 @@ function payoffStatusVariant(status: string): "default" | "secondary" | "outline
 
 function payoffStatusTone(status: string): string {
   if (status === "overdue") {
-    return "border-amber-300 bg-amber-50 text-amber-900";
+    return "border-warning/40 bg-warning/10 text-warning";
   }
   if (status === "paid_off") {
-    return "border-emerald-300 bg-emerald-50 text-emerald-900";
+    return "border-success/40 bg-success/10 text-success";
   }
   if (status === "failed") {
-    return "border-slate-300 bg-slate-100 text-slate-700";
+    return "border-border/60 bg-muted/40 text-muted-foreground";
   }
   return "";
 }

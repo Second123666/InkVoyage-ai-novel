@@ -13,20 +13,20 @@ interface ChapterExecutionStatusFlowProps {
 
 function toneClassName(status: ChapterExecutionFlowStageStatus, isCurrent: boolean): string {
   if (isCurrent) {
-    return "border-sky-300 bg-sky-50 text-sky-800";
+    return "border-info/40 bg-info/10 text-info";
   }
   if (status === "done") {
-    return "border-emerald-200 bg-emerald-50 text-emerald-800";
+    return "border-success/40 bg-success/10 text-success";
   }
   return "border-border/70 bg-background text-muted-foreground";
 }
 
 function dotClassName(status: ChapterExecutionFlowStageStatus, isCurrent: boolean): string {
   if (isCurrent) {
-    return "bg-sky-500";
+    return "bg-info";
   }
   if (status === "done") {
-    return "bg-emerald-500";
+    return "bg-success";
   }
   return "bg-muted-foreground/30";
 }

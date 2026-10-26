@@ -181,7 +181,7 @@ export default function PipelineTab(props: PipelineTabProps) {
         <CardContent className="space-y-3 px-0 pt-5">
           <WorldInjectionHint worldInjectionSummary={worldInjectionSummary} />
           {!hasCharacters ? (
-            <div className="flex items-center justify-between gap-2 rounded-2xl bg-amber-50 px-4 py-3 text-xs text-amber-800">
+            <div className="flex items-center justify-between gap-2 rounded-lg bg-warning/10 px-4 py-3 text-xs text-warning">
               <span>请先添加至少 1 个角色，再执行流水线。</span>
               <Button size="sm" variant="outline" onClick={onGoToCharacterTab}>去角色管理</Button>
             </div>
@@ -392,9 +392,9 @@ export default function PipelineTab(props: PipelineTabProps) {
                         state === "active"
                           ? "border-primary bg-primary/10"
                           : state === "completed"
-                            ? "border-emerald-500/30 bg-emerald-500/10"
+                            ? "border-success/30 bg-success/10"
                             : state === "failed"
-                              ? "border-red-400/40 bg-red-500/10"
+                              ? "border-destructive/40 bg-destructive/10"
                               : "border-border bg-background"
                       }`}
                     >
@@ -456,7 +456,7 @@ export default function PipelineTab(props: PipelineTabProps) {
                       <div>完成：{pipelineJob.completedCount}/{pipelineJob.totalCount}</div>
                       <div>重试：{pipelineJob.retryCount}/{pipelineJob.maxRetries}</div>
                       {pipelineJob.lastErrorType ? <div>失败分类：{pipelineJob.lastErrorType}</div> : null}
-                      {pipelineJob.error ? <div className="text-red-600">错误：{pipelineJob.error}</div> : null}
+                      {pipelineJob.error ? <div className="text-destructive">错误：{pipelineJob.error}</div> : null}
                     </div>
                   ) : (
                     <div className="text-muted-foreground">暂无运行中的流水线任务。</div>
