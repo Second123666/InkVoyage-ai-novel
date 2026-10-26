@@ -58,7 +58,8 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 47. ~~**LOOP-47 RF-3 密钥存储加固**~~ ✅ 完成(2026-10-26):AES-256-GCM 加密落库 + 启动幂等迁移,守卫 5 条,server 1462/1450/0。
 48. ~~**LOOP-48 RF-4 文档一致性清理**~~ ✅ 完成(2026-10-26):519 引用校验,修复 11 个失效引用,剩余 3 项为环境文件/构建产物。
 49. ~~**LOOP-49 RF-5 依赖面收敛**~~ ✅ 完成(2026-10-26):运行时环 0(假环为类型边),RAG 单例惰性化,守卫 2 条,server 1464/1452/0。
-50. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **OPS-3(LICENSE/NOTICE/CLA)** 或 OPS-4(对外文档审校);UI-6(promptWorkbench 主题、可视化分类色)、UI-7 可视化增量、BUG-7 仍需所有者决策/排期。
+50. ~~**LOOP-50 OPS-3 许可与归属梳理**~~ ✅ 完成(2026-10-26):NOTICE 衍生声明 + README + wiki + 守卫 4 条。
+51. **所有者指示(2026-10-20):此后按 BACKLOG 顺序执行** → 下一项 **OPS-4 对外文档审校**;其后 UI-6(promptWorkbench 主题、可视化分类色)、UI-7 可视化增量、BUG-7、OPS-1/2 仍需所有者决策/排期。
     **完成项打勾规则(2026-10-20 所有者要求)**:每轮收尾同步更新 BACKLOG —— 完成项 `[x]` + ✅,进行中 `[/]`,入口建议划线。
 
 ---
@@ -277,5 +278,6 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
   删 `refs/remotes/upstream/*` + `git gc --prune=now`,复检历史无旧 key;遵守红线(绝不 push --all/--mirror)。
 - [ ] **OPS-2 品牌与命名定稿** · S · P2
   是否改项目名、README/介绍站/包名统一表述;由所有者拍板。
-- [ ] **OPS-3 LICENSE / NOTICE / CLA 归属梳理** · S · P2。
+- [x] **OPS-3 LICENSE / NOTICE / CLA 归属梳理** · S · P2(= LOOP-50,2026-10-26 完成) ✅
+  结果:审计确认许可栈完整(LICENSE 双许可 + AGPL 全文、CLA 版权保留 + 商业再许可、CONTRIBUTING、5 包 license 一致);NOTICE 补充「独立衍生」声明与上游保留条款,README 同步;新增 wiki `product/licensing-and-attribution.md` 与守卫 `server/tests/licensing.test.js`(4 条)。
 - [ ] **OPS-4 对外文档审校** · S · P3。
