@@ -42,4 +42,4 @@
 - `server/src/services/novel/director/workflowStepRuntime/directorPlanningStepModules.ts`
 - `server/src/services/novel/director/recovery/novelDirectorRecovery.ts`
 - `server/src/services/novel/worldContext/WorldContextGateway.ts`
-- `client/src/pages/novels/components/NovelAutoDirectorSetupPanel.tsx`
+- `client/src/pages/novels/components/DirectorTakeoverEntryPanel.tsx`

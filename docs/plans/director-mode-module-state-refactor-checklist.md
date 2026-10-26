@@ -2,6 +2,10 @@
 
 更新日期：2026-05-05
 
+> **历史计划说明(RF-4 文档一致性,2026-10-26)**:本文是当时的收口清单,文中代码路径以当时结构为准;
+> 后续导演模块已按 `commands/`、`runtime/`、`automation/`、`phases/` 等责任子目录重组。
+> 当前目录边界以 wiki `architecture/director-takeover-module.md` 与 `workflows/auto-director-runtime.md` 为准。
+
 本文基于当前 `beta` 分支代码、最近一轮导演模式 Worker / Command / Projection 改造，以及现有自动导演重构计划整理。它不是新的愿景文档，而是下一轮开发的收口清单：把“自动导演、继续执行、恢复、接管”统一收敛到同一个 Pipeline Engine，让步骤模块真正拥有输入、输出、进度检查和恢复契约。
 
 ## 1. 当前结论
@@ -282,13 +286,13 @@ chapter.execution
 
 当前超阈值或接近阈值的重点文件包括：
 
-- `server/src/services/novel/director/novelDirectorTakeover.ts`
-- `server/src/services/novel/director/novelDirectorAutoExecutionRuntime.ts`
+- `server/src/services/novel/director/runtime/novelDirectorTakeover.ts`
+- `server/src/services/novel/director/automation/novelDirectorAutoExecutionRuntime.ts`
 - `server/src/services/novel/director/runtime/DirectorWorkspaceAnalyzer.ts`
-- `server/src/services/novel/director/DirectorRuntimeExecutionService.ts`
 - `server/src/services/novel/director/NovelDirectorService.ts`
 - `server/src/services/novel/director/runtime/DirectorRuntimeStore.ts`
-- `server/src/services/novel/director/DirectorCommandService.ts`
+- `server/src/services/novel/director/commands/DirectorCommandService.ts`
+  （原清单中的 `DirectorRuntimeExecutionService.ts` 已并入 NovelDirectorService / pipeline runtime,现无同名文件。）
 - `server/src/services/novel/director/runtime/DirectorEventProjectionService.ts`
 
 任务：

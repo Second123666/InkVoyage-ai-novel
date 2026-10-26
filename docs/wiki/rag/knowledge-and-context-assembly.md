@@ -87,7 +87,7 @@
 
 - `server/src/services/rag/`
 - `server/src/services/knowledge/`
-- `server/src/services/bookAnalysis/bookAnalysis.publish.facets.ts`
+- `server/src/services/bookAnalysis/publish/bookAnalysis.publish.facets.ts`
 - `server/src/services/novel/runtime/GenerationContextAssembler.ts`
 - `server/src/services/novel/runtime/context/layeredMemoryContext.ts`(分层记忆纯函数)
 - `server/src/prompting/prompts/novel/context/chapterContextBlocks.ts`(分层记忆块)

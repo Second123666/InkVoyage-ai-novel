@@ -17,6 +17,21 @@
 
 ---
 
+## 2026-10-26 · LOOP-48 · RF-4 文档一致性清理
+
+- **类别**: 文档 / 重构收尾(RF 线;主对话执行)
+- **目标**: RF-4 —— `docs/` 与代码引用对齐。
+- **审计方法**: 扫描 160 个 markdown 文件的 519 个仓库内路径引用 + 相对链接,逐一校验存在性。
+- **修复**:
+  1. `auto-director-runtime.md`:4 个导演模块路径更新到 `commands/`、`runtime/` 子目录;
+  2. `knowledge-and-context-assembly.md`:`bookAnalysis.publish.facets.ts` → `bookAnalysis/publish/…`;
+  3. `auto-director-world-setup.md`:`NovelAutoDirectorSetupPanel.tsx` → `DirectorTakeoverEntryPanel.tsx`;
+  4. `director-mode-module-state-refactor-checklist.md`:路径同步到现结构,`DirectorRuntimeExecutionService.ts` 标注"已并入 NovelDirectorService / pipeline runtime",并在文首加历史计划说明(不篡改记录语义)。
+- **结果**: 519 个引用中失效项从 15 降至 **3**,且剩余 3 项均为设计上不在仓库内/构建产物(`client/.env`、`client/.env.local`、`site/dist`);相对链接无失效(1 条为绝对 URL 误报)。
+- **验证**: 纯文档改动,未跑测试;引用扫描脚本零真实失效。server/client 未动。
+- **发布说明**: 纯内部文档整理,无用户可见变化,按规则跳过。
+- **下一步**: **LOOP-49 = OPS-3(LICENSE/NOTICE/CLA 梳理)** 或 OPS-4(对外文档审校);UI-6 / UI-7 / BUG-7 仍等所有者决策。
+
 ## 2026-10-26 · LOOP-47 · RF-3 密钥存储加固(API Key 加密落库)
 
 - **类别**: 安全 / 重构(RF 线;主对话执行)

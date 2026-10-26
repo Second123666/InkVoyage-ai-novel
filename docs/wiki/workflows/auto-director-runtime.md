@@ -205,10 +205,10 @@ Web API 只接收命令和返回轻量投影；Worker 负责执行重型生产�
 
 ## 相关模块
 
-- `server/src/services/novel/director/DirectorCommandService.ts`
-- `server/src/services/novel/director/DirectorCommandExecutor.ts`
-- `server/src/services/novel/director/DirectorCommandInterpreter.ts`
-- `server/src/services/novel/director/directorSubsystem.ts`
+- `server/src/services/novel/director/commands/DirectorCommandService.ts`
+- `server/src/services/novel/director/commands/DirectorCommandExecutor.ts`
+- `server/src/services/novel/director/commands/DirectorCommandInterpreter.ts`
+- `server/src/services/novel/director/runtime/directorSubsystem.ts`
 - `server/src/services/novel/director/runtime/`
 - `server/src/services/novel/director/workflowStepRuntime/`
 - `server/src/workers/`
