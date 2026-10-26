@@ -17,6 +17,22 @@
 
 ---
 
+## 2026-10-26 · LOOP-54 · UI-7① 故事时间线视图
+
+- **类别**: UI / 创新增量(可视化;主对话执行;UI-7 收官)
+- **目标**: UI-7 第一项 —— 小说级故事时间线可视化与伏笔追踪。
+- **改动**:
+  1. 共享契约 `StoryTimelineOverview`(事件 + 伏笔 + 截断统计);
+  2. 服务端只读端点 `GET /api/story-timeline/:novelId`(归位 `modules/timeline/http`):repository 新增 `listEventsForNovel` / `listHooksForNovel`(limit+1 判定截断),service 聚合;
+  3. 客户端纯函数 `buildStoryTimelineGraph`:章节分列、事件按 eventOrder 排列、前置/后续依赖边去重;状态/类型/来源/可见性中文标签;
+  4. `StoryTimelineCanvas`(React Flow):章节时间轴、依赖边(虚线前置/实线后续)、点击事件查看详情;
+  5. 页面 `/novels/:id/story-timeline`:状态筛选、未回收伏笔列表(优先级排序 + 到期未回收标记)、截断提示;小说工作区「项目工具」入口;移动端路由与 CSS 合同;
+  6. 守卫测试:client 3 条(布局/依赖边/接入与移动端)、server 2 条(投影聚合与截断、只读路由)。
+- **验证**: shared build ✅;client typecheck 0 错误、client **278/278**;server **1470 测试 / 1458 过 / 0 失败 / 12 跳过**。UI 视觉验收留待所有者。
+- **发布说明**: 用户可见,已记 release-notes/README(2026-10-26 新增)。
+- **遗留**: UI-7 整项完成;RAG 追踪图表暂缓(数据在检索追踪页,可另立)。
+- **下一步**: UI-8 截图刷新(需真实数据环境)。
+
 ## 2026-10-26 · LOOP-53 · UI-7② 自动导演工作流步骤图(React Flow + dagre)
 
 - **类别**: UI / 创新增量(可视化;主对话执行)
