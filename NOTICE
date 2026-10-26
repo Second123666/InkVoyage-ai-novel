@@ -1,6 +1,11 @@
 AI Novel Writing Assistant 2
 Copyright 2026 ExplosiveCoderflome and contributors
 
+This repository is an independently maintained derivative of the upstream
+"AI-Novel-Writing-Assistant" project. Upstream copyright notices and license
+terms are preserved. Modifications and new contributions made in this
+repository are Copyright 2026 this repository's maintainers and contributors.
+
 This repository uses a dual-license model.
 
 By default, this repository is distributed under the GNU Affero General Public
