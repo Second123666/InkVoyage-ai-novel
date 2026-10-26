@@ -17,6 +17,26 @@
 
 ---
 
+## 2026-10-26 · LOOP-42 · UI-1 第六批(启动):全站验收扫描 + 状态组件色迁移
+
+- **类别**: UI / 流程(设计系统落地;主对话执行)
+- **目标**: UI-1 第六批「全站一致性验收」—— 先扫描量化,再按安全分组逐批迁移。
+- **全站扫描结论**:181 处 hex + 990 处调色板色,**并非全部可机械替换**:
+  - `promptWorkbench` 6 文件 137 处 hex = 自定义绿色编辑器主题(40+ 色阶)→ 属 UI-6 同类设计决策;
+  - 可视化画布(关系图/世界图谱/紧张度)节点色 = 分类色 → 与 UI-6 同源;
+  - 其余为散落状态色 → 可安全分组迁移。
+  已在 rollout 第六批加分批说明,避免后续盲目全站扫描。
+- **改动(本轮安全分组:小说工作台状态组件)**:
+  1. `ChapterExecutionStatusFlow`:进行中→info、完成→success;
+  2. `PipelineTab`:完成态→success、失败态→destructive、缺角色提示→warning、错误文案→text-destructive,圆角 rounded-2xl→rounded-lg;
+  3. `BookPayoffLedgerCard`:逾期→warning、已兑现→success、failed 保持中性→muted(不升级为 destructive,保持原意图);
+  4. 守卫 `statusColorContracts.test.js`(2 条:三组件无调色板残留 + 语义正确)。
+- **计划纠偏**:rollout 阶段状态 第四批/第五批 由「待开始」改为**完成**(LOOP-38 / 39-41 实际已交付)。
+- **验证**: client typecheck 0 错误;守卫 2/2;client **267/267**。server 未动。
+- **发布说明**: 状态色一致性细微改进,按规则跳过(与 UI-2 主题层一起验收)。
+- **残留**: 第六批其余分组(散落状态色逐组)、需决策项(promptWorkbench 自定义主题、可视化分类色 = UI-6)、`.mobile-route-*` 兜底迁移(独立工程)。
+- **下一步**: **LOOP-43 = 第六批下一组状态色** 或 **UI-5 开源 Showcase**;UI-6 / BUG-7 等所有者决策。
+
 ## 2026-10-26 · LOOP-41 · UI-1 第五批:章节编辑器圆角与状态色收敛
 
 - **类别**: UI(设计系统落地;主对话执行)
