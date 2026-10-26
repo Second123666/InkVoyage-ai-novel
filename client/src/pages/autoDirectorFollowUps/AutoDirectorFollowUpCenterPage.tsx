@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { lazy, Suspense, useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type {
   AutoDirectorAction,
@@ -41,6 +41,9 @@ import {
 import { resolveInternalNavigationTarget } from "@/lib/internalNavigation";
 import { AUTO_DIRECTOR_MOBILE_CLASSES } from "@/mobile/autoDirector";
 import { Activity, RefreshCw, ShieldAlert } from "lucide-react";
+
+// UI-7 工作流步骤图:React Flow 画布按需懒加载,不进入导演跟进主界面首屏。
+const WorkflowStepGraphCanvas = lazy(() => import("./components/WorkflowStepGraphCanvas"));
 
 const TASK_STATUSES: readonly TaskStatus[] = [
   "queued",
@@ -120,6 +123,7 @@ export default function AutoDirectorFollowUpCenterPage() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [selectedDirectorTaskIds, setSelectedDirectorTaskIds] = useState<string[]>([]);
+  const [workflowGraphOpen, setWorkflowGraphOpen] = useState(false);
 
   const selectedDirectorTaskId = searchParams.get("directorTaskId")?.trim() || searchParams.get("taskId")?.trim() || "";
   const section = parseEnumParam(searchParams.get("section"), AUTO_DIRECTOR_FOLLOW_UP_SECTIONS);
@@ -210,6 +214,11 @@ export default function AutoDirectorFollowUpCenterPage() {
   const selectedItems = useMemo(
     () => items.filter((item) => selectedDirectorTaskIds.includes(item.directorTaskId)),
     [items, selectedDirectorTaskIds],
+  );
+
+  const selectedFollowUpItem = useMemo(
+    () => items.find((item) => item.directorTaskId === selectedDirectorTaskId) ?? null,
+    [items, selectedDirectorTaskId],
   );
 
   const batchActionCode = useMemo(() => {
@@ -528,6 +537,35 @@ export default function AutoDirectorFollowUpCenterPage() {
         onClear={() => setSelectedDirectorTaskIds([])}
         onExecute={handleExecuteBatch}
       />
+
+      <section className="rounded-xl bg-muted/20 p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <div className="text-sm font-medium text-foreground">工作流步骤图</div>
+            <div className="mt-0.5 text-xs text-muted-foreground">
+              按阶段查看自动导演的步骤依赖;选中跟进任务后,图中会高亮该任务当前阶段的步骤。
+            </div>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => setWorkflowGraphOpen((open) => !open)}
+          >
+            {workflowGraphOpen ? "收起步骤图" : "查看步骤图"}
+          </Button>
+        </div>
+        {workflowGraphOpen ? (
+          <div className="mt-3">
+            <Suspense fallback={<div className="rounded-xl bg-background p-4 text-xs text-muted-foreground">正在加载步骤图…</div>}>
+              <WorkflowStepGraphCanvas
+                highlightCheckpoint={selectedFollowUpItem?.checkpointType ?? null}
+                highlightStage={selectedFollowUpItem?.currentStage ?? null}
+              />
+            </Suspense>
+          </div>
+        ) : null}
+      </section>
     </div>
   );
 }
