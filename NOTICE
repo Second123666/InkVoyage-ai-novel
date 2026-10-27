@@ -28,5 +28,7 @@ Commercial cooperation:
 
 Third-party notices:
   Dependencies are declared in the workspace package manifests and remain
-  subject to their own licenses. Third-party assets added later must record
-  their source and license here or in the relevant directory.
+  subject to their own licenses. UI primitives adapted from shadcn/ui are
+  covered by the MIT notice in THIRD_PARTY_NOTICES.md. Third-party assets
+  added later must record their source and license here or in the relevant
+  directory.

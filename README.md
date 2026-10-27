@@ -181,6 +181,7 @@ images/   README 与公开文档截图
 
 - 本项目是上游 `AI-Novel-Writing-Assistant` 的独立衍生版本，上游版权声明与许可条款保留；本仓库的修改与新贡献归当前维护者与贡献者。
 - 商业合作可以联系项目维护者，但开源许可不因商业合作而改变；使用、修改或分发本项目时，请遵守 AGPL-3.0-only。
+- 第三方组件与素材许可见 [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md)。
 - 新贡献默认按 [CLA.md](./CLA.md) 提交，并随项目按 AGPL-3.0-only 分发。
 
 ## 最新更新

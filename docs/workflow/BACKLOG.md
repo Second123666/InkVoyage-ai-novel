@@ -68,7 +68,7 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 57. ~~**LOOP-59 OPS-2 品牌与身份统一**~~ ✅ 已完成(2026-10-26):更名「墨航 InkVoyage」,自有仓库/Pages/下载入口统一,内部技术标识保持稳定。
 58. ~~**LOOP-60 INN-A1b 第一批**~~ ✅ 已完成(2026-10-26):注入保底/排序/上限、风险信号透传、逾期 payoff 语义、遥测、sync_stale、planner 回退、版本钉住修复。
 59. ~~**LOOP-61 INN-A1b 第二、三批**~~ ✅ 已完成(2026-10-26):伏笔卡片筛选/跳转/窗口编辑/重新同步、验收字段接线、Markdown 伏笔清单;INN-A1b 整项完成。
-60. ~~**LOOP-65 OPS-5 公开前许可与旧品牌素材清理**~~ ✅ 已完成(2026-10-26):LICENSE 回归纯 AGPL、NOTICE 署名与许可说明、CLA/CONTRIBUTING 同步、删除无许可归属的 shadcn-ui skill、移除旧品牌截图与文档引用、重做社交预览;远端 67 tags 待删除。
+60. ~~**LOOP-65 OPS-5 公开前许可与旧品牌素材清理**~~ ✅ 已完成(2026-10-26):LICENSE 回归纯 AGPL、NOTICE 署名与许可说明、CLA/CONTRIBUTING 同步、补 shadcn/ui UI 组件 MIT 归属、删除无许可归属的 shadcn-ui skill、移除旧品牌截图与文档引用、重做社交预览;远端 67 tags 已删除。
 61. **剩余**:UI-8 尾图由所有者自行补拍;公开前远端 67 个旧 tag 由所有者确认删除;其余待办均已闭环。
     **完成项打勾规则(2026-10-20 所有者要求)**:每轮收尾同步更新 BACKLOG —— 完成项 `[x]` + ✅,进行中 `[/]`,入口建议划线。
 
@@ -80,7 +80,7 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 - **质量基线**:server 全量 `1484 / 1472 过 / 0 失败 / 12 跳过`;client `283/283`;client/site/desktop typecheck 绿;`check:docs-manifest` 与公开文档相对链接校验通过。
 - **转公开前置(2026-10-26)**:本地许可与素材清理已完成(LOOP-65);远端 GitHub 的 67 个上游旧 tag 已删除并复核为 0(删除前清单见 `.logs/github-tags-before-delete-2026-10-26.txt`);剩余需在 GitHub 页面核对并删除旧 Releases,再切换仓库可见性;只推 `main`(红线:绝不 `push --all` / `--mirror`)。
 - **归属收尾(LOOP-62)**:sitemap/prerender 生成器、LICENSE/CLA/CONTRIBUTING 标题、桌面构建默认 owner/repo 已统一;README 上游捐赠/QQ 群段已移除,改为 GitHub Issues;上游版权与 AGPL 归属按许可证保留。
-- **许可收尾(LOOP-65)**:LICENSE 回归纯 AGPL-3.0 原文;NOTICE 改为正式署名与上游历史许可说明;CLA/CONTRIBUTING 去掉商业再许可承诺;删除无独立许可归属的 shadcn-ui skill 与 `skills-lock.json`;许可守卫扩至 6 条。
+- **许可收尾(LOOP-65)**:LICENSE 回归纯 AGPL-3.0 原文;NOTICE 改为正式署名与上游历史许可说明;CLA/CONTRIBUTING 去掉商业再许可承诺;`THIRD_PARTY_NOTICES.md` 补 shadcn/ui UI 组件 MIT 归属;删除无独立许可归属的 shadcn-ui skill 与 `skills-lock.json`;许可守卫扩至 7 条。
 - **素材收尾**:此前清理 23 个未引用 tracked 文件;本轮再删除 13 张旧品牌截图(角色库/知识库/导演模式 5 张 + 自动导演流程截图 8 张),并重做 3 张社交预览;`TASK.md` 重写为当前路线(无私有分支信息)。
 - **文档收尾(LOOP-63)**:删除 1 篇过时计划与 1 篇重复开发指南(独有命令并入 README),docs 文档 161 → 159;`docs/wiki/README.md` 索引由 19 篇补全到 84 篇;全库文档链接与 manifest 校验通过。
 - **推送状态**:本地 `main` 领先 `github/main` 1 个提交,尚未推送;需要时只推送 `main`。

@@ -17,6 +17,7 @@
 1. **许可文件职责**
    - `LICENSE`:AGPL-3.0 完整原文,不添加衍生说明或商业限制;
    - `NOTICE`:上游归属、独立衍生声明、上游历史许可与当前许可说明、商业合作说明;
+   - `THIRD_PARTY_NOTICES.md`:第三方组件与素材的许可证原文与归属(如 `client/src/components/ui/` 中基于 shadcn/ui 的 MIT 许可);
    - `CLA.md`:贡献者权利确认、版权保留、按 AGPL 分发的授权范围;
    - `CONTRIBUTING.md`:提交即视为同意 CLA 的流程说明与第三方素材披露要求;
    - `README.md`「License」段:用户视角摘要并链接以上文件。
@@ -36,7 +37,7 @@
 
 ## 相关模块
 
-- `LICENSE`、`NOTICE`、`CLA.md`、`CONTRIBUTING.md`
+- `LICENSE`、`NOTICE`、`THIRD_PARTY_NOTICES.md`、`CLA.md`、`CONTRIBUTING.md`
 - `README.md`「License」与「贡献与反馈」段落
 - 各 workspace `package.json` 的 `license` 字段
 - `server/tests/licensing.test.js` 许可与归属守卫

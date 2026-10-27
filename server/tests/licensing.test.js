@@ -11,7 +11,7 @@ function read(relativePath) {
 }
 
 test("许可文件齐全且 LICENSE 为纯 AGPL-3.0 文本", () => {
-  for (const file of ["LICENSE", "NOTICE", "CLA.md", "CONTRIBUTING.md"]) {
+  for (const file of ["LICENSE", "NOTICE", "THIRD_PARTY_NOTICES.md", "CLA.md", "CONTRIBUTING.md"]) {
     assert.ok(fs.existsSync(path.join(repoRoot, file)), `缺少 ${file}`);
   }
   const license = read("LICENSE");
@@ -44,6 +44,13 @@ test("所有 workspace 包的 license 字段统一为 AGPL-3.0-only", () => {
     const parsed = JSON.parse(read(pkg));
     assert.equal(parsed.license, "AGPL-3.0-only", `${pkg} license 不一致`);
   }
+});
+
+test("基于 shadcn/ui 的 UI 组件保留 MIT 归属", () => {
+  const notices = read("THIRD_PARTY_NOTICES.md");
+  assert.match(notices, /shadcn\/ui/, "必须标注 shadcn/ui 来源");
+  assert.match(notices, /MIT License/, "必须保留 MIT 许可");
+  assert.match(notices, /Copyright \(c\) 2023 shadcn/, "必须保留版权声明");
 });
 
 test("无独立许可归属的第三方 shadcn-ui skill 不回流", () => {
