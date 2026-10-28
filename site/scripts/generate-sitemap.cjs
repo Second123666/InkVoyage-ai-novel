@@ -2,7 +2,7 @@ const fs = require("node:fs");
 const path = require("node:path");
 
 const SITE_ORIGIN = "https://second123666.github.io";
-const SITE_PATH = "/AI-novel";
+const SITE_PATH = "/InkVoyage-ai-novel";
 const SITE_BASE = `${SITE_ORIGIN}${SITE_PATH}/`;
 
 const repoRoot = path.resolve(__dirname, "..", "..");

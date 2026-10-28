@@ -21,7 +21,7 @@ import bookshelfImage from "../../images/v2/微信截图_20260813220328.png";
 import chapterExecutionImage from "../../images/write/章节执行.png";
 import projectSettingsImage from "../../images/write/项目设定.png";
 
-const repoUrl = "https://github.com/Second123666/AI-novel";
+const repoUrl = "https://github.com/Second123666/InkVoyage-ai-novel";
 const releaseUrl = `${repoUrl}/releases/latest`;
 const docsIntroBannerImage = `${import.meta.env.BASE_URL}assets/docs-intro-banner.png`;
 
@@ -158,7 +158,7 @@ function App({ initialPath }: AppProps) {
 }
 
 function SiteNav({ page }: { page: "home" | "docs" }) {
-  const stars = useGithubStars("Second123666", "AI-novel");
+  const stars = useGithubStars("Second123666", "InkVoyage-ai-novel");
   return (
     <nav className="site-nav" aria-label="主导航">
       <a className="brand" href={sitePath("/")} aria-label="墨航 InkVoyage 首页">
@@ -194,7 +194,7 @@ function SiteNav({ page }: { page: "home" | "docs" }) {
 }
 
 function HomePage() {
-  const stars = useGithubStars("Second123666", "AI-novel");
+  const stars = useGithubStars("Second123666", "InkVoyage-ai-novel");
   usePageMeta(null);
   return (
     <>

@@ -61,7 +61,7 @@ function writeDesktopUpdaterConfig() {
   const releaseChannel = (process.env.AI_NOVEL_RELEASE_CHANNEL || "beta").trim().toLowerCase();
   const releaseType = releaseChannel === "beta" ? "prerelease" : "release";
   const owner = (process.env.AI_NOVEL_GITHUB_OWNER || "Second123666").trim();
-  const repo = (process.env.AI_NOVEL_GITHUB_REPO || "AI-novel").trim();
+  const repo = (process.env.AI_NOVEL_GITHUB_REPO || "InkVoyage-ai-novel").trim();
   const updaterCacheDirName = desktopPackage.inkvoyage?.updaterCacheDirName || "inkvoyage-updater";
   const config = [
     "provider: github",

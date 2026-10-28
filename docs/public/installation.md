@@ -6,7 +6,7 @@
 
 普通用户优先使用 GitHub Releases 页面提供的桌面版：
 
-1. 打开 [GitHub Releases](https://github.com/Second123666/AI-novel/releases/latest)。
+1. 打开 [GitHub Releases](https://github.com/Second123666/InkVoyage-ai-novel/releases/latest)。
 2. 下载 Windows 安装包或 portable 包。
 3. 运行应用，进入系统设置。
 4. 配置至少一个可用模型供应商。

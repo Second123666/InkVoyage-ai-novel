@@ -165,7 +165,7 @@ images/   README 与公开文档截图
 
 ## 贡献与反馈
 
-欢迎通过 [GitHub Issues](https://github.com/Second123666/AI-novel/issues) 反馈问题、交流使用体验，或讨论自动导演、章节生产、写法引擎等方向。
+欢迎通过 [GitHub Issues](https://github.com/Second123666/InkVoyage-ai-novel/issues) 反馈问题、交流使用体验，或讨论自动导演、章节生产、写法引擎等方向。
 
 提交 Pull Request 即表示你确认自己有权提交该内容，并已阅读且同意 [CLA.md](./CLA.md)；如果包含第三方代码、素材、AI 生成内容或其他受许可证约束的内容，请在 PR 中明确说明来源和许可证。详见 [CONTRIBUTING.md](./CONTRIBUTING.md)。
 

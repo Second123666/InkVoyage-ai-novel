@@ -13,7 +13,7 @@ function firstNonEmpty(...values) {
 const releaseChannel = firstNonEmpty(process.env.AI_NOVEL_RELEASE_CHANNEL, "beta").toLowerCase();
 const isBetaRelease = releaseChannel === "beta";
 const githubOwner = firstNonEmpty(process.env.AI_NOVEL_GITHUB_OWNER, "Second123666");
-const githubRepo = firstNonEmpty(process.env.AI_NOVEL_GITHUB_REPO, "AI-novel");
+const githubRepo = firstNonEmpty(process.env.AI_NOVEL_GITHUB_REPO, "InkVoyage-ai-novel");
 const productName = desktopPackage.productName;
 const appId = desktopPackage.appId;
 const executableName = desktopPackage.inkvoyage?.executableName || "InkVoyage";

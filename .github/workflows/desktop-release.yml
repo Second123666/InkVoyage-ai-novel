@@ -18,7 +18,7 @@ jobs:
       AI_NOVEL_RELEASE_CHANNEL: release
       AI_NOVEL_ALLOW_UNSIGNED_RELEASE: "true"
       AI_NOVEL_GITHUB_OWNER: Second123666
-      AI_NOVEL_GITHUB_REPO: AI-novel
+      AI_NOVEL_GITHUB_REPO: InkVoyage-ai-novel
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       CSC_LINK: ${{ secrets.WINDOWS_CSC_LINK }}
       CSC_KEY_PASSWORD: ${{ secrets.WINDOWS_CSC_KEY_PASSWORD }}

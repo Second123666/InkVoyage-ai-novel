@@ -7,8 +7,8 @@
 ## Decision
 
 - 产品显示名:**墨航 InkVoyage**;英文场景使用 **InkVoyage**。
-- 自有仓库:`https://github.com/Second123666/AI-novel`;Gitee 镜像:`https://gitee.com/secondkiller/ai-novel`。
-- 公开介绍站:`https://second123666.github.io/AI-novel/`(GitHub Pages,base path `/AI-novel/`)。
+- 自有仓库:`https://github.com/Second123666/InkVoyage-ai-novel`;Gitee 镜像:`https://gitee.com/secondkiller/ai-novel`。
+- 公开介绍站:`https://second123666.github.io/InkVoyage-ai-novel/`(GitHub Pages,base path `/InkVoyage-ai-novel/`)。
 - 上游归属继续保留:NOTICE、README License 段、Ani Book Skill / ani-book-agent 链接保留,并明确标注为「上游作者维护的独立项目」。
 
 ## Current Rule

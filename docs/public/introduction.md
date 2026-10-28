@@ -88,13 +88,13 @@
 
 普通用户优先使用 Windows 桌面版：
 
-- 最新版本页：[GitHub Releases](https://github.com/Second123666/AI-novel/releases/latest)
+- 最新版本页：[GitHub Releases](https://github.com/Second123666/InkVoyage-ai-novel/releases/latest)
 - 建议优先下载安装版。
 - 不想安装时，可以选择 portable 版本直接运行。
 
 源码和项目仓库：
 
-[墨航 InkVoyage](https://github.com/Second123666/AI-novel)
+[墨航 InkVoyage](https://github.com/Second123666/InkVoyage-ai-novel)
 
 ## 下一步阅读
 

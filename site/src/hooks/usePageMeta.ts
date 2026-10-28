@@ -3,7 +3,7 @@ import { useEffect } from "react";
 const DEFAULT_TITLE = "墨航 InkVoyage · 从灵感、趋势或参考作品到整本小说";
 const DEFAULT_DESCRIPTION =
   "从灵感、公开榜单或参考作品开书，让自动导演准备世界、角色和卷章任务，再选择简易创作持续推进或进入专业工作台接管；失败可从已保存进度恢复。";
-const CANONICAL_BASE = "https://second123666.github.io/AI-novel/";
+const CANONICAL_BASE = "https://second123666.github.io/InkVoyage-ai-novel/";
 
 function ensureMeta(selector: string, attribute: "name" | "property", key: string) {
   let element = document.head.querySelector<HTMLMetaElement>(selector);

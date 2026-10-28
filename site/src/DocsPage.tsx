@@ -13,7 +13,7 @@ import { docsManifest, flattenedDocs } from "./docsManifest";
 import { usePageMeta } from "./hooks/usePageMeta";
 import { docsPath, sitePath } from "./routing";
 
-const repoUrl = "https://github.com/Second123666/AI-novel";
+const repoUrl = "https://github.com/Second123666/InkVoyage-ai-novel";
 
 type DocsPageProps = {
   docId?: string;

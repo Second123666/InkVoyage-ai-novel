@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://second123666.github.io/AI-novel/sitemap.xml
+Sitemap: https://second123666.github.io/InkVoyage-ai-novel/sitemap.xml

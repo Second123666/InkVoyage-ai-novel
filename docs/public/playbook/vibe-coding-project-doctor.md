@@ -21,7 +21,7 @@
 .agents/skills/ai-novel-vibe-doctor/SKILL.md
 ```
 
-[查看完整 SKILL.md](https://github.com/Second123666/AI-novel/blob/main/.agents/skills/ai-novel-vibe-doctor/SKILL.md)
+[查看完整 SKILL.md](https://github.com/Second123666/InkVoyage-ai-novel/blob/main/.agents/skills/ai-novel-vibe-doctor/SKILL.md)
 
 ## 完整 SKILL.md 内容
 

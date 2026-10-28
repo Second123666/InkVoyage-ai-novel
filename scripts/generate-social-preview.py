@@ -70,7 +70,7 @@ def main() -> None:
     draw.text((x, 306), "从一句灵感到一本完整长篇小说", font=subtitle_font, fill=CREAM)
     draw.line([(x, 372), (x + 390, 372)], fill=GOLD, width=3)
     draw.text((x, 402), "开书 · 规划 · 章节生产 · 审核修复 · 长篇记忆", font=body_font, fill=(185, 201, 214, 255))
-    draw.text((x, 500), "github.com/Second123666/AI-novel", font=latin_font, fill=(127, 155, 176, 255))
+    draw.text((x, 500), "github.com/Second123666/InkVoyage-ai-novel", font=latin_font, fill=(127, 155, 176, 255))
 
     GITHUB_DIR.mkdir(parents=True, exist_ok=True)
     SITE_ASSETS_DIR.mkdir(parents=True, exist_ok=True)
