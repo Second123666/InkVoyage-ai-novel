@@ -1,0 +1,5 @@
+# Canonical identities for contributor attribution.
+# GitHub reads .mailmap for the repository contributors list and commit
+# attribution, so the maintainer's commits are linked to the account even
+# though early commits used a placeholder address.
+SecondKiller <249055995+Second123666@users.noreply.github.com> Second <Second@.com>
