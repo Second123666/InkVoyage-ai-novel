@@ -48,8 +48,17 @@ jobs:
       - name: Regenerate desktop icon assets
         run: python desktop/scripts/generate-desktop-icons.py
 
-      - name: Typecheck
-        run: pnpm typecheck
+      - name: Typecheck shared
+        run: pnpm --filter @ai-novel/shared build
+
+      - name: Typecheck server
+        run: pnpm --filter @ai-novel/server typecheck
+
+      - name: Typecheck client
+        run: pnpm --filter @ai-novel/client typecheck
+
+      - name: Typecheck desktop
+        run: pnpm --filter @ai-novel/desktop typecheck
 
       - name: Build and stage desktop app
         run: pnpm stage:desktop
