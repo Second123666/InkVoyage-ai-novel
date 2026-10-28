@@ -174,6 +174,41 @@ function githubRequest({ owner, repo, token, method, path: requestPath, body }) 
   });
 }
 
+async function resolveReleaseByTag({ owner, repo, token, tagName }) {
+  try {
+    return await githubRequest({
+      owner,
+      repo,
+      token,
+      method: "GET",
+      path: `/releases/tags/${encodeURIComponent(tagName)}`,
+    });
+  } catch (error) {
+    if (!/failed with 404\b/.test(error.message)) {
+      throw error;
+    }
+
+    // GitHub hides draft releases from the by-tag endpoint; fall back to the
+    // release list (which includes drafts for authenticated tokens).
+    const releases = await githubRequest({
+      owner,
+      repo,
+      token,
+      method: "GET",
+      path: "/releases?per_page=100",
+    });
+    const matched = Array.isArray(releases)
+      ? releases.find((release) => release.tag_name === tagName)
+      : null;
+    if (!matched) {
+      throw error;
+    }
+
+    console.log("[desktop-release-notes] matched draft release from release list.");
+    return matched;
+  }
+}
+
 async function main() {
   const options = parseArgs(process.argv.slice(2));
   if (options.help) {
@@ -208,13 +243,7 @@ async function main() {
     throw new Error("GitHub token is missing. Set GH_TOKEN or GITHUB_TOKEN.");
   }
 
-  const release = await githubRequest({
-    owner,
-    repo,
-    token,
-    method: "GET",
-    path: `/releases/tags/${encodeURIComponent(tagName)}`,
-  });
+  const release = await resolveReleaseByTag({ owner, repo, token, tagName });
 
   await githubRequest({
     owner,

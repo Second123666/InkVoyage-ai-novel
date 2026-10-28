@@ -28,6 +28,9 @@
 - 如果 GitHub Release tag 已存在，不能复用同一个版本重新上传；应继续 bump 到新的 `X.Y.Z`。
 - 如果发版前只更新 release notes 但没有 bump 桌面版本，自动更新链路会把新包识别成旧版本，必须先修正版本源再发布。
 - 如果 GitHub Actions 提示某个 action 仍在使用 Node 20，应优先升级该 action 的 major 版本，而不是重新加入强制运行时环境变量。
+- 不要删除或移动已经推送过的发布 tag:GitHub 会把关联 Release 转为草稿,草稿在未登录访问的 Releases 列表和 `GET /releases/tags/<tag>` 中都不可见,资产下载链接返回 404。版本需要修正时按 bump 规则发新版本,而不是重新指向同一个 tag。
+- 发布说明步骤按 tag 查询 404 时会回退到 Release 列表(含草稿)匹配,避免因为草稿导致流水线最后一步失败;但草稿本身仍需在 Releases 页面手动发布。
+- 仓库改名或迁移后,必须同步 `AI_NOVEL_GITHUB_REPO`、`desktop/electron-builder.config.cjs`、`stage-desktop.cjs` 的默认仓库名、站点 base path 与 canonical,否则更新源、说明脚本和页面链接会指向旧地址。
 
 ## Related Modules
 
