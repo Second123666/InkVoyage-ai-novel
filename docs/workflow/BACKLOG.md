@@ -85,7 +85,7 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 - **桌面身份收尾(LOOP-66)**:桌面 productName/appId/exe/数据目录/更新缓存统一为墨航 InkVoyage;首次启动复制旧数据目录并保留旧目录;桌面/浏览器/站点图标统一为墨帆;版本升至 0.5.0;身份与迁移守卫 10 条;安装器冒烟通过(安装/快捷方式/启动/卸载/重装数据保留)。
 - **素材收尾**:此前清理 23 个未引用 tracked 文件;本轮再删除 13 张旧品牌截图(角色库/知识库/导演模式 5 张 + 自动导演流程截图 8 张),并重做 3 张社交预览;`TASK.md` 重写为当前路线(无私有分支信息)。
 - **文档收尾(LOOP-63)**:删除 1 篇过时计划与 1 篇重复开发指南(独有命令并入 README),docs 文档 161 → 159;`docs/wiki/README.md` 索引由 19 篇补全到 84 篇;全库文档链接与 manifest 校验通过。
-- **合并状态**:`beta` 已合入 `main`(`56152dd6`),`beta` 与 `main` 保持对齐;`gitee` 的 `beta` / `main` 已推送。`github` 推送待网络恢复后补推(`github.com:443` 当时不可达,`api.github.com` 正常);补推时只推 `beta` 与 `main` 两个分支,禁止 `push --all` / `--mirror`。特性分支 `feat/inkvoyage-identity` 已确认合并并删除。
+- **合并状态**:`beta` 已合入 `main`;`gitee` 与 `github` 的 `beta` / `main` 均已推送,四个远端分支与本地对齐;特性分支 `feat/inkvoyage-identity` 已确认合并并删除。
 - **桌面打包验证边界(LOOP-67)**:本机非管理员环境无法创建符号链接,`winCodeSign` 解包失败,完整打包以 GitHub Actions 为准;exe 资源已用 rcedit 手工补验(产品名/版本正确、图标逐像素一致)。排查路径见 `docs/wiki/debugging/desktop-packaging-native-and-codesign.md`。
 - **续跑入口**:新会话读 `PROGRESS.md` 最新 1–2 条 + 本收尾块即可继续;新一轮从 UI-8 尾图或新需求开始。
 
