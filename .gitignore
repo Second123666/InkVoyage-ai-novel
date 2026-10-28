@@ -43,3 +43,5 @@ server/prisma-diff-migrations-to-schema.sql
 .codex-backups/
 .cursor/
 .playwright-mcp/
+
+.superpowers/

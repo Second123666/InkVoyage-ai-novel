@@ -11,6 +11,8 @@ import {
   resolveSuggestedLegacyDatabasePath,
 } from "./runtime/dataImport";
 import { appendDesktopLog, cleanupDesktopLogs, logDesktopError } from "./runtime/logging";
+import { migrateLegacyDesktopDataDir } from "./runtime/dataDirMigration";
+import { DESKTOP_APP_ID, DESKTOP_PRODUCT_NAME } from "./runtime/identity";
 import { resolveDesktopServerPort, startDesktopServer } from "./runtime/server";
 import {
   isPortableDesktopRuntime,
@@ -30,7 +32,7 @@ import {
 import { initializeDesktopUpdater, type DesktopUpdaterController } from "./runtime/updater";
 import { createDesktopLogBundle } from "./runtime/logBundle";
 
-const APP_USER_MODEL_ID = "com.ai-novel.desktop";
+const APP_USER_MODEL_ID = DESKTOP_APP_ID;
 const MAIN_WINDOW_BACKGROUND = "#08101f";
 const BOOTSTRAP_CHANNEL = "desktop:bootstrap-state-changed";
 const UPDATER_CHANNEL = "desktop:updater-state-changed";
@@ -597,8 +599,24 @@ async function handleBootstrapFailure(error: unknown): Promise<void> {
   app.exit(1);
 }
 
+const dataDirMigration = migrateLegacyDesktopDataDir();
+app.setName(DESKTOP_PRODUCT_NAME);
 app.setPath("userData", resolveDesktopAppDataDir());
 app.setAppUserModelId(APP_USER_MODEL_ID);
+
+if (dataDirMigration.migrated) {
+  appendDesktopLog(
+    "desktop.data-migration",
+    `Migrated legacy desktop data from ${dataDirMigration.from} to ${dataDirMigration.to}.`,
+  );
+} else if (dataDirMigration.reason === "failed") {
+  appendDesktopLog(
+    "desktop.data-migration",
+    `Legacy desktop data migration failed: ${dataDirMigration.error ?? "unknown error"}`,
+    "warn",
+  );
+}
+
 registerDesktopIpcHandlers();
 registerStoreBroadcasts();
 

@@ -3,6 +3,7 @@ const { createRequire } = require("node:module");
 const path = require("node:path");
 
 const desktopDir = path.resolve(__dirname, "..");
+const desktopPackage = require(path.join(desktopDir, "package.json"));
 const electronBuilderPackageJson = require.resolve("electron-builder/package.json", { paths: [desktopDir] });
 const electronBuilderRequire = createRequire(electronBuilderPackageJson);
 const asar = electronBuilderRequire("@electron/asar");
@@ -78,6 +79,12 @@ function main() {
   const appPackageJson = JSON.parse(fs.readFileSync(appPackageJsonPath, "utf8"));
   if (appPackageJson.dependencies?.electron) {
     throw new Error("Electron must not be bundled as an application dependency in the staged app.");
+  }
+  if (appPackageJson.productName !== desktopPackage.productName) {
+    throw new Error("Staged desktop productName does not match desktop/package.json.");
+  }
+  if (appPackageJson.appId !== desktopPackage.appId) {
+    throw new Error("Staged desktop appId does not match desktop/package.json.");
   }
 
   const runtimeSource = fs.readFileSync(stagedRuntimeFile, "utf8");

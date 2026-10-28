@@ -38,6 +38,7 @@ Wiki 不记录单次提交改了什么，也不替代 release notes。它只记�
 - [章节身份与规划扩展边界](./architecture/chapter-identity-and-planning-boundary.md)
 - [章节资产增量模块边界(Chapter Artifact Delta)](./architecture/chapter-artifact-delta-module.md)
 - [Novel 应用能力层边界](./architecture/novel-application-services.md)
+- [桌面身份与数据目录迁移](./architecture/desktop-identity-migration.md)
 - [Server Architecture Migration Plan](./architecture/server-architecture-migration-plan.md)
 
 ### Workflows

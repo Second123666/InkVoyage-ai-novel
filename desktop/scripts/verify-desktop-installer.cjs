@@ -3,12 +3,14 @@ const path = require("node:path");
 const { spawn } = require("node:child_process");
 
 const repoRoot = path.resolve(__dirname, "..", "..");
+const desktopPackage = require(path.join(repoRoot, "desktop", "package.json"));
 const distDir = path.join(repoRoot, "desktop", "build", "dist");
 const smokeRoot = path.join(repoRoot, "desktop", "build", "installer-smoke");
 const installDir = path.join(smokeRoot, "install");
 const dataDir = path.join(smokeRoot, "data");
 const markerFile = path.join(dataDir, "retained-marker.txt");
-const expectedExeName = "AI Novel Writing Assistant v2.exe";
+const expectedExeName = `${desktopPackage.inkvoyage?.executableName || "InkVoyage"}.exe`;
+const expectedShortcutName = desktopPackage.inkvoyage?.shortcutName || desktopPackage.productName;
 const desktopShortcutDir = path.join(process.env.USERPROFILE || "", "Desktop");
 const startMenuProgramsDir = path.join(
   process.env.APPDATA || "",
@@ -183,8 +185,8 @@ async function main() {
   console.log(`[verify:desktop:installer] using installer ${installerPath}`);
 
   await installSilently(installerPath);
-  const desktopShortcut = findShortcut(desktopShortcutDir, "AI Novel Writing Assistant");
-  const startMenuShortcut = findShortcut(startMenuProgramsDir, "AI Novel Writing Assistant");
+  const desktopShortcut = findShortcut(desktopShortcutDir, expectedShortcutName);
+  const startMenuShortcut = findShortcut(startMenuProgramsDir, expectedShortcutName);
 
   if (!desktopShortcut) {
     throw new Error("Desktop shortcut was not created by the NSIS installer.");

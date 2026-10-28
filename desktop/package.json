@@ -1,11 +1,23 @@
 {
   "name": "@ai-novel/desktop",
-  "version": "0.4.24",
+  "version": "0.5.0",
   "private": true,
   "license": "AGPL-3.0-only",
   "author": "InkVoyage maintainers",
-  "description": "Windows desktop runtime for InkVoyage",
-  "productName": "AI Novel Writing Assistant v2",
+  "description": "Windows desktop runtime for 墨航 InkVoyage",
+  "productName": "墨航 InkVoyage",
+  "appId": "com.inkvoyage.desktop",
+  "inkvoyage": {
+    "appName": "InkVoyage",
+    "executableName": "InkVoyage",
+    "artifactBaseName": "InkVoyage",
+    "updaterCacheDirName": "inkvoyage-updater",
+    "shortcutName": "墨航 InkVoyage",
+    "legacyAppNames": [
+      "AI-Novel-Writing-Assistant-v2",
+      "AI Novel Writing Assistant v2"
+    ]
+  },
   "main": "dist/main.js",
   "files": [
     "dist"
@@ -14,6 +26,7 @@
     "prepare:runtime": "node scripts/ensure-electron-runtime.cjs --install",
     "verify:runtime": "node scripts/ensure-electron-runtime.cjs",
     "build": "tsc -p tsconfig.json",
+    "test": "pnpm run build && node --test tests/*.test.cjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "dev": "pnpm run prepare:runtime && pnpm run build && electron dist/main.js",
     "start": "pnpm run prepare:runtime && electron dist/main.js"

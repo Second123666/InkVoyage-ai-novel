@@ -4,6 +4,7 @@ const { execSync } = require("node:child_process");
 
 const repoRoot = path.resolve(__dirname, "..", "..");
 const desktopDir = path.resolve(__dirname, "..");
+const desktopPackage = require(path.join(desktopDir, "package.json"));
 const buildDir = path.join(desktopDir, "build");
 const appDir = path.join(buildDir, "app");
 const resourcesDir = path.join(buildDir, "resources");
@@ -61,13 +62,14 @@ function writeDesktopUpdaterConfig() {
   const releaseType = releaseChannel === "beta" ? "prerelease" : "release";
   const owner = (process.env.AI_NOVEL_GITHUB_OWNER || "Second123666").trim();
   const repo = (process.env.AI_NOVEL_GITHUB_REPO || "AI-novel").trim();
+  const updaterCacheDirName = desktopPackage.inkvoyage?.updaterCacheDirName || "inkvoyage-updater";
   const config = [
     "provider: github",
     `owner: ${owner}`,
     `repo: ${repo}`,
     `channel: ${releaseChannel}`,
     `releaseType: ${releaseType}`,
-    "updaterCacheDirName: ai-novel-writing-assistant-v2-updater",
+    `updaterCacheDirName: ${updaterCacheDirName}`,
     "",
   ].join("\n");
   fs.writeFileSync(appUpdateConfigPath, config, "utf8");

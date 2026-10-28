@@ -1,4 +1,5 @@
 const path = require("node:path");
+const desktopPackage = require("./package.json");
 
 function firstNonEmpty(...values) {
   for (const value of values) {
@@ -13,6 +14,11 @@ const releaseChannel = firstNonEmpty(process.env.AI_NOVEL_RELEASE_CHANNEL, "beta
 const isBetaRelease = releaseChannel === "beta";
 const githubOwner = firstNonEmpty(process.env.AI_NOVEL_GITHUB_OWNER, "Second123666");
 const githubRepo = firstNonEmpty(process.env.AI_NOVEL_GITHUB_REPO, "AI-novel");
+const productName = desktopPackage.productName;
+const appId = desktopPackage.appId;
+const executableName = desktopPackage.inkvoyage?.executableName || "InkVoyage";
+const shortcutName = desktopPackage.inkvoyage?.shortcutName || productName;
+const artifactBaseName = desktopPackage.inkvoyage?.artifactBaseName || "InkVoyage";
 const windowsSigningLink = firstNonEmpty(
   process.env.CSC_LINK,
   process.env.WIN_CSC_LINK,
@@ -34,8 +40,9 @@ if (!isBetaRelease && !hasWindowsSigningMaterial && !allowUnsignedRelease) {
 }
 
 module.exports = {
-  appId: "com.ai-novel.desktop",
-  productName: "AI Novel Writing Assistant v2",
+  appId,
+  productName,
+  executableName,
   directories: {
     app: "build/app",
     output: "build/dist",
@@ -96,7 +103,8 @@ module.exports = {
     ],
   },
   nsis: {
-    artifactName: "${productName}-${version}-setup-${arch}.${ext}",
+    artifactName: `${artifactBaseName}-\${version}-setup-\${arch}.\${ext}`,
+    shortcutName,
     oneClick: false,
     perMachine: false,
     allowToChangeInstallationDirectory: true,
@@ -110,6 +118,6 @@ module.exports = {
     installerHeaderIcon: builderIconPath,
   },
   portable: {
-    artifactName: "${productName}-${version}-portable-${arch}.${ext}",
+    artifactName: `${artifactBaseName}-\${version}-portable-\${arch}.\${ext}`,
   },
 };

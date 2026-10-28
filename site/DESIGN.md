@@ -1,4 +1,4 @@
-# AI Novel Editorial Console Design
+# InkVoyage Editorial Console Design
 
 ## Design Goal
 

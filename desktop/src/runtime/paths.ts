@@ -1,8 +1,9 @@
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { DESKTOP_APP_NAME, DESKTOP_LEGACY_APP_NAMES } from "./identity";
 
-const APP_NAME = "AI-Novel-Writing-Assistant-v2";
+const APP_NAME = DESKTOP_APP_NAME;
 const PORTABLE_DATA_SUFFIX = "-data";
 
 export interface DesktopRuntimeConfig {
@@ -15,14 +16,18 @@ export interface DesktopRuntimeConfig {
   updateChannel: string;
 }
 
-function resolvePortableDesktopAppDataDir(): string | null {
+function resolvePortableDesktopAppDataDirForName(appName: string): string | null {
   const portableExecutableDir = process.env.PORTABLE_EXECUTABLE_DIR?.trim();
   if (!portableExecutableDir) {
     return null;
   }
 
+  return path.join(portableExecutableDir, `${appName}${PORTABLE_DATA_SUFFIX}`);
+}
+
+function resolvePortableDesktopAppDataDir(): string | null {
   const portableAppName = process.env.PORTABLE_EXECUTABLE_APP_FILENAME?.trim() || APP_NAME;
-  return path.join(portableExecutableDir, `${portableAppName}${PORTABLE_DATA_SUFFIX}`);
+  return resolvePortableDesktopAppDataDirForName(portableAppName);
 }
 
 export function isPortableDesktopRuntime(): boolean {
@@ -55,6 +60,31 @@ export function resolveDesktopAppDataDir(): string {
   }
 
   return path.join(os.homedir(), `.${APP_NAME}`);
+}
+
+export function resolveDesktopLegacyAppDataDirs(): string[] {
+  const dirs = new Set<string>();
+  const localAppData = process.env.LOCALAPPDATA?.trim();
+  const appData = process.env.APPDATA?.trim();
+
+  for (const legacyName of DESKTOP_LEGACY_APP_NAMES) {
+    const portableDir = resolvePortableDesktopAppDataDirForName(legacyName);
+    if (portableDir) {
+      dirs.add(portableDir);
+    }
+    if (localAppData) {
+      dirs.add(path.join(localAppData, legacyName));
+    }
+    if (appData) {
+      dirs.add(path.join(appData, legacyName));
+    }
+    if (process.platform === "darwin") {
+      dirs.add(path.join(os.homedir(), "Library", "Application Support", legacyName));
+    }
+    dirs.add(path.join(os.homedir(), `.${legacyName}`));
+  }
+
+  return [...dirs];
 }
 
 export function resolveDesktopLogsDir(): string {
