@@ -22,14 +22,14 @@
 - **类别**: 开源就绪 / 桌面打包
 - **背景**: 公开前剩余旧技术标识(productName/appId/exe/数据目录/更新缓存)和图标;所有者确认切换为「墨航 InkVoyage」,并接受新旧版本并排安装。
 - **改动**:
-  1. **身份配置**:`desktop/package.json` 升至 `0.5.0`,`productName` = `墨航 InkVoyage`,`appId` = `com.inkvoyage.desktop`,新增 `inkvoyage.*` 统一配置;`electron-builder.config.cjs` 从统一配置读取,exe/安装包用 ASCII `InkVoyage`,快捷方式显示「墨航 InkVoyage」;`stage-desktop.cjs`、`verify-desktop-installer.cjs`、`verify-desktop-package.cjs` 同步;
+  1. **身份配置**:`desktop/package.json` 升至 `0.5.0`,`productName` = `墨航 InkVoyage`,`appId` = `com.inkvoyage.desktop`,新增 `inkvoyage.*` 统一配置;`electron-builder.config.cjs` 从统一配置读取,exe/安装包用 ASCII `InkVoyage`,快捷方式显示「墨航 InkVoyage」,`extraMetadata.name=inkvoyage` 让更新缓存落到 `inkvoyage-updater`,并关闭安装后自动启动;`stage-desktop.cjs`、`verify-desktop-installer.cjs`、`verify-desktop-package.cjs` 同步;
   2. **数据迁移**:新增 `desktop/src/runtime/identity.ts` 与 `dataDirMigration.ts`;`paths.ts` 的 `APP_NAME` 改为 `InkVoyage`,`server/src/runtime/appPaths.ts` 同步;首次启动用 staging 目录复制旧数据并保留旧目录,新目录非空跳过,失败不阻塞;
   3. **图标**:重写 `generate-desktop-icons.py` 生成「墨帆」全尺寸 PNG/ICO(小尺寸简化版),同步客户端、站点和 `site/src/assets`;新增 `generate-social-preview.py` 重做 GitHub/站点社交预览;
-  4. **守卫**:新增 `server/tests/desktopIdentity.test.js`(5 条)与 `desktop/tests/dataDirMigration.test.cjs`(5 条),锁定身份、迁移、图标产物;
+  4. **守卫**:新增 `server/tests/desktopIdentity.test.js`(5 条)与 `desktop/tests/dataDirMigration.test.cjs`(5 条),锁定身份、迁移、图标产物;安装器冒烟脚本改用无空格测试目录、移除 `ELECTRON_RUN_AS_NODE`、不预先创建安装目录并在结束时清理;
   5. **文档**:品牌 wiki、桌面身份迁移 wiki、release notes / README(2026-10-28)、BACKLOG/PROGRESS。
-- **验证**:`node --test server/tests/licensing.test.js server/tests/desktopIdentity.test.js` **12/12**;`pnpm --filter @ai-novel/desktop test` **5/5**;`pnpm check:docs-manifest` 通过;`pnpm --filter @ai-novel/site build` 通过(37 路由);`pnpm --filter @ai-novel/client build` 通过;`pnpm build:desktop:all` + `node desktop/scripts/stage-desktop.cjs` 通过,暂存包 `productName=墨航 InkVoyage`、`appId=com.inkvoyage.desktop`、`executableName=InkVoyage`、`updaterCacheDirName=inkvoyage-updater`。
+- **验证**:`node --test server/tests/licensing.test.js server/tests/desktopIdentity.test.js` **12/12**;`pnpm --filter @ai-novel/desktop test` **5/5**;`pnpm check:docs-manifest` 通过;`pnpm --filter @ai-novel/site build` 通过(37 路由);`pnpm --filter @ai-novel/client build` 通过;`pnpm build:desktop:all` + `node desktop/scripts/stage-desktop.cjs` 通过,暂存包 `productName=墨航 InkVoyage`、`appId=com.inkvoyage.desktop`、`executableName=InkVoyage`、`updaterCacheDirName=inkvoyage-updater`;`node desktop/scripts/verify-desktop-package.cjs` 通过;NSIS `InkVoyage-0.5.0-setup-x64.exe` 构建成功,`verify-desktop-installer.cjs` 完成安装/快捷方式/启动/卸载/重装数据保留验证并通过,测试目录与快捷方式已清理。
 - **发布说明**:已记 release-notes/README(2026-10-28)。
-- **遗留**:未运行 electron-builder 安装包/安装器冒烟(本轮中断了 `verify:desktop-package`);发布前需补跑 `pnpm verify:desktop-package` 或 `pnpm verify:desktop:installer`,验证 exe、快捷方式、安装路径和卸载保留数据。`appId` 变化意味着新旧版本并排安装;`@ai-novel/*`、`AI_NOVEL_*`、数据库文件名与 Qdrant collection 按约定保持兼容。
+- **遗留**:当前环境缺少 Windows 符号链接权限,electron-builder 解压 `winCodeSign` 失败;安装器验证使用 `--config.win.signAndEditExecutable=false` 构建,因此 exe 资源编辑(图标/版本信息/签名)未在安装器中实际验证。发布前建议在开启 Developer Mode 或管理员终端下补跑 `pnpm verify:desktop:installer`(不传 override)。`appId` 变化意味着新旧版本并排安装;`@ai-novel/*`、`AI_NOVEL_*`、数据库文件名与 Qdrant collection 按约定保持兼容。
 - **下一步**:合并到 `beta` 做安装/升级验证。
 
 ## 2026-10-26 · LOOP-65 · 公开前许可与旧品牌素材清理

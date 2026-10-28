@@ -192,6 +192,7 @@ images/   README 与公开文档截图
 
 - 桌面版统一使用「墨航 InkVoyage」应用身份：安装包、快捷方式、数据目录和图标更新为新品牌；首次启动会自动复制旧版本地数据，旧数据保留。
 - Windows 安装包和便携版使用 InkVoyage 文件名，桌面与开始菜单快捷方式显示「墨航 InkVoyage」。
+- 安装完成后从桌面或开始菜单启动，安装过程不会自动打开应用。
 - 桌面、浏览器和项目介绍站统一使用新的「墨帆」图标。
 
 完整历史更新见 [docs/releases/release-notes.md](./docs/releases/release-notes.md)。

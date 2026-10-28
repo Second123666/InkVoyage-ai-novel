@@ -1,11 +1,17 @@
 const fs = require("node:fs");
+const os = require("node:os");
 const path = require("node:path");
 const { spawn } = require("node:child_process");
 
 const repoRoot = path.resolve(__dirname, "..", "..");
 const desktopPackage = require(path.join(repoRoot, "desktop", "package.json"));
 const distDir = path.join(repoRoot, "desktop", "build", "dist");
-const smokeRoot = path.join(repoRoot, "desktop", "build", "installer-smoke");
+// Keep the smoke install path free of spaces. NSIS `/D=` is parsed as the
+// remaining command line; a space-containing path makes the silent installer
+// exit with a Windows access-violation status on some Windows builds.
+const smokeRoot = process.platform === "win32"
+  ? path.join(path.parse(repoRoot).root, "inkvoyage-installer-smoke")
+  : path.join(os.tmpdir(), "inkvoyage-installer-smoke");
 const installDir = path.join(smokeRoot, "install");
 const dataDir = path.join(smokeRoot, "data");
 const markerFile = path.join(dataDir, "retained-marker.txt");
@@ -27,6 +33,10 @@ function ensureCleanDir(targetDir) {
 
 function ensureDir(targetDir) {
   fs.mkdirSync(targetDir, { recursive: true });
+}
+
+function ensureAbsentDir(targetDir) {
+  fs.rmSync(targetDir, { recursive: true, force: true });
 }
 
 function findNewestMatchingFile(directory, predicate) {
@@ -132,14 +142,19 @@ async function killProcessTree(pid) {
 }
 
 async function launchInstalledApp(installedExePath) {
+  const env = {
+    ...process.env,
+    AI_NOVEL_APP_DATA_DIR: dataDir,
+  };
+  // Codex/Claude shells can set this globally; it would make the Electron
+  // binary run as plain Node and exit before the desktop app boots.
+  delete env.ELECTRON_RUN_AS_NODE;
+
   const child = spawn(installedExePath, [], {
     cwd: installDir,
     windowsHide: false,
     detached: false,
-    env: {
-      ...process.env,
-      AI_NOVEL_APP_DATA_DIR: dataDir,
-    },
+    env,
     stdio: "ignore",
   });
 
@@ -152,7 +167,10 @@ async function launchInstalledApp(installedExePath) {
 }
 
 async function installSilently(installerPath) {
-  ensureCleanDir(installDir);
+  // Let NSIS create the destination directory itself. Pre-creating an empty
+  // custom install directory triggers an access-violation exit on some NSIS
+  // builds when `/D=` is used.
+  ensureAbsentDir(installDir);
   ensureDir(dataDir);
   await spawnAndWait(installerPath, ["/S", `/D=${installDir}`], {
     cwd: distDir,
@@ -219,7 +237,13 @@ async function main() {
   console.log(`[verify:desktop:installer] desktop shortcut: ${desktopShortcut}`);
   console.log(`[verify:desktop:installer] start menu shortcut: ${startMenuShortcut}`);
   console.log(`[verify:desktop:installer] retained data directory: ${dataDir}`);
-  console.log("[verify:desktop:installer] silent install/uninstall/reinstall verification passed.");
+
+  await uninstallSilently();
+  if (findShortcut(desktopShortcutDir, expectedShortcutName) || findShortcut(startMenuProgramsDir, expectedShortcutName)) {
+    throw new Error("Uninstall did not remove the desktop/start-menu shortcuts.");
+  }
+  fs.rmSync(smokeRoot, { recursive: true, force: true });
+  console.log("[verify:desktop:installer] silent install/uninstall/reinstall verification passed; smoke artifacts cleaned.");
 }
 
 main().catch((error) => {

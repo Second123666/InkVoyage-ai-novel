@@ -75,6 +75,9 @@ module.exports = {
   npmRebuild: true,
   nativeRebuilder: "sequential",
   extraMetadata: {
+    // Keep the packaged app name ASCII so electron-builder derives the same
+    // updater cache directory as stage-desktop.cjs (inkvoyage-updater).
+    name: "inkvoyage",
     main: "dist/main.js",
   },
   publish: [
@@ -112,7 +115,9 @@ module.exports = {
     createDesktopShortcut: true,
     createStartMenuShortcut: true,
     deleteAppDataOnUninstall: false,
-    runAfterFinish: true,
+    // Keep first launch explicit: silent installer verification and managed
+    // deployments should not open the app with an unintended user-data dir.
+    runAfterFinish: false,
     installerIcon: builderIconPath,
     uninstallerIcon: builderIconPath,
     installerHeaderIcon: builderIconPath,

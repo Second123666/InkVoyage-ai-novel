@@ -34,6 +34,8 @@ test("electron-builder 从统一身份配置读取桌面标识", () => {
   assert.match(config, /desktopPackage\.appId/);
   assert.match(config, /desktopPackage\.inkvoyage\?\.executableName/);
   assert.match(config, /desktopPackage\.inkvoyage\?\.shortcutName/);
+  assert.match(config, /name: "inkvoyage"/);
+  assert.match(config, /runAfterFinish: false/);
   assert.doesNotMatch(config, /AI Novel Writing Assistant v2/);
   assert.doesNotMatch(config, /com\.ai-novel\.desktop/);
 });
@@ -68,7 +70,12 @@ test("打包、更新缓存与安装器校验使用新标识", () => {
   const installer = read("desktop/scripts/verify-desktop-installer.cjs");
   assert.match(installer, /desktopPackage\.inkvoyage\?\.executableName/);
   assert.match(installer, /expectedShortcutName/);
+  assert.match(installer, /delete env\.ELECTRON_RUN_AS_NODE/);
   assert.doesNotMatch(installer, /AI Novel Writing Assistant v2\.exe/);
+
+  const packageVerifier = read("desktop/scripts/verify-desktop-package.cjs");
+  assert.match(packageVerifier, /app-update\.yml/);
+  assert.match(packageVerifier, /updaterCacheDirName: inkvoyage-updater/);
 });
 
 test("图标源与生成产物齐全", () => {

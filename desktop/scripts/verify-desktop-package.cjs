@@ -30,6 +30,7 @@ const stagedClientIndex = path.join(buildDir, "resources", "client", "dist", "in
 const unpackedClientIndex = path.join(unpackedDir, "resources", "client", "dist", "index.html");
 const unpackedAppArchive = path.join(unpackedDir, "resources", "app.asar");
 const unpackedWindowIcon = path.join(unpackedDir, "resources", "icons", "app-icon.ico");
+const unpackedAppUpdateConfig = path.join(unpackedDir, "resources", "app-update.yml");
 const stagedRuntimeFile = path.join(appDir, "dist", "runtime", "server.js");
 
 function assertExists(targetPath, description) {
@@ -67,6 +68,7 @@ function main() {
   assertExists(unpackedClientIndex, "packaged renderer index");
   assertExists(unpackedAppArchive, "packaged app archive");
   assertExists(unpackedWindowIcon, "packaged desktop window icon");
+  assertExists(unpackedAppUpdateConfig, "packaged updater feed configuration");
   assertExists(stagedRuntimeFile, "desktop runtime server bundle");
   assertNotExists(path.join(appDir, "src"), "desktop source directory inside staged app");
   assertNotExists(path.join(appDir, "node_modules", "electron"), "Electron runtime inside staged app node_modules");
@@ -98,6 +100,10 @@ function main() {
   const updaterConfigSource = fs.readFileSync(stagedAppUpdateConfig, "utf8");
   if (!updaterConfigSource.includes("provider: github")) {
     throw new Error("Desktop updater feed configuration is missing the GitHub provider.");
+  }
+  const unpackedUpdaterConfigSource = fs.readFileSync(unpackedAppUpdateConfig, "utf8");
+  if (!unpackedUpdaterConfigSource.includes("updaterCacheDirName: inkvoyage-updater")) {
+    throw new Error("Packaged updater cache directory must be inkvoyage-updater.");
   }
 
   const packagedFiles = new Set(asar.listPackage(unpackedAppArchive).map((entry) => entry.replace(/^\\/, "").replace(/\\/g, "/")));

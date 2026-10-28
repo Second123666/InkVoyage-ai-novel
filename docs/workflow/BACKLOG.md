@@ -82,7 +82,7 @@ ID 规则:`FEAT` 残缺功能收束 · `INN` 创新 · `RF` 重构 · `UI` 前�
 - **转公开前置(2026-10-26)**:本地许可与素材清理已完成(LOOP-65);远端 GitHub 的 67 个上游旧 tag 已删除并复核为 0(删除前清单见 `.logs/github-tags-before-delete-2026-10-26.txt`);剩余需在 GitHub 页面核对并删除旧 Releases,再切换仓库可见性;只推 `main`(红线:绝不 `push --all` / `--mirror`)。
 - **归属收尾(LOOP-62)**:sitemap/prerender 生成器、LICENSE/CLA/CONTRIBUTING 标题、桌面构建默认 owner/repo 已统一;README 上游捐赠/QQ 群段已移除,改为 GitHub Issues;上游版权与 AGPL 归属按许可证保留。
 - **许可收尾(LOOP-65)**:LICENSE 回归纯 AGPL-3.0 原文;NOTICE 改为正式署名与上游历史许可说明;CLA/CONTRIBUTING 去掉商业再许可承诺;`THIRD_PARTY_NOTICES.md` 补 shadcn/ui UI 组件 MIT 归属;删除无独立许可归属的 shadcn-ui skill 与 `skills-lock.json`;许可守卫扩至 7 条。
-- **桌面身份收尾(LOOP-66)**:桌面 productName/appId/exe/数据目录/更新缓存统一为墨航 InkVoyage;首次启动复制旧数据目录并保留旧目录;桌面/浏览器/站点图标统一为墨帆;版本升至 0.5.0;身份与迁移守卫 10 条。
+- **桌面身份收尾(LOOP-66)**:桌面 productName/appId/exe/数据目录/更新缓存统一为墨航 InkVoyage;首次启动复制旧数据目录并保留旧目录;桌面/浏览器/站点图标统一为墨帆;版本升至 0.5.0;身份与迁移守卫 10 条;安装器冒烟通过(安装/快捷方式/启动/卸载/重装数据保留)。
 - **素材收尾**:此前清理 23 个未引用 tracked 文件;本轮再删除 13 张旧品牌截图(角色库/知识库/导演模式 5 张 + 自动导演流程截图 8 张),并重做 3 张社交预览;`TASK.md` 重写为当前路线(无私有分支信息)。
 - **文档收尾(LOOP-63)**:删除 1 篇过时计划与 1 篇重复开发指南(独有命令并入 README),docs 文档 161 → 159;`docs/wiki/README.md` 索引由 19 篇补全到 84 篇;全库文档链接与 manifest 校验通过。
 - **推送状态**:桌面身份切换在 `feat/inkvoyage-identity` 分支完成,尚未推送/合并;合并前先在 `beta` 做安装与迁移验证。
