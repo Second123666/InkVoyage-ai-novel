@@ -102,6 +102,7 @@ Wiki 不记录单次提交改了什么，也不替代 release notes。它只记�
 - [章节可靠性隔离验证](./debugging/chapter-reliability-isolated-tests.md)
 - [重复故障模式与排查路径](./debugging/recurring-failure-modes.md)
 - [LLM 限速器内存泄漏与淘汰机制](./debugging/llm-request-limiter-memory-leak.md)
+- [桌面打包:原生模块 ABI 与 winCodeSign 权限](./debugging/desktop-packaging-native-and-codesign.md)
 
 ### Product
 

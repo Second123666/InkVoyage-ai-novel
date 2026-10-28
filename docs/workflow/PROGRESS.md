@@ -17,6 +17,26 @@
 
 ---
 
+## 2026-10-28 · LOOP-67 · beta 集成验证
+
+- **类别**: 发布准备 / 验证
+- **目标**: 在 `beta` 分支完成集成验证,确认桌面身份切换版本可以进入 `main`。
+- **范围确认**: `beta`(`7648c578`)= `main`(`6b117eb9`)+ 身份切换 4 个提交;相对已通过验证的 `e2f19c8f` 只多 BACKLOG/PROGRESS 各 1 行,业务代码一致。
+- **改动**:
+  1. **环境修复**:打包时 electron-builder 把 `better-sqlite3` 重建为 Electron 35 ABI(133),导致 Node 24(137)下 server 测试全量 `ERR_DLOPEN_FAILED`;用 `prebuild-install -r node` 恢复 Node ABI 后测试恢复;
+  2. **验证记录**:新增 `docs/wiki/debugging/desktop-packaging-native-and-codesign.md`,记录 ABI 来回切换与 `winCodeSign` 符号链接权限两类故障的成因、排查步骤与本地补验方法;`docs/wiki/README.md` 补索引。
+- **验证**:
+  - server fast 套件 **1492 例 / 1480 过 / 0 失败 / 12 跳过**;
+  - `pnpm --filter @ai-novel/desktop test` **5/5**(含构建);
+  - `pnpm run typecheck`(shared / server / client / desktop)通过;
+  - `pnpm run check:docs-manifest` 通过(35 篇公开文档);
+  - 生产配置打包:在 `app-builder.exe rcedit` 阶段因 `winCodeSign` 内 macOS 符号链接无创建权限而中断(`toolsets.winCodeSign=1.1.0` 无效,该下载在 app-builder 内部触发);手工用缓存 `rcedit-x64.exe` 对 `win-unpacked/InkVoyage.exe` 补资源后,`ProductName=墨航 InkVoyage`、`FileDescription=墨航 InkVoyage`、`ProductVersion=0.5.0`,exe 图标与 `app-icon.ico` 32×32 帧逐像素一致(RMSE 0);
+  - 复用 `e2f19c8f` 上同一份代码的既有结果:client 构建、site 构建(37 路由)、`verify-desktop-package`(带 `signAndEditExecutable=false` 覆盖)、NSIS 安装器冒烟(安装/快捷方式/启动/卸载/重装数据保留)均通过;`beta` 相对该提交未改业务代码。
+- **结论**:`beta` 代码可通过验证并进入 `main`;带 exe 资源的完整打包以 GitHub Actions(管理员权限)为准,`desktop-release.yml` / `desktop-beta-release.yml` 已覆盖。
+- **发布说明**:本轮为内部验证与文档,无用户可见变化,跳过 release notes。
+- **遗留**:本机非管理员环境无法完成带 exe 资源编辑的完整打包,发布前以 CI 打包结果为准。
+- **下一步**:`beta` 合入 `main`;桌面发布使用 `v0.5.0` 并核对 `desktop/package.json`。
+
 ## 2026-10-28 · LOOP-66 · 桌面身份与图标切换为墨航 InkVoyage
 
 - **类别**: 开源就绪 / 桌面打包
