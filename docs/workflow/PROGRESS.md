@@ -30,7 +30,7 @@
 - **验证**:`node --test server/tests/licensing.test.js server/tests/desktopIdentity.test.js` **12/12**;`pnpm --filter @ai-novel/desktop test` **5/5**;`pnpm check:docs-manifest` 通过;`pnpm --filter @ai-novel/site build` 通过(37 路由);`pnpm --filter @ai-novel/client build` 通过;`pnpm build:desktop:all` + `node desktop/scripts/stage-desktop.cjs` 通过,暂存包 `productName=墨航 InkVoyage`、`appId=com.inkvoyage.desktop`、`executableName=InkVoyage`、`updaterCacheDirName=inkvoyage-updater`;`node desktop/scripts/verify-desktop-package.cjs` 通过;NSIS `InkVoyage-0.5.0-setup-x64.exe` 构建成功,`verify-desktop-installer.cjs` 完成安装/快捷方式/启动/卸载/重装数据保留验证并通过,测试目录与快捷方式已清理。
 - **发布说明**:已记 release-notes/README(2026-10-28)。
 - **遗留**:当前环境缺少 Windows 符号链接权限,electron-builder 解压 `winCodeSign` 失败;安装器验证使用 `--config.win.signAndEditExecutable=false` 构建,因此 exe 资源编辑(图标/版本信息/签名)未在安装器中实际验证。发布前建议在开启 Developer Mode 或管理员终端下补跑 `pnpm verify:desktop:installer`(不传 override)。`appId` 变化意味着新旧版本并排安装;`@ai-novel/*`、`AI_NOVEL_*`、数据库文件名与 Qdrant collection 按约定保持兼容。
-- **下一步**:合并到 `beta` 做安装/升级验证。
+- **下一步**:`beta` 已推送到 GitHub/Gitee,在 `beta` 做集成验证后再合入 `main`。
 
 ## 2026-10-26 · LOOP-65 · 公开前许可与旧品牌素材清理
 
