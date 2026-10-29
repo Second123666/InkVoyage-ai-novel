@@ -4,6 +4,11 @@ Upstream project:
   AI-Novel-Writing-Assistant
   Copyright 2026 ExplosiveCoderflome and contributors
 
+  Upstream code is primarily authored by wnagchi (1214 commits) and
+  ExplosiveCoderflome (39 commits), with contributions from 735140144,
+  ystyleb, lawyer112 and others. See the upstream contributors page:
+  https://github.com/ExplosiveCoderflome/AI-Novel-Writing-Assistant/graphs/contributors
+
 This repository is an independently maintained derivative of the upstream
 "AI-Novel-Writing-Assistant" project. Upstream copyright notices and license
 terms are preserved. Modifications and new contributions made in this
